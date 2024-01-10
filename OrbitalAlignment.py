@@ -20,8 +20,8 @@ def OrbitalAlignment(A,B,epsilon,diagmat=True,diagmis=True):
     I=np.zeros([q,n])
     for i in range(min(q,n)):
         I[i,i]=1.
-    U,Sigma,VH=np.linalg.svd((B.conj().T@A).T@I)
-    X=(U@VH).conj()
+    U,Sigma,VH=np.linalg.svd((B.conj().T@A).conj().T@I)
+    X=U@VH
 
     E=np.zeros(n)
     Y=np.eye(n,dtype='complex128')
