@@ -184,9 +184,6 @@ def CompareQeWF(wf1,wf2): # Comparing the two QeWaveFunction objects.
     print("evc",evc)
 
 
-
-
-
 if __name__=='__main__':
     # Checking whether parsing and exporting is correct.
     from sys import argv
@@ -194,5 +191,3 @@ if __name__=='__main__':
     wf1.Export(argv[2]) # Exporting it to another *.save folder.
     wf2=QeWaveFunction(argv[2]) # Reading the two wfc*.dat file and checking whether they are the same.
     CompareQeWF(wf1,wf2)
-
-
