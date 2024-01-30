@@ -32,7 +32,7 @@ class MwfnOrbital:
 
 class MultiWaveFunction:
 
-    Info=None
+    Info=""
 
     # Field 1
     Wfntype=None
@@ -309,17 +309,31 @@ class MultiWaveFunction:
             n+=len(shell.Exponents)
         return n
 
-    def getShellIndexByCenter(self):
+    def getShellIndexByCenter(self,centers=-1):
         indices=[]
-        for center in self.Centers:
+        if centers==-1:
+            for center in self.Centers:
+                indices.append(self.getShellIndexByCenter(center))
+            return indices
+        elif type(centers) is list:
+            for center in centers:
+                indices.append(self.getShellIndexByCenter(center))
+            return indices
+        else:
+            assert type(centers) is MwfnCenter or int
+            thiscenter=None
+            if type(centers) is MwfnCenter:
+                assert centers in self.Centers
+                thiscenter=centers
+            else:
+                thiscenter=self.Centers[centers]
             ishell=0
-            theseindices=[]
             for shell in self.Shells:
-                if shell.Center is center:
-                    theseindices.append(ishell)
+                if shell.Center is thiscenter:
+                    indices.append(ishell)
                 ishell+=1
-            indices.append(theseindices)
         return indices
+
 
     def getBasisIndexByCenter(self,centers=-1):
         indices=[]
@@ -349,17 +363,50 @@ class MultiWaveFunction:
                     ibasis+=shell.getSize()
         return indices
 
-    def getBasisIndexByShell(self):
+    def getBasisIndexByShell(self,shells=-1):
         indices=[]
-        ibasis=0
-        for shell in self.Shells:
-            theseindices=[]
-            for i in range(shell.getSize()):
-                theseindices.append(ibasis)
-                ibasis+=1
-            indices.append(theseindices)
-        return indices
+        if shells==-1:
+            for shell in self.Shells:
+                indices.append(self.getBasisIndexByShell(shell))
+            return indices
+        elif type(shells) is list:
+            for shell in shells:
+                indices.append(self.getBasisIndexByShell(shell))
+            return indices
+        else:
+            assert type(shells) is MwfnShell or int
+            thisshell=None
+            if type(shells) is MwfnShell:
+                assert shells in self.Shells
+                thisshell=shells
+            else:
+                thisshell=self.Shells[shells]
+            ibasis=0
+            for shell in self.Shells:
+                for i in range(shell.getSize()):
+                    if thisshell==shell:
+                        indices.append(ibasis)
+                    ibasis+=1
+            return indices
 
+    def getCoefficientMatrix(self):
+        matrix=np.zeros([self.getNumBasis(),self.getNumBasis()])
+        for orbital,iorbital in zip(self.Orbitals,range(len(self.Orbitals))):
+            matrix[:,iorbital]=orbital.Coeff
+        return matrix
+
+    def setCoefficientMatrix(self,matrix):
+        assert matrix.shape==(self.getNumBasis(),len(self.Orbitals))
+        for orbital,iorbital in zip(self.Orbitals,range(len(self.Orbitals))):
+            orbital.Coeff=matrix[:,iorbital]
+
+    def getOccupation(self):
+        return [orbital.Occ for orbital in self.Orbitals]
+
+    def setOccupation(self,occupations):
+        assert len(occupations)==len(self.Orbitals)
+        for iorbital in range(len(self.Orbitals)):
+            self.Orbitals[iorbital].Occ=occupations[iorbital]
 
     def Export(self,filename):
 
