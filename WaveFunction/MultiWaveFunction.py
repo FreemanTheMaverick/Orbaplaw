@@ -400,6 +400,14 @@ class MultiWaveFunction:
         for orbital,iorbital in zip(self.Orbitals,range(len(self.Orbitals))):
             orbital.Coeff=matrix[:,iorbital]
 
+    def getEnergy(self):
+        return [orbital.Energy for orbital in self.Orbitals]
+
+    def setEnergy(self,energies):
+        assert len(energies)==len(self.Orbitals)
+        for iorbital in range(len(self.Orbitals)):
+            self.Orbitals[iorbital].Energy=energies[iorbital]
+
     def getOccupation(self):
         return [orbital.Occ for orbital in self.Orbitals]
 
