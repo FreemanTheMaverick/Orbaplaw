@@ -107,9 +107,9 @@ class MultiWaveFunction:
                 elif "Wfntype=" in line:
                     self.Wfntype=int(value)
                 elif "Naelec=" in line: # Charge is inferred from Naelec, Nbelec and nuclear charges of centers.
-                    self.Naelec=int(value)
+                    self.Naelec=int(float(value))
                 elif "Nbelec=" in line:
-                    self.Nbelec=int(value)
+                    self.Nbelec=int(float(value))
                 elif "E_tot=" in line:
                     self.E_tot=float(value)
                 elif "VT_ratio=" in line:
@@ -507,13 +507,18 @@ class MultiWaveFunction:
 
             # Field 5
             f.write("\n\n# Matrices\n")
-            f.write("$Total density matrix, dim= "+str(self.Total_density_matrix.shape[0])+" "+str(self.Total_density_matrix.shape[1])+" lower= 1\n")
-            PrintMatrix(f,self.Total_density_matrix,True)
-            f.write("$1-e Hamiltonian matrix, dim= "+str(self.Hamiltonian_matrix.shape[0])+" "+str(self.Hamiltonian_matrix.shape[1])+" lower= 1\n")
-            PrintMatrix(f,self.Hamiltonian_matrix,True)
-            f.write("$Overlap matrix, dim= "+str(self.Overlap_matrix.shape[0])+" "+str(self.Overlap_matrix.shape[1])+" lower= 1\n")
-            PrintMatrix(f,self.Overlap_matrix,True)
-            f.write("$Kinetic energy matrix, dim= "+str(self.Kinetic_energy_matrix.shape[0])+" "+str(self.Kinetic_energy_matrix.shape[1])+" lower= 1\n")
-            PrintMatrix(f,self.Kinetic_energy_matrix,True)
-            f.write("$Potential energy matrix, dim= "+str(self.Potential_energy_matrix.shape[0])+" "+str(self.Potential_energy_matrix.shape[1])+" lower= 1\n")
-            PrintMatrix(f,self.Potential_energy_matrix,True)
+            if self.Total_density_matrix is not None:
+                f.write("$Total density matrix, dim= "+str(self.Total_density_matrix.shape[0])+" "+str(self.Total_density_matrix.shape[1])+" lower= 1\n")
+                PrintMatrix(f,self.Total_density_matrix,True)
+            if self.Hamiltonian_matrix is not None:
+                f.write("$1-e Hamiltonian matrix, dim= "+str(self.Hamiltonian_matrix.shape[0])+" "+str(self.Hamiltonian_matrix.shape[1])+" lower= 1\n")
+                PrintMatrix(f,self.Hamiltonian_matrix,True)
+            if self.Overlap_matrix is not None:
+                f.write("$Overlap matrix, dim= "+str(self.Overlap_matrix.shape[0])+" "+str(self.Overlap_matrix.shape[1])+" lower= 1\n")
+                PrintMatrix(f,self.Overlap_matrix,True)
+            if self.Kinetic_energy_matrix is not None:
+                f.write("$Kinetic energy matrix, dim= "+str(self.Kinetic_energy_matrix.shape[0])+" "+str(self.Kinetic_energy_matrix.shape[1])+" lower= 1\n")
+                PrintMatrix(f,self.Kinetic_energy_matrix,True)
+            if self.Potential_energy_matrix is not None:
+                f.write("$Potential energy matrix, dim= "+str(self.Potential_energy_matrix.shape[0])+" "+str(self.Potential_energy_matrix.shape[1])+" lower= 1\n")
+                PrintMatrix(f,self.Potential_energy_matrix,True)
