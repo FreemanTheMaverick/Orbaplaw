@@ -157,6 +157,12 @@ def generateNaturalAtomicOrbital(shell_indices_by_center,basis_indices_by_shell,
     N=N@Ow
     Spnao=N.T@S@N
     W=np.diag(W)
+    '''
+    print(sl.norm(Spnao[np.ix_(all_basis_indices_nmb,all_basis_indices_nmb)]-np.eye(len(all_basis_indices_nmb))))
+    print(np.diag(Spnao[np.ix_(all_basis_indices_nrb,all_basis_indices_nrb)]))
+    print(sl.norm(Spnao[np.ix_(all_basis_indices_nrb,all_basis_indices_nrb)]-np.eye(len(all_basis_indices_nrb))))
+    print(sl.norm(Spnao[np.ix_(all_basis_indices_nmb,all_basis_indices_nrb)]))
+    '''
 
     # 4b: Restoration of natural character of the NAOs.
     W.setflags(write=True)
@@ -192,6 +198,31 @@ def generateNaturalAtomicOrbital(shell_indices_by_center,basis_indices_by_shell,
     return basis_indices_nmb,basis_indices_nrb,W,N
 
 
+MinimalShells=[
+        [0,0,0,0,0,0,0],
+        [1,0,0,0,0,0,0],
+        [1,0,0,0,0,0,0],
+        [2,0,0,0,0,0,0],
+        [2,0,0,0,0,0,0],
+        [2,1,0,0,0,0,0],
+        [2,1,0,0,0,0,0],
+        [2,1,0,0,0,0,0],
+        [2,1,0,0,0,0,0],
+        [2,1,0,0,0,0,0],
+        [2,1,0,0,0,0,0],
+        [3,1,0,0,0,0,0],
+        [3,1,0,0,0,0,0],
+        [3,2,0,0,0,0,0],
+        [3,2,0,0,0,0,0],
+        [3,2,0,0,0,0,0],
+        [3,2,0,0,0,0,0],
+        [3,2,0,0,0,0,0],
+        [3,2,0,0,0,0,0],
+        [4,2,0,0,0,0,0],
+        [4,2,0,0,0,0,0],
+        [4,2,1,0,0,0,0],
+        [4,2,1,0,0,0,0]]
+
 def NaturalAtomicOrbital(mwfn_obj):
     result_mwfn_obj=cp.deepcopy(mwfn_obj)
     basis_indices_by_center=result_mwfn_obj.getBasisIndexByCenter()
@@ -200,39 +231,14 @@ def NaturalAtomicOrbital(mwfn_obj):
     D=result_mwfn_obj.Total_density_matrix/2
     S=result_mwfn_obj.Overlap_matrix
     angulars=[shell.Type for shell in result_mwfn_obj.Shells]
-    MinimalShells=[
-            [None],
-            [1,0,0,0,0,0,0],
-            [1,0,0,0,0,0,0],
-            [2,0,0,0,0,0,0],
-            [2,0,0,0,0,0,0],
-            [2,1,0,0,0,0,0],
-            [2,1,0,0,0,0,0],
-            [2,1,0,0,0,0,0],
-            [2,1,0,0,0,0,0],
-            [2,1,0,0,0,0,0],
-            [2,1,0,0,0,0,0],
-            [3,1,0,0,0,0,0],
-            [3,1,0,0,0,0,0],
-            [3,2,0,0,0,0,0],
-            [3,2,0,0,0,0,0],
-            [3,2,0,0,0,0,0],
-            [3,2,0,0,0,0,0],
-            [3,2,0,0,0,0,0],
-            [3,2,0,0,0,0,0],
-            [4,2,0,0,0,0,0],
-            [4,2,0,0,0,0,0],
-            [4,2,1,0,0,0,0],
-            [4,2,1,0,0,0,0]]
-    minimal_shells=[MinimalShells[int(center.Index)] for center in mwfn_obj.Centers]
+    minimal_shells=[MinimalShells[int(center.Nuclear_charge)] for center in mwfn_obj.Centers]
     basis_indices_nmb,basis_indices_nrb,W,N=generateNaturalAtomicOrbital(shell_indices_by_center,basis_indices_by_shell,basis_indices_by_center,angulars,D,S,minimal_shells)
-    print("Natural minimal basis indices:",basis_indices_nmb)
-    print("Natural Rydberg basis indices:",basis_indices_nrb)
     result_mwfn_obj.setOccupation(W)
     result_mwfn_obj.setCoefficientMatrix(N)
     result_mwfn_obj.setEnergy([0 for iorbital in result_mwfn_obj.Orbitals])
-    result_mwfn_obj.Total_density_matrix=N.T@S@D@S@N
-    result_mwfn_obj.Overlap_matrix=N.T@S@N
-    result_mwfn_obj.Info="Natural atomic orbitals. The Total_density_matrix is NAO-based P. The Overlap_matrix is NAO-based S."
+    result_mwfn_obj.Extra_info["NAO_density_matrix"]=N.T@S@D@S@N
+    result_mwfn_obj.Extra_info["NAO_minimal_basis_indices"]=basis_indices_nmb
+    result_mwfn_obj.Extra_info["NAO_Rydberg_basis_indices"]=basis_indices_nrb
+    result_mwfn_obj.Comment="Natural atomic orbitals. The Total_density_matrix is NAO-based P."
     return result_mwfn_obj
 
