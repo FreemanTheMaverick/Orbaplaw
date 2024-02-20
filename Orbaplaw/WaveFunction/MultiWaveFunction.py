@@ -73,7 +73,10 @@ class MultiWaveFunction:
                     break
                 newvalues=newline.split()
                 for newvalue in newvalues:
-                    elements[ielement]=float(newvalue)
+                    try:
+                        elements[ielement]=float(newvalue)
+                    except ValueError:
+                        elements[ielement]=0.
                     ielement+=1
                     if ielement==nelements:
                         finished=True
@@ -244,7 +247,10 @@ class MultiWaveFunction:
                             break
                         newvalues=newline.split()
                         for newvalue in newvalues:
-                            self.Orbitals[iorbital].Coeff[ibasis]=float(newvalue)
+                            try:
+                                self.Orbitals[iorbital].Coeff[ibasis]=float(newvalue)
+                            except ValueError:
+                                self.Orbitals[iorbital].Coeff[ibasis]=0.
                             ibasis+=1
                             if ibasis==self.getNumBasis():
                                 finished=True

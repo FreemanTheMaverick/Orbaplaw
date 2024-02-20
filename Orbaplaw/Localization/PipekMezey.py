@@ -86,7 +86,7 @@ def generatePipekMezey(C,S,basis_indices_by_center,charge_type,reverse):
     norbitals=C.shape[1]
     U=np.eye(norbitals)
     max_gamma_error=114514
-    while max_gamma_error>1: # Jacobi sweep
+    while max_gamma_error>0.5: # Jacobi sweep
         max_gamma_error=0
         for k in range(norbitals):
             for l in range(k):
@@ -107,10 +107,10 @@ def generatePipekMezey(C,S,basis_indices_by_center,charge_type,reverse):
                     continue
                 sin4a=Bst/np.sqrt(Ast**2+Bst**2)
                 cos4a=-Ast/np.sqrt(Ast**2+Bst**2)
-                four_a=np.sign(sin4a)*np.arccos(cos4a)
+                four_a=(np.arccos(cos4a) if sin4a>0 else 2*np.pi-np.arccos(cos4a)) if reverse else np.sign(sin4a)*np.arccos(cos4a)
                 a=four_a/4.
-                gamma=a+ (0.25 if reverse else 0) *np.pi
-                gamma_error=(gamma-0.25*np.pi)**2 if reverse else abs((gamma-0.5*np.pi)*gamma)
+                gamma=a-0.25*np.pi if reverse else a
+                gamma_error=(0.25*np.pi-a)**2 if reverse else abs((gamma-0.5*np.pi)*gamma)
                 max_gamma_error=max_gamma_error if max_gamma_error > gamma_error else gamma_error
                 U[:,[l,k]]=U[:,[l,k]]@np.array([[np.cos(gamma),np.sin(gamma)],[-np.sin(gamma),np.cos(gamma)]])
     x0=[0 for i in range(int(norbitals*(norbitals-1)/2))]
@@ -126,10 +126,10 @@ def PipekMezey(mo_mwfn,occ=True,vir=True,charge_type=LowdinCharge):
         C=mo_mwfn.getCoefficientMatrix()
         nocc=mo_mwfn.Naelec
         if occ: # Localizing occupied orbitals
-            Uocc=generatePipekMezey(C[:,:nocc],S,basis_indices_by_center,charge_type,False)
+            Uocc=generatePipekMezey(C[:,:nocc],S,basis_indices_by_center,charge_type,0)
             C[:,:nocc]=C[:,:nocc]@Uocc
         if vir: # Localizing virtual orbitals
-            Uvir=generatePipekMezey(C[:,nocc:],S,basis_indices_by_center,charge_type,False)
+            Uvir=generatePipekMezey(C[:,nocc:],S,basis_indices_by_center,charge_type,0)
             C[:,nocc:]=C[:,nocc:]@Uvir
         pm_mwfn.setCoefficientMatrix(C)
         pm_mwfn.setEnergy([0 for i in range(mo_mwfn.getNumIndBasis())])
