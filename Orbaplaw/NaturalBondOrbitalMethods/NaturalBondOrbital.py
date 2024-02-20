@@ -2,8 +2,6 @@ import numpy as np
 import scipy.linalg as sl
 import itertools as it
 import copy as cp
-import sys
-sys.path.append("..")
 from Orbaplaw import Localization as loc
 
 
