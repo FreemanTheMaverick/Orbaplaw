@@ -70,8 +70,8 @@ def generateNaturalBondOrbital(basis_indices_by_frag,P,C,S,maxnfrags,maxnnbos,th
     H=np.zeros_like(P) # Reseting NBO data, coefficient matrix of NBO in NHO basis
     N=np.zeros(P.shape[0]) # Occupation of NBO
     nnbos=0
-    for nho_indices_comb in nho_indices: # NHO indices of this combination, [fragments] -> [[NHO]]
-        nic=sum(nho_indices_comb,[]) # NHO indices of this combination, [fragments -> NHO]
+    for nho_indices_comb in nho_indices: # NHO indices of this combination, [NBO] -> [[NHO]]
+        nic=sum(nho_indices_comb,[]) # NHO indices of this combination, [NBO -> NHO]
         Nblock,Hblock=np.linalg.eigh(Pnho[np.ix_(nic,nic)])
         degenerate=[114514,[]]
         for i in range(len(Nblock)+1):
