@@ -57,13 +57,14 @@ def generateNaturalBondOrbital(basis_indices_by_frag,P,C,S,maxnfrags,maxnnbos,th
     # Localization of natural hybrid orbital
     for nho_indices_comb in nho_indices: # NHO indices of this combination, [NBO] -> [[NHO]]
         if nho_indices_comb!=[]:
-            nho_indices_frags=[[] for i in range(len(nho_indices_comb[0]))] # NHO indices of this combination, [fragments] -> [[NHO]]
-        for nho_indices_nbo in nho_indices_comb:
-            for ifrag in range(len(nho_indices_nbo)):
-                nho_indices_frags[ifrag].append(nho_indices_nbo[ifrag])
-        for nho_indices_frag in nho_indices_frags:
-            U=loc.generatePipekMezey(C@I[:,nho_indices_frag],S,basis_indices_by_frag,loc.LowdinCharge,0) # C - NAO in AO basis; C@I - degenerate NHO in AO basis
-            I[:,nho_indices_frag]=I[:,nho_indices_frag]@U
+            if len(nho_indices_comb[0])>1:
+                nho_indices_frags=[[] for i in range(len(nho_indices_comb[0]))] # NHO indices of this combination, [fragments] -> [[NHO]]
+                for nho_indices_nbo in nho_indices_comb:
+                    for ifrag in range(len(nho_indices_nbo)):
+                        nho_indices_frags[ifrag].append(nho_indices_nbo[ifrag])
+                for nho_indices_frag in nho_indices_frags:
+                    U=loc.generatePipekMezey(C@I[:,nho_indices_frag],S,basis_indices_by_frag,loc.LowdinCharge,0) # C - NAO in AO basis; C@I - degenerate NHO in AO basis
+                    I[:,nho_indices_frag]=I[:,nho_indices_frag]@U
     Pnho=I.T@P@I # Transforming the density matrix of NHO to that of orthogonal and localized NHO
 
     # Generation of natural bond orbital
@@ -79,8 +80,10 @@ def generateNaturalBondOrbital(basis_indices_by_frag,P,C,S,maxnfrags,maxnnbos,th
                 G=np.zeros([P.shape[0],len(degenerate[1])]) # Degenerate
                 for j,k in zip(degenerate[1],range(len(degenerate[1]))):
                     G[nic,k]=Hblock[:,j]
-                U=loc.generatePipekMezey(C@I@G,S,basis_indices_by_frag,loc.LowdinCharge,0) # C - NAO in AO basis; C@I@G - degenerate NBO in AO basis
-                G=G@U
+                nho_indices_frags=[[] for i in range(len(nho_indices_comb[0]))] # NHO indices of this combination, [fragments] -> [[NHO]]
+                if len(nho_indices_comb[0])>1:
+                    U=loc.generatePipekMezey(C@I@G,S,basis_indices_by_frag,loc.LowdinCharge,0) # C - NAO in AO basis; C@I@G - degenerate NBO in AO basis
+                    G=G@U
                 for j,k in zip(degenerate[1],range(len(degenerate[1]))):
                     Hblock[:,j]=G[nic,k]
                 degenerate[1]=[]
