@@ -1,4 +1,3 @@
-import numpy as np
 from Orbaplaw import WaveFunction as wfn
 from Orbaplaw import NaturalBondOrbitalMethods as nbo
 
