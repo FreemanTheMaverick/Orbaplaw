@@ -193,103 +193,221 @@ def generateNaturalAtomicOrbital(shell_indices_by_center,basis_indices_by_shell,
                 Nred[np.ix_(basis_indices,basis_indices)]=(OL@NL)[:,::-1]
     N=N@Nred
 
+    # Computing population of NAOs
+    P_nao=N.T@P@N
+    W=np.diag(P_nao)
+
     return basis_indices_nmb,basis_indices_nrb,W,N
 
+def MinimalShells(an,nc): # an - Atomic number; nc - Nuclear charge
+    match an:
+        case 1:
+            return [1,0,0,0,0,0,0] #  H
+        case 2:
+            return [1,0,0,0,0,0,0] # He
+        case 3:
+            return [2,0,0,0,0,0,0] # Li
+        case 4:
+            return [2,0,0,0,0,0,0] # Be
+        case 5:
+            return [2,1,0,0,0,0,0] #  B
+        case 6:
+            return [2,1,0,0,0,0,0] #  C
+        case 7:
+            return [2,1,0,0,0,0,0] #  N
+        case 8:
+            return [2,1,0,0,0,0,0] #  O
+        case 9:
+            return [2,1,0,0,0,0,0] #  F
+        case 10:
+            return [2,1,0,0,0,0,0] # Ne
+        case 11:
+            return [3,1,0,0,0,0,0] # Na
+        case 12:
+            return [3,1,0,0,0,0,0] # Mg
+        case 13:
+            return [3,2,0,0,0,0,0] # Al
+        case 14:
+            return [3,2,0,0,0,0,0] # Si
+        case 15:
+            return [3,2,0,0,0,0,0] #  P
+        case 16:
+            return [3,2,0,0,0,0,0] #  S
+        case 17:
+            return [3,2,0,0,0,0,0] # Cl
+        case 18:
+            return [3,2,0,0,0,0,0] # Ar
+        case 19:
+            if nc==9:
+                return [2,1,0,0,0,0,0]
+            return [4,2,0,0,0,0,0] #  K
+        case 20:
+            return [4,2,0,0,0,0,0] # Ca
+        case 21:
+            return [4,2,1,0,0,0,0] # Sc
+        case 22:
+            return [4,2,1,0,0,0,0] # Ti
+        case 23:
+            return [4,2,1,0,0,0,0] #  V
+        case 24:
+            return [4,2,1,0,0,0,0] # Cr
+        case 25:
+            return [4,2,1,0,0,0,0] # Mn
+        case 26:
+            return [4,2,1,0,0,0,0] # Fe
+        case 27:
+            return [4,2,1,0,0,0,0] # Co
+        case 28:
+            return [4,2,1,0,0,0,0] # Ni
+        case 29:
+            return [4,2,1,0,0,0,0] # Cu
+        case 30:
+            return [4,2,1,0,0,0,0] # Zn
+        case 31:
+            return [4,3,1,0,0,0,0] # Ga
+        case 32:
+            return [4,3,1,0,0,0,0] # Ge
+        case 33:
+            if nc==5:
+                return [1,1,0,0,0,0,0]
+            return [4,3,1,0,0,0,0] # As
+        case 34:
+            return [4,3,1,0,0,0,0] # Se
+        case 35:
+            return [4,3,1,0,0,0,0] # Br
+        case 36:
+            return [4,3,1,0,0,0,0] # Kr
+        case 37:
+            if nc==9:
+                return [2,1,0,0,0,0,0]
+            return [5,3,1,0,0,0,0] # Rb
+        case 38:
+            if nc==10:
+                return [2,1,0,0,0,0,0]
+            return [5,3,1,0,0,0,0] # Sr
+        case 39:
+            return [5,3,2,0,0,0,0] #  Y
+        case 40:
+            return [5,3,2,0,0,0,0] # Zr
+        case 41:
+            return [5,3,2,0,0,0,0] # Nb
+        case 42:
+            return [5,3,2,0,0,0,0] # Mo
+        case 43:
+            return [5,3,2,0,0,0,0] # Tc
+        case 44:
+            return [5,3,2,0,0,0,0] # Ru
+        case 45:
+            return [5,3,2,0,0,0,0] # Rh
+        case 46:
+            if nc==18:
+                return [2,1,1,0,0,0,0]
+            return [5,3,2,0,0,0,0] # Pd
+        case 47:
+            return [5,3,2,0,0,0,0] # Ag
+        case 48:
+            return [5,3,2,0,0,0,0] # Cd
+        case 49:
+            return [5,4,2,0,0,0,0] # In
+        case 50:
+            if nc==4:
+                return [1,1,0,0,0,0,0]
+            if nc==22:
+                return [2,2,1,0,0,0,0]
+            return [5,4,2,0,0,0,0] # Sn
+        case 51:
+            if nc==5:
+                return [1,1,0,0,0,0,0]
+            if nc==23:
+                return [2,2,1,0,0,0,0]
+            return [5,4,2,0,0,0,0] # Sb
+        case 52:
+            return [5,4,2,0,0,0,0] # Te
+        case 53:
+            return [5,4,2,0,0,0,0] #  I
+        case 54:
+            return [5,4,2,0,0,0,0] # Xe
+        case 55:
+            return [6,4,2,0,0,0,0] # Cs
+        case 56:
+            return [6,4,2,0,0,0,0] # Ba
+        case 57:
+            return [6,4,3,0,0,0,0] # La
+        case 58:
+            return [6,4,3,1,0,0,0] # Ce
+        case 59:
+            return [6,4,2,1,0,0,0] # Pr
+        case 60:
+            return [6,4,2,1,0,0,0] # Nd
+        case 61:
+            return [6,4,2,1,0,0,0] # Pm
+        case 62:
+            return [6,4,2,1,0,0,0] # Sm
+        case 63:
+            return [6,4,2,1,0,0,0] # Eu
+        case 64:
+            return [6,4,3,1,0,0,0] # Gd
+        case 65:
+            return [6,4,2,1,0,0,0] # Tb
+        case 66:
+            return [6,4,2,1,0,0,0] # Dy
+        case 67:
+            return [6,4,2,1,0,0,0] # Ho
+        case 68:
+            return [6,4,2,1,0,0,0] # Er
+        case 69:
+            return [6,4,2,1,0,0,0] # Tm
+        case 70:
+            return [6,4,2,1,0,0,0] # Yb
+        case 71:
+            return [6,4,3,1,0,0,0] # Lu
+        case 72:
+            return [6,4,3,1,0,0,0] # Hf
+        case 73:
+            return [6,4,3,1,0,0,0] # Ta
+        case 74:
+            return [6,4,3,1,0,0,0] #  W
+        case 75:
+            if nc==15:
+                return [2,1,1,0,0,0,0]
+            return [6,4,3,1,0,0,0] # Re
+        case 76:
+            return [6,4,3,1,0,0,0] # Os
+        case 77:
+            return [6,4,3,1,0,0,0] # Ir
+        case 78:
+            return [6,4,3,1,0,0,0] # Pt
+        case 79:
+            if nc==19:
+                return [2,1,1,0,0,0,0]
+            return [6,4,3,1,0,0,0] # Au
+        case 80:
+            return [6,4,3,1,0,0,0] # Hg
+        case 81:
+            return [6,5,3,1,0,0,0] # Tl
+        case 82:
+            return [6,5,3,1,0,0,0] # Pb
+        case 83:
+            return [6,5,3,1,0,0,0] # Bi
+        case 84:
+            return [6,5,3,1,0,0,0] # Po
+        case 85:
+            return [6,5,3,1,0,0,0] # At
+        case 86:
+            return [6,5,3,1,0,0,0] # Rn
+        case 87:
+            return [7,5,3,1,0,0,0] # Fr
+        case 88:
+            return [7,5,3,1,0,0,0] # Ra
+        case 89:
+            return [7,5,4,1,0,0,0] # Ac
+        case 90:
+            return [7,5,4,1,0,0,0] # Th
+        case 91:
+            return [7,5,4,2,0,0,0] # Pa
+        case 92:
+            return [7,5,4,2,0,0,0] # U
 
-MinimalShells=[
-        [0,0,0,0,0,0,0],
-        [1,0,0,0,0,0,0], #  H
-        [1,0,0,0,0,0,0], # He
-        [2,0,0,0,0,0,0], # Li
-        [2,0,0,0,0,0,0], # Be
-        [2,1,0,0,0,0,0], #  B
-        [2,1,0,0,0,0,0], #  C
-        [2,1,0,0,0,0,0], #  N
-        [2,1,0,0,0,0,0], #  O
-        [2,1,0,0,0,0,0], #  F
-        [2,1,0,0,0,0,0], # Ne
-        [3,1,0,0,0,0,0], # Na
-        [3,1,0,0,0,0,0], # Mg
-        [3,2,0,0,0,0,0], # Al
-        [3,2,0,0,0,0,0], # Si
-        [3,2,0,0,0,0,0], #  P
-        [3,2,0,0,0,0,0], #  S
-        [3,2,0,0,0,0,0], # Cl
-        [3,2,0,0,0,0,0], # Ar
-        [4,2,0,0,0,0,0], #  K
-        [4,2,0,0,0,0,0], # Ca
-        [4,2,1,0,0,0,0], # Sc
-        [4,2,1,0,0,0,0], # Ti
-        [4,2,1,0,0,0,0], #  V
-        [4,2,1,0,0,0,0], # Cr
-        [4,2,1,0,0,0,0], # Mn
-        [4,2,1,0,0,0,0], # Fe
-        [4,2,1,0,0,0,0], # Co
-        [4,2,1,0,0,0,0], # Ni
-        [4,2,1,0,0,0,0], # Cu
-        [4,2,1,0,0,0,0], # Zn
-        [4,3,1,0,0,0,0], # Ga
-        [4,3,1,0,0,0,0], # Ge
-        [4,3,1,0,0,0,0], # As
-        [4,3,1,0,0,0,0], # Se
-        [4,3,1,0,0,0,0], # Br
-        [4,3,1,0,0,0,0], # Kr
-        [5,3,1,0,0,0,0], # Rb
-        [5,3,1,0,0,0,0], # Sr
-        [5,3,2,0,0,0,0], #  Y
-        [5,3,2,0,0,0,0], # Zr
-        [5,3,2,0,0,0,0], # Nb
-        [5,3,2,0,0,0,0], # Mo
-        [5,3,2,0,0,0,0], # Tc
-        [5,3,2,0,0,0,0], # Ru
-        [5,3,2,0,0,0,0], # Rh
-        [5,3,2,0,0,0,0], # Pd
-        [5,3,2,0,0,0,0], # Ag
-        [5,3,2,0,0,0,0], # Cd
-        [5,4,2,0,0,0,0], # In
-        [5,4,2,0,0,0,0], # Sn
-        [5,4,2,0,0,0,0], # Sb
-        [5,4,2,0,0,0,0], # Te
-        [5,4,2,0,0,0,0], #  I
-        [5,4,2,0,0,0,0], # Xe
-        [6,4,2,0,0,0,0], # Cs
-        [6,4,2,0,0,0,0], # Ba
-        [6,4,3,0,0,0,0], # La
-        [6,4,3,1,0,0,0], # Ce
-        [6,4,2,1,0,0,0], # Pr
-        [6,4,2,1,0,0,0], # Nd
-        [6,4,2,1,0,0,0], # Pm
-        [6,4,2,1,0,0,0], # Sm
-        [6,4,2,1,0,0,0], # Eu
-        [6,4,3,1,0,0,0], # Gd
-        [6,4,2,1,0,0,0], # Tb
-        [6,4,2,1,0,0,0], # Dy
-        [6,4,2,1,0,0,0], # Ho
-        [6,4,2,1,0,0,0], # Er
-        [6,4,2,1,0,0,0], # Tm
-        [6,4,2,1,0,0,0], # Yb
-        [6,4,3,1,0,0,0], # Lu
-        [6,4,3,1,0,0,0], # Hf
-        [6,4,3,1,0,0,0], # Ta
-        [6,4,3,1,0,0,0], #  W
-        [6,4,3,1,0,0,0], # Re
-        [6,4,3,1,0,0,0], # Os
-        [6,4,3,1,0,0,0], # Ir
-        [6,4,3,1,0,0,0], # Pt
-        [6,4,3,1,0,0,0], # Au
-        [6,4,3,1,0,0,0], # Hg
-        [6,5,3,1,0,0,0], # Tl
-        [6,5,3,1,0,0,0], # Pb
-        [6,5,3,1,0,0,0], # Bi
-        [6,5,3,1,0,0,0], # Po
-        [6,5,3,1,0,0,0], # At
-        [6,5,3,1,0,0,0], # Rn
-        [7,5,3,1,0,0,0], # Fr
-        [7,5,3,1,0,0,0], # Ra
-        [7,5,4,1,0,0,0], # Ac
-        [7,5,4,1,0,0,0], # Th
-        [7,5,4,2,0,0,0], # Pa
-        [7,5,4,2,0,0,0]] # U
 
 def NaturalAtomicOrbital(mwfn_obj):
     result_mwfn_obj=cp.deepcopy(mwfn_obj)
@@ -299,9 +417,9 @@ def NaturalAtomicOrbital(mwfn_obj):
     D=result_mwfn_obj.Total_density_matrix/2
     S=result_mwfn_obj.Overlap_matrix
     angulars=[shell.Type for shell in result_mwfn_obj.Shells]
-    minimal_shells=[MinimalShells[int(center.Nuclear_charge)] for center in mwfn_obj.Centers]
+    minimal_shells=[MinimalShells(center.Index,int(center.Nuclear_charge)) for center in mwfn_obj.Centers]
     basis_indices_nmb,basis_indices_nrb,W,N=generateNaturalAtomicOrbital(shell_indices_by_center,basis_indices_by_shell,basis_indices_by_center,angulars,D,S,minimal_shells)
-    result_mwfn_obj.setOccupation(W)
+    result_mwfn_obj.setOccupation(2*W)
     result_mwfn_obj.setCoefficientMatrix(N)
     result_mwfn_obj.setEnergy([0 for iorbital in result_mwfn_obj.Orbitals])
     result_mwfn_obj.Extra_info["NAO_density_matrix"]=N.T@S@D@S@N
