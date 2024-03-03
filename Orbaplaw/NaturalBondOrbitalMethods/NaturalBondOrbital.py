@@ -51,7 +51,7 @@ def generateNaturalBondOrbital(basis_indices_by_frag,P,C,S,maxnfrags,maxnnbos,th
                 break
         finished= nfrags==maxnfrags or nnbos==maxnnbos
         nfrags+=1 # One more interacting fragment is considered.
-    #return I,N,H
+    #return I,N,H,""
 
     # Orthogonalization of natural hybrid orbital
     Snho=I[:,:nnhos].T@I[:,:nnhos] # Overlap matrix of pre-orthogonalized NHO
@@ -72,6 +72,8 @@ def generateNaturalBondOrbital(basis_indices_by_frag,P,C,S,maxnfrags,maxnnbos,th
                     U=loc.generatePipekMezey(C@I[:,NHO_INDICES_FRAG],S,basis_indices_by_frag,loc.LowdinCharge,0) # C - NAO in AO basis; C@I - degenerate NHO in AO basis
                     I[:,NHO_INDICES_FRAG]=I[:,NHO_INDICES_FRAG]@U
     Pnho=I.T@P@I # Transforming the density matrix of NHO to that of orthogonal and localized NHO
+    J=np.diag(Pnho) # Population of NHO
+    #return I,N,H,""
 
     # Generation of natural bond orbital
     H=np.zeros_like(P) # Reseting NBO data, coefficient matrix of NBO in NHO basis
@@ -89,7 +91,6 @@ def generateNaturalBondOrbital(basis_indices_by_frag,P,C,S,maxnfrags,maxnnbos,th
                 G=np.zeros([P.shape[0],len(degenerate[1])]) # Degenerate eigenvectors
                 for j,k in zip(degenerate[1],range(len(degenerate[1]))):
                     G[nic,k]=Hblock[:,j]
-                #nho_indices_frags=[[] for i in range(len(nho_indices_comb[0]))] # NHO indices of this combination, [fragments] -> [[NHO]]
                 if len(nho_indices_comb[0])>1: # Partial localization of degenerate NBOs.
                     U=loc.generatePipekMezey(C@I@G,S,basis_indices_by_frag,loc.LowdinCharge,0) # C - NAO in AO basis; C@I@G - degenerate NBO in AO basis
                     G=G@U
@@ -105,9 +106,16 @@ def generateNaturalBondOrbital(basis_indices_by_frag,P,C,S,maxnfrags,maxnnbos,th
             N[nnbos]=Nblock[i] # Copying the occupation number of this combination into the holistic occupation array
             H[nic,nnbos]=Hblock[:,i] # Copying the NBO into the holistic NBO coefficient matrix
             info+="NBO_"+str(nnbos)+" ="
-            for j in nic:
-                if abs(H[j,nnbos])>0.3:
+            H_nic=H[nic,nnbos]
+            square=H_nic**2 # Putting the NBO_NHO coefficients in decreasing order
+            order=np.argsort(square)[::-1]
+            nic_=np.array(nic)[np.ix_(order)]
+            H_nic=H_nic[np.ix_(order)]
+            square_sum=0
+            for j in nic_:
+                if square_sum<0.99:
                     info+="  "+str(round(H[j,nnbos],3))+" * NHO_"+str(j)
+                square_sum+=H[j,nnbos]**2
             info+="\n"
             nnbos+=1
  
@@ -115,7 +123,7 @@ def generateNaturalBondOrbital(basis_indices_by_frag,P,C,S,maxnfrags,maxnnbos,th
     #print(sl.norm(NBO_nao.T@NBO_nao-np.diag(np.diag(NBO_nao.T@NBO_nao))))
     #print(np.diag(NBO_nao.T@NBO_nao))
 
-    return I,N,H,info
+    return J,I,N,H,info
 
 
 def NaturalBondOrbital(nao_mwfn,frags=[],maxnfrags=-1,maxnnbos=-1,threshold=0.0075): # By default, every atom is a fragment, which is the case of NBO. By combining atoms into fragments one extends NBO to natural fragment bond orbital (NFBO).
@@ -137,14 +145,14 @@ def NaturalBondOrbital(nao_mwfn,frags=[],maxnfrags=-1,maxnnbos=-1,threshold=0.00
         S=nao_mwfn.Overlap_matrix
         maxnnbos=nao_mwfn.Naelec if maxnnbos==-1 else maxnnbos
         P=nao_mwfn.Extra_info["NAO_density_matrix"]
-        NHO_nao,NBO_n,NBO_nao,info=generateNaturalBondOrbital(basis_indices_by_frag,P,C,S,maxnfrags,maxnnbos,threshold)
+        NHO_n,NHO_nao,NBO_n,NBO_nao,info=generateNaturalBondOrbital(basis_indices_by_frag,P,C,S,maxnfrags,maxnnbos,threshold)
         print(info)
         nho_mwfn.setEnergy([0 for i in range(nbasis)])
-        nho_mwfn.setOccupation([0 for i in range(nbasis)])
+        nho_mwfn.setOccupation(2*NHO_n)
         nho_mwfn.setCoefficientMatrix(nho_mwfn.getCoefficientMatrix()@NHO_nao)
         nho_mwfn.Comment="Natural hybrid orbital."
         nbo_mwfn.setEnergy([0 for i in range(nbasis)])
-        nbo_mwfn.setOccupation(NBO_n*2)
+        nbo_mwfn.setOccupation(2*NBO_n)
         nbo_mwfn.setCoefficientMatrix(nbo_mwfn.getCoefficientMatrix()@NBO_nao)
         nbo_mwfn.Comment="Natural bond orbital."
     return nho_mwfn,nbo_mwfn
