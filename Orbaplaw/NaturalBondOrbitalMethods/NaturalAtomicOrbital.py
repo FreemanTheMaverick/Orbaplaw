@@ -2,6 +2,7 @@ import numpy as np
 import scipy.linalg as sl
 import copy as cp
 
+
 def generateNaturalAtomicOrbital(shell_indices_by_center,basis_indices_by_shell,basis_indices_by_center,angulars,D,S,minimal_shells):
     P=S@D@S
 
@@ -376,6 +377,8 @@ def MinimalShells(an,nc): # an - Atomic number; nc - Nuclear charge
         case 77:
             return [6,4,3,1,0,0,0] # Ir
         case 78:
+            if nc==18:
+                return [2,1,1,0,0,0,0]
             return [6,4,3,1,0,0,0] # Pt
         case 79:
             if nc==19:
