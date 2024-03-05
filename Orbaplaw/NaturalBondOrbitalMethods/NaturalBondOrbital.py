@@ -6,127 +6,142 @@ from Orbaplaw import Localization as loc
 
 
 def generateNaturalBondOrbital(basis_indices_by_frag,P,C,S,maxnfrags,maxnnbos,threshold):
-    nfrags=1
-    nnbos=0
-    nnhos=0
-    nho_indices=[] # [combinations] -> [[NBO]] -> [[[NHO]]]
-    NHO_INDICES=[] # [combinations] -> [[fragments]] -> [[[NHO]]]
-    combinations=[] # List of combinations of fragments
-    info=""
-    Pr=cp.deepcopy(P) # Residual of matrix P
-    H=np.zeros_like(P) # Coefficient matrix of NBO in NAO basis
-    I=np.zeros_like(P) # Coefficient matrix of NHO in NAO basis
-    N=np.zeros(P.shape[0]) # Occupation of NBO
-    finished=False # Whether search is finished
-    while not finished:
-        fraglists=list(it.combinations(range(len(basis_indices_by_frag)),nfrags)) # Combinations of fragment indices, [combinations] -> [[fragments]] -> [[[basis]]]
-        for fraglist in fraglists: # Looping over combinations
-            combinations.append(fraglist)
-            basis_indices_comb=[] # Basis indices of this combination, [fragments] -> [[basis]]
-            for frag in fraglist: # Looping over fragments
-                basis_indices_comb.append(basis_indices_by_frag[frag])
-            bic=sum(basis_indices_comb,[]) # Basis indices of this combination, [fragments -> basis]
-            Pblock=Pr[np.ix_(bic,bic)] # Block of P matrix belonging to this combination
-            Nblock,Hblock=sl.eigh(Pblock) # The related occupation and orbitals
-            Nblock=Nblock[::-1] # Decreasing order
-            Hblock=np.fliplr(Hblock)
-            nho_indices_comb=[] # NHO indices of this combination, [NBO] -> [[NHO]]
-            for i in range(Nblock.shape[0]):
-                if Nblock[i]<1.-threshold: # Ignoring all small occupation
-                    Nblock[i]=0
-                else:
-                    N[nnbos]=Nblock[i] # Copying the occupation number of this combination into the holistic occupation array
-                    H[bic,nnbos]=Hblock[:,i] # Copying the NBO into the holistic NBO coefficient matrix
-                    nho_indices_nbo=[] # NHO indices of this fragment, [NHO]
-                    for basis_indices_frag in basis_indices_comb: # Basis indices of this fragment, [basis]
-                        I[basis_indices_frag,nnhos]=H[basis_indices_frag,nnbos] # Copying the elements of NBO belonging to each fragment NHO into the holistic NHO coefficient matrix
-                        nho_indices_nbo.append(nnhos) # Adding the index of this NHO to the list
-                        nnhos+=1 # One more NHO is found.
-                    nho_indices_comb.append(nho_indices_nbo) # Adding the list to the list of lists
-                    nnbos+=1 # One more NBO is found.
-            nho_indices.append(nho_indices_comb) # Adding the list of lists to the list of lists of lists
-            Pr[np.ix_(bic,bic)]-=Hblock@np.diag(Nblock)@Hblock.T # Removing the density of the found NBO from the total P
-            finished= nfrags==maxnfrags or nnbos==maxnnbos # Exiting the loop when the max number of interacting fragments or NBOs are found
-            if finished:
-                break
-        finished= nfrags==maxnfrags or nnbos==maxnnbos
-        nfrags+=1 # One more interacting fragment is considered.
-    #return I,N,H,""
+    # P - The NAO-based density matrix.
+    # C - The NAO coefficient matrix in AO basis set.
+    # S - The AO-based overlap matrix.
 
-    # Orthogonalization of natural hybrid orbital
-    Snho=I[:,:nnhos].T@I[:,:nnhos] # Overlap matrix of pre-orthogonalized NHO
-    Onho=sl.sqrtm(np.linalg.inv(Snho)) # Transformation matrix for symmetric orthogonalization
-
-    I[:,:nnhos]=I[:,:nnhos]@Onho.real # Transforming the coefficient matrix of NHO to that of orthogonal NHO
-
-    # Localization of natural hybrid orbital
-    for nho_indices_comb in nho_indices: # NHO indices of this combination, [NBO] -> [[NHO]]
-        if nho_indices_comb!=[]:
-            if len(nho_indices_comb[0])>1:
-                NHO_INDICES_COMB=[[] for i in range(len(nho_indices_comb[0]))] # NHO indices of this combination, [fragments] -> [[NHO]]; Capital letters correspond to NHO_INDICES, [combinations] -> [[fragments]] -> [[[NHO]]]
-                for nho_indices_nbo in nho_indices_comb:
-                    for ifrag in range(len(nho_indices_nbo)):
-                        NHO_INDICES_COMB[ifrag].append(nho_indices_nbo[ifrag])
-                NHO_INDICES.append(NHO_INDICES_COMB)
-                for NHO_INDICES_FRAG in NHO_INDICES_COMB:
-                    U=loc.generatePipekMezey(C@I[:,NHO_INDICES_FRAG],S,basis_indices_by_frag,loc.LowdinCharge,0) # C - NAO in AO basis; C@I - degenerate NHO in AO basis
-                    I[:,NHO_INDICES_FRAG]=I[:,NHO_INDICES_FRAG]@U
-    Pnho=I.T@P@I # Transforming the density matrix of NHO to that of orthogonal and localized NHO
-    J=np.diag(Pnho) # Population of NHO
-    #return I,N,H,""
-
-    # Generation of natural bond orbital
-    H=np.zeros_like(P) # Reseting NBO data, coefficient matrix of NBO in NHO basis
-    N=np.zeros(P.shape[0]) # Occupation of NBO
-    nnbos=0
-    icomb=0
-    for nho_indices_comb in nho_indices: # NHO indices of this combination, [NBO] -> [[NHO]]
-        info+="Fragment combination "+str(combinations[icomb])+":\n"
-        icomb+=1
-        nic=sum(nho_indices_comb,[]) # NHO indices of this combination, [NBO -> NHO]
-        Nblock,Hblock=np.linalg.eigh(Pnho[np.ix_(nic,nic)])
-        degenerate=[114514,[]]
-        for i in range(len(Nblock)+1):
-            if ( (not np.isclose(degenerate[0],Nblock[i])) if i<len(Nblock) else i==len(Nblock) ) and degenerate[1]!=[]: # Finding degenerate NBOs.
-                G=np.zeros([P.shape[0],len(degenerate[1])]) # Degenerate eigenvectors
-                for j,k in zip(degenerate[1],range(len(degenerate[1]))):
-                    G[nic,k]=Hblock[:,j]
-                if len(nho_indices_comb[0])>1: # Partial localization of degenerate NBOs.
-                    U=loc.generatePipekMezey(C@I@G,S,basis_indices_by_frag,loc.LowdinCharge,0) # C - NAO in AO basis; C@I@G - degenerate NBO in AO basis
-                    G=G@U
-                for j,k in zip(degenerate[1],range(len(degenerate[1]))):
-                    Hblock[:,j]=G[nic,k]
-                degenerate[1]=[]
-            if i<len(Nblock):
-                degenerate[0]=Nblock[i]
-                degenerate[1].append(i)
-        Nblock=Nblock[::-1] # Decreasing order
+    # Searching for pNBOs and pNHOs.
+    pnbo=0 # Number of pNBOs.
+    pnho=0 # Number of pNHOs.
+    pnbo_info=[] # Information of pNBOs.
+    pnho_info=[] # Information of pNHOs.
+    Pr=cp.deepcopy(P) # Residual of matrix P.
+    H=np.zeros_like(P) # Coefficient matrix of (p-)NBO in NAO basis.
+    I=np.zeros_like(P) # Coefficient matrix of (p-)NHO in NAO basis.
+    N=np.zeros(P.shape[0]) # Occupation of (p-)NBOs.
+    J=np.zeros(P.shape[0]) # Occupation of (p-)NHOs.
+    combs=[] # Combinations of fragments.
+    for nfrags in range(1,maxnfrags+1): # Generating all possible combinations.
+        combs+=list(it.combinations(range(len(basis_indices_by_frag)),nfrags))
+    for icomb in range(len(combs)): # Looping over combinations.
+        basis_indices_comb=[] # Basis indices of this combination, [fragments] -> [[basis]].
+        nfrags=len(combs[icomb]) # Number of fragments.
+        for jfrag in range(nfrags): # Looping over fragments of this combination to find all its basis indices.
+            frag=combs[icomb][jfrag] # Index of this fragment.
+            basis_indices_comb.append(basis_indices_by_frag[frag])
+        bic=sum(basis_indices_comb,[]) # Basis indices of this combination, [fragments -> basis].
+        Pblock=Pr[np.ix_(bic,bic)] # Block of P matrix belonging to this combination.
+        Nblock,Hblock=sl.eigh(Pblock) # The related occupation and orbitals.
+        Nblock=Nblock[::-1] # Decreasing order.
         Hblock=np.fliplr(Hblock)
-        for i in range(len(Nblock)):
-            N[nnbos]=Nblock[i] # Copying the occupation number of this combination into the holistic occupation array
-            H[nic,nnbos]=Hblock[:,i] # Copying the NBO into the holistic NBO coefficient matrix
-            info+="NBO_"+str(nnbos)+" ="
-            H_nic=H[nic,nnbos]
-            square=H_nic**2 # Putting the NBO_NHO coefficients in decreasing order
-            order=np.argsort(square)[::-1]
-            nic_=np.array(nic)[np.ix_(order)]
-            H_nic=H_nic[np.ix_(order)]
-            square_sum=0
-            for j in nic_:
-                if square_sum<0.99:
-                    info+="  "+str(round(H[j,nnbos],3))+" * NHO_"+str(j)
-                square_sum+=H[j,nnbos]**2
-            info+="\n"
-            nnbos+=1
- 
-    H=I@H # Transforming the coefficient matrix of NBO from NHO basis to NAO basis
-    #print(sl.norm(NBO_nao.T@NBO_nao-np.diag(np.diag(NBO_nao.T@NBO_nao))))
-    #print(np.diag(NBO_nao.T@NBO_nao))
+        for jpnbo in range(len(bic)):
+            if Nblock[jpnbo]<1.-threshold: # Ignoring all little occupation.
+                Nblock[jpnbo]=0
+            else:
+                N[pnbo]=Nblock[jpnbo] # Copying the occupation number of this combination into the pNBO occupation array.
+                H[bic,pnbo]=Hblock[:,jpnbo] # Copying the pNBO into the pNBO coefficient matrix.
+                pnho_indices_pnbo=[]
+                for kfrag in range(nfrags): # Looping over the fragments of this pNBO to find its pNHOs.
+                    basis_indices_frag=basis_indices_comb[kfrag] # Basis indices of this fragment.
+                    pnho_indices_pnbo.append(pnho) # Adding the index of this pNHO to the list.
+                    pnho_info.append({ # Recording the information about this pNHO.
+                        "comb":icomb, # Index of its combination.
+                        "pnbo":pnbo, # Index of its pNBO.
+                        "frag":combs[icomb][kfrag]}) # Index of its fragment.
+                    pnho+=1 # A new pNHO is found.
+                pnbo_info.append({ # Recording the information about this NBO.
+                    "comb":icomb, # Index of its combination.
+                    "pnhos":pnho_indices_pnbo}) # Indices of its pNHOs.
+                pnbo+=1 # A new pNBO is found.
+        Pr[np.ix_(bic,bic)]-=Hblock@np.diag(Nblock)@Hblock.T # Removing the density of the found pNBOs from the total P.
+        if pnbo==maxnnbos: # Exiting the loop when the max number of NBOs are found.
+            combs=combs[:icomb+1] # Removing all the unused combinations.
+            break
 
+    # Finding degenerate pNBOs and partially localizing them.
+    pnbo_indices=[[] for i in range(len(combs))] # pNBO indices of each combination, [combination] -> [[pNBO]].
+    for jpnbo in range(pnbo): # Looping over all pNBOs.
+        pnbo_indices[pnbo_info[jpnbo]["comb"]].append(jpnbo)
+    eigenlists=[] # List of indices of degenerate pNBOs, [degenerate group] -> [[pNBO]].
+    for icomb in range(len(combs)):
+        if len(combs[icomb])==1: # One-fragment non-bonding orbitals do not need localizing.
+            continue
+        eigenvalue=114514
+        eigenlist=[] # List of indices of degenerate pNBOs in this degenerate group.
+        for jpnbo in pnbo_indices[icomb]:
+            if not np.isclose(eigenvalue,N[jpnbo]) and eigenlist!=[]: # One group of degenerate pNBOs is found if the eigenvalue of the current pNBO is different from that of last one.
+                eigenlists.append(eigenlist) # Recording this degenerate group.
+                eigenlist=[] # Clean the degenerate pNBO list.
+            eigenvalue=N[jpnbo] # Recording the eigenvalue and the index of the current pNBO.
+            eigenlist.append(jpnbo)
+            if jpnbo==pnbo_indices[icomb][-1]: # One group of degenerate pNBOs is found if the current pNBO is the last one in this combination.
+                eigenlists.append(eigenlist)
+    for keigen in range(len(eigenlists)): # Looping over degenerate groups.
+        nbid=eigenlists[keigen] # pNBO indices of this degenerate group.
+        if len(nbid)==1: # Degenerate groups of only one pNBO, namely non-degenerate-pNBOs, do not need localizing.
+            continue
+        U=loc.generatePipekMezey(C@H[:,nbid],S,basis_indices_by_frag,loc.LowdinCharge,0) # C - NAO in AO basis; C@H - degenerate pNBO in AO basis
+        H[:,nbid]=H[:,nbid]@U # Partially localizing the degenerate pNBOs.
+
+    # Dividing pNBOs into pNHOs.
+    for ipnbo in range(pnbo): # Looping over pNBOs.
+        for jpnho in pnbo_info[ipnbo]["pnhos"]: # Looping over pNHOs of this pNBO.
+            bif=basis_indices_by_frag[pnho_info[jpnho]["frag"]]
+            I[bif,jpnho]=H[bif,ipnbo] # Copying the elements of this pNBO belonging to each fragment into the pNHO coefficient matrix.
+
+    # Orthogonalization of pNHOs and generalization of NHOs.
+    pnho_indices=[[] for i in range(len(basis_indices_by_frag))] # pNHO indices of each fragment, [fragment] -> [[pNHO]]; len(basis_indices_by_frag) is the total number of fragments.
+    for ipnho in range(pnho): # Looping over all pNHOs.
+        pnho_indices[pnho_info[ipnho]["frag"]].append(ipnho)
+    for ifrag in range(len(pnho_indices)): # Looping over fragments.
+        Iblock=I[:,pnho_indices[ifrag]] # The coefficients of the pNHOs of this fragment.
+        Sblock=Iblock.T@Iblock # The overlap matrix of pNHOs in NAO basis set. NAOs are mutually orthonormal.
+        Jblock=np.diag(np.diag(Iblock.T@P@Iblock)) # Population of pNHOs derived from the fragment density matrix in pNHO basis set.
+        Oblock=Jblock@sl.sqrtm(np.linalg.inv(Jblock@Sblock@Jblock)) # Occupancy-weighted symmetric orthogonalization.
+        Iblock=Iblock@Oblock
+        I[:,pnho_indices[ifrag]]=Iblock
+        J[pnho_indices[ifrag]]=np.diag(Iblock.T@P@Iblock) # Occupation numbers of NHOs.
+
+    # Generation of NBO by diagonalization of the NHO-based density matrix.
+    nbo=0 # Number of NBOs.
+    nbo_info=[] # Information of NBOs.
+    N=np.zeros_like(N) # Occupation of NBOs.
+    H=np.zeros_like(H) # Temporarily the NBO coefficient matrix is in NHO basis. It will be transformed to NAO basis later.
+    for ipnbo in range(pnbo): # Looping over all pNBOs.
+        Iblock=I[:,pnbo_info[ipnbo]["pnhos"]] # The NHOs of this pNBO.
+        Pblock=Iblock.T@P@Iblock # The density matrix expressed by these NHOs.
+        Nblock,Hblock=np.linalg.eigh(Pblock) # NBOs.
+        Nblock=Nblock[::-1] # Decreasing order.
+        Hblock=np.fliplr(Hblock)
+        for jpnho in range(len(pnbo_info[ipnbo]["pnhos"])): # Looping over the component NHOs.
+            N[nbo]=Nblock[jpnho]
+            H[pnbo_info[ipnbo]["pnhos"],nbo]=Hblock[:,jpnho]
+            nbo_info.append({ # Recording the information about this NBO, which is the same as that about its primitive counterpart, except that pNHO is replaced by NHO.
+                "comb":pnbo_info[ipnbo]["comb"],
+                "nhos":pnbo_info[ipnbo]["pnhos"]})
+            nbo+=1 # A new NBO is found.
+    '''
+    # Checking the orthonormality of NHOs and NBOs
+    for A in [I,H]:
+        print(sl.norm(I.T@I-np.diag(np.diag(I.T@I))))
+        print(np.diag(I.T@I))
+    '''
+
+    # Printing NBO and NHO information
+    info=""
+    for icomb in range(len(combs)):
+        info+="Fragment combination "+str(combs[icomb])+"\n"
+        for jnbo in range(nbo):
+            if nbo_info[jnbo]["comb"]==icomb:
+                info+="NBO_"+str(jnbo)+" ("+str(round(N[jnbo],3))+")  ="
+                for knho in nbo_info[jnbo]["nhos"]:
+                    info+="  "+str(round(H[knho,jnbo],3))+" * NHO_"+str(knho)+" ("+str(round(J[knho],3))+", F_"+str(pnho_info[knho]["frag"])+")"
+                info+="\n"
+    H=I@H # Transforming the coefficient matrix of NBO from NHO basis to NAO basis
     return J,I,N,H,info
 
 
-def NaturalBondOrbital(nao_mwfn,frags=[],maxnfrags=-1,maxnnbos=-1,threshold=0.0075): # By default, every atom is a fragment, which is the case of NBO. By combining atoms into fragments one extends NBO to natural fragment bond orbital (NFBO).
+def NaturalBondOrbital(nao_mwfn,frags=[],maxnfrags=-1,maxnnbos=-1,threshold=0.05): # By default, every atom is a fragment, which is the case of NBO. By combining atoms into fragments one extends NBO to natural fragment bond orbital (NFBO).
     maxnfrags=nao_mwfn.getNumCenters() if maxnfrags==-1 else maxnfrags
     frags=[[i] for i in range(nao_mwfn.getNumCenters())] if frags==[] else frags
     basis_indices_by_center=nao_mwfn.getBasisIndexByCenter()
