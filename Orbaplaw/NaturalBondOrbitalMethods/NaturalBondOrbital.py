@@ -69,7 +69,7 @@ def generateNaturalBondOrbital(basis_indices_by_frag,P,C,S,maxnfrags,maxnnbos,th
         eigenvalue=114514
         eigenlist=[] # List of indices of degenerate pNBOs in this degenerate group.
         for jpnbo in pnbo_indices[icomb]:
-            if not np.isclose(eigenvalue,N[jpnbo]) and eigenlist!=[]: # One group of degenerate pNBOs is found if the eigenvalue of the current pNBO is different from that of last one.
+            if not np.isclose(eigenvalue,N[jpnbo]) and eigenlist!=[]: # One group of degenerate pNBOs is found if the eigenvalue of the current pNBO is different from that of the last one.
                 eigenlists.append(eigenlist) # Recording this degenerate group.
                 eigenlist=[] # Clean the degenerate pNBO list.
             eigenvalue=N[jpnbo] # Recording the eigenvalue and the index of the current pNBO.
@@ -95,6 +95,9 @@ def generateNaturalBondOrbital(basis_indices_by_frag,P,C,S,maxnfrags,maxnnbos,th
         pnho_indices[pnho_info[ipnho]["frag"]].append(ipnho)
     for ifrag in range(len(pnho_indices)): # Looping over fragments.
         Iblock=I[:,pnho_indices[ifrag]] # The coefficients of the pNHOs of this fragment.
+        for jcol in range(Iblock.shape[1]):
+            vector=Iblock[:,jcol]
+            Iblock[:,jcol]/=sl.norm(vector)
         Sblock=Iblock.T@Iblock # The overlap matrix of pNHOs in NAO basis set. NAOs are mutually orthonormal.
         Jblock=np.diag(np.diag(Iblock.T@P@Iblock)) # Population of pNHOs derived from the fragment density matrix in pNHO basis set.
         Oblock=Jblock@sl.sqrtm(np.linalg.inv(Jblock@Sblock@Jblock)) # Occupancy-weighted symmetric orthogonalization.
@@ -118,7 +121,8 @@ def generateNaturalBondOrbital(basis_indices_by_frag,P,C,S,maxnfrags,maxnnbos,th
             H[pnbo_info[ipnbo]["pnhos"],nbo]=Hblock[:,jpnho]
             nbo_info.append({ # Recording the information about this NBO, which is the same as that about its primitive counterpart, except that pNHO is replaced by NHO.
                 "comb":pnbo_info[ipnbo]["comb"],
-                "nhos":pnbo_info[ipnbo]["pnhos"]})
+                "nhos":pnbo_info[ipnbo]["pnhos"],
+                "pnbo":ipnbo})
             nbo+=1 # A new NBO is found.
     '''
     # Checking the orthonormality of NHOs and NBOs
@@ -126,6 +130,32 @@ def generateNaturalBondOrbital(basis_indices_by_frag,P,C,S,maxnfrags,maxnnbos,th
         print(sl.norm(I.T@I-np.diag(np.diag(I.T@I))))
         print(np.diag(I.T@I))
     '''
+
+    # Finding degenerate NBOs and partially localizing them.
+    nbo_indices=[[] for i in range(pnbo)] # NBO indices of each pNBO, [pNBO] -> [[NBO]].
+    for jnbo in range(nbo): # Looping over all NBOs.
+        nbo_indices[nbo_info[jnbo]["pnbo"]].append(jnbo)
+    eigenlists=[] # List of indices of degenerate pNBOs, [degenerate group] -> [[NBO]].
+    for ipnbo in range(pnbo):
+        if len(nbo_indices[ipnbo])==1: # One-fragment non-bonding orbitals do not need localizing.
+            continue
+        eigenvalue=114514
+        eigenlist=[] # List of indices of degenerate NBOs in this degenerate group.
+        for jnbo in nbo_indices[ipnbo]:
+            if not np.isclose(eigenvalue,N[jnbo]) and eigenlist!=[]: # One group of degenerate NBOs is found if the eigenvalue of the current pNBO is different from that of the last one.
+                eigenlists.append(eigenlist) # Recording this degenerate group.
+                eigenlist=[] # Clean the degenerate NBO list.
+            eigenvalue=N[jnbo] # Recording the eigenvalue and the index of the current NBO.
+            eigenlist.append(jnbo)
+            if jnbo==nbo_indices[ipnbo][-1]: # One group of degenerate NBOs is found if the current NBO is the last one in this pNBO.
+                eigenlists.append(eigenlist)
+    for keigen in range(len(eigenlists)): # Looping over degenerate groups.
+        nbid=eigenlists[keigen] # NBO indices of this degenerate group.
+        if len(nbid)==1: # Degenerate groups of only one NBO, namely non-degenerate-NBOs, do not need localizing.
+            continue
+        U=loc.generatePipekMezey(C@I@H[:,nbid],S,basis_indices_by_frag,loc.LowdinCharge,0) # C - NAO in AO basis; C@I@H - degenerate pNBO in AO basis
+        H[:,nbid]=H[:,nbid]@U # Partially localizing the degenerate NBOs.
+
 
     # Printing NBO and NHO information
     info=""
