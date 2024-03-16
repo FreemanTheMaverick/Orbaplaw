@@ -52,7 +52,11 @@ class MultiWaveFunction:
 
     # Field 5
     Total_density_matrix=None # np.array
+    Alpha_density_matrix=None
+    Beta_density_matrix=None
     Hamiltonian_matrix=None
+    Alpha_Hamiltonian_matrix=None
+    Beta_Hamiltonian_matrix=None
     Overlap_matrix=None
     Kinetic_energy_matrix=None
     Potential_energy_matrix=None
@@ -226,7 +230,7 @@ class MultiWaveFunction:
                 # Field 4
                 elif "Index=" in line:
                     if iorbital is None:
-                        self.Orbitals=[MwfnOrbital() for i in range(self.getNumIndBasis())]
+                        self.Orbitals=[MwfnOrbital() for i in range(self.getNumIndBasis()*(1 if self.Wfntype==0 else 2))]
                         for orbital in self.Orbitals:
                             orbital.Coeff=np.zeros(self.getNumBasis())
                     iorbital=int(value)-1
@@ -262,11 +266,31 @@ class MultiWaveFunction:
                     ncols=int(values[5])
                     lower=int(values[7])
                     self.Total_density_matrix=ReadMatrix(f,nrows,ncols,lower)
+                elif "$Alpha density matrix" in line:
+                    nrows=int(values[4])
+                    ncols=int(values[5])
+                    lower=int(values[7])
+                    self.Alpha_density_matrix=ReadMatrix(f,nrows,ncols,lower)
+                elif "$Beta density matrix" in line:
+                    nrows=int(values[4])
+                    ncols=int(values[5])
+                    lower=int(values[7])
+                    self.Beta_density_matrix=ReadMatrix(f,nrows,ncols,lower)
                 elif "$1-e Hamiltonian matrix" in line:
                     nrows=int(values[4])
                     ncols=int(values[5])
                     lower=int(values[7])
                     self.Hamiltonian_matrix=ReadMatrix(f,nrows,ncols,lower)
+                elif "$Alpha 1-e Hamiltonian matrix" in line:
+                    nrows=int(values[4])
+                    ncols=int(values[5])
+                    lower=int(values[7])
+                    self.Alpha_Hamiltonian_matrix=ReadMatrix(f,nrows,ncols,lower)
+                elif "$Beta 1-e Hamiltonian matrix" in line:
+                    nrows=int(values[4])
+                    ncols=int(values[5])
+                    lower=int(values[7])
+                    self.Beta_Hamiltonian_matrix=ReadMatrix(f,nrows,ncols,lower)
                 elif "$Overlap matrix" in line:
                     nrows=int(values[3])
                     ncols=int(values[4])
@@ -398,32 +422,36 @@ class MultiWaveFunction:
                     ibasis+=1
             return indices
 
-    def getCoefficientMatrix(self):
+    def getCoefficientMatrix(self,type_):
         matrix=np.zeros([self.getNumBasis(),self.getNumBasis()])
-        for orbital,iorbital in zip(self.Orbitals,range(len(self.Orbitals))):
-            matrix[:,iorbital]=orbital.Coeff
+        orbital_indices=[i for i in range(len(self.Orbitals)) if self.Orbitals[i].Type==type_]
+        for i in range(len(orbital_indices)):
+            matrix[:,i]=self.Orbitals[orbital_indices[i]].Coeff
         return matrix
 
-    def setCoefficientMatrix(self,matrix):
-        assert matrix.shape==(self.getNumBasis(),len(self.Orbitals))
-        for orbital,iorbital in zip(self.Orbitals,range(len(self.Orbitals))):
-            orbital.Coeff=matrix[:,iorbital]
+    def setCoefficientMatrix(self,type_,matrix):
+        orbital_indices=[i for i in range(len(self.Orbitals)) if self.Orbitals[i].Type==type_]
+        assert matrix.shape==(self.getNumBasis(),len(orbital_indices))
+        for i in range(len(orbital_indices)):
+            self.Orbitals[orbital_indices[i]].Coeff=matrix[:,i]
 
-    def getEnergy(self):
-        return [orbital.Energy for orbital in self.Orbitals]
+    def getEnergy(self,type_):
+        return [orbital.Energy for orbital in self.Orbitals if orbital.Type==type_]
 
-    def setEnergy(self,energies):
-        assert len(energies)==len(self.Orbitals)
-        for iorbital in range(len(self.Orbitals)):
-            self.Orbitals[iorbital].Energy=energies[iorbital]
+    def setEnergy(self,type_,energies):
+        orbital_indices=[i for i in range(len(self.Orbitals)) if self.Orbitals[i].Type==type_]
+        assert len(energies)==len(orbital_indices)
+        for i in range(len(orbital_indices)):
+            self.Orbitals[orbital_indices[i]].Energy=energies[i]
 
-    def getOccupation(self):
-        return [orbital.Occ for orbital in self.Orbitals]
+    def getOccupation(self,type_):
+        return [orbital.Occ for orbital in self.Orbitals if orbital.Type==type_]
 
-    def setOccupation(self,occupations):
-        assert len(occupations)==len(self.Orbitals)
-        for iorbital in range(len(self.Orbitals)):
-            self.Orbitals[iorbital].Occ=occupations[iorbital]
+    def setOccupation(self,type_,occupations):
+        orbital_indices=[i for i in range(len(self.Orbitals)) if self.Orbitals[i].Type==type_]
+        assert len(occupations)==len(orbital_indices)
+        for i in range(len(orbital_indices)):
+            self.Orbitals[orbital_indices[i]].Occ=occupations[i]
 
     def Export(self,filename):
 
@@ -500,7 +528,7 @@ class MultiWaveFunction:
 
             # Field 4
             f.write("\n\n# Orbitals")
-            for iorbital,orbital in zip(range(self.getNumIndBasis()),self.Orbitals):
+            for iorbital,orbital in zip(range(len(self.Orbitals)),self.Orbitals):
                 f.write("\nIndex= %9d\n" % (iorbital+1))
                 f.write("Type= "+str(orbital.Type)+"\n")
                 f.write("Energy= "+str(orbital.Energy)+"\n")
@@ -516,9 +544,21 @@ class MultiWaveFunction:
             if self.Total_density_matrix is not None:
                 f.write("$Total density matrix, dim= "+str(self.Total_density_matrix.shape[0])+" "+str(self.Total_density_matrix.shape[1])+" lower= 1\n")
                 PrintMatrix(f,self.Total_density_matrix,True)
+            if self.Alpha_density_matrix is not None:
+                f.write("$Alpha density matrix, dim= "+str(self.Alpha_density_matrix.shape[0])+" "+str(self.Alpha_density_matrix.shape[1])+" lower= 1\n")
+                PrintMatrix(f,self.Alpha_density_matrix,True)
+            if self.Beta_density_matrix is not None:
+                f.write("$Beta density matrix, dim= "+str(self.Beta_density_matrix.shape[0])+" "+str(self.Beta_density_matrix.shape[1])+" lower= 1\n")
+                PrintMatrix(f,self.Beta_density_matrix,True)
             if self.Hamiltonian_matrix is not None:
                 f.write("$1-e Hamiltonian matrix, dim= "+str(self.Hamiltonian_matrix.shape[0])+" "+str(self.Hamiltonian_matrix.shape[1])+" lower= 1\n")
                 PrintMatrix(f,self.Hamiltonian_matrix,True)
+            if self.Alpha_Hamiltonian_matrix is not None:
+                f.write("$Alpha 1-e Hamiltonian matrix, dim= "+str(self.Alpha_Hamiltonian_matrix.shape[0])+" "+str(self.Alpha_Hamiltonian_matrix.shape[1])+" lower= 1\n")
+                PrintMatrix(f,self.Alpha_Hamiltonian_matrix,True)
+            if self.Beta_Hamiltonian_matrix is not None:
+                f.write("$Beta 1-e Hamiltonian matrix, dim= "+str(self.Beta_Hamiltonian_matrix.shape[0])+" "+str(self.Beta_Hamiltonian_matrix.shape[1])+" lower= 1\n")
+                PrintMatrix(f,self.Beta_Hamiltonian_matrix,True)
             if self.Overlap_matrix is not None:
                 f.write("$Overlap matrix, dim= "+str(self.Overlap_matrix.shape[0])+" "+str(self.Overlap_matrix.shape[1])+" lower= 1\n")
                 PrintMatrix(f,self.Overlap_matrix,True)
