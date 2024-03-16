@@ -1,6 +1,6 @@
 import numpy as np
-from scipy import linalg as sl
 import copy as cp
+
 
 def generatePrincipalInteractingOrbital(basis_indices_by_frag,P):
 
@@ -10,7 +10,7 @@ def generatePrincipalInteractingOrbital(basis_indices_by_frag,P):
 
     # Principal interacting orbital
     Pab=P[np.ix_(bfA,bfB)]
-    U,Sigma,VT=sl.svd(Pab)
+    U,Sigma,VT=np.linalg.svd(Pab)
     T=np.zeros_like(P)
     T[np.ix_(bfA,bfA)]=U # NAO -> PIO
     T[np.ix_(bfB,bfB)]=VT.T
@@ -52,20 +52,7 @@ def generatePrincipalInteractingOrbital(basis_indices_by_frag,P):
             O[pips]=Oblock[::-1]
             Y[np.ix_(pips,pips)]=np.fliplr(Yblock)
     
-    # Printing PIMO components
-    info=""
-    if len(basis_indices_by_frag)==2:
-        for ipair in range(len(pair_info)):
-            pimos=pair_info[ipair]["pimos"]
-            pios=pair_info[ipair]["pios"]
-            for pimo in pimos:
-                info+="PIMO_"+str(pimo)+" ("+str(round(O[pimo],3))+", "+str(round(I[pimo],3))+") ="
-                for pio in pios:
-                    info+="  "+str(round(Y[pio,pimo],3))+" * PIO_"+str(pio)+" ("+str(round(N[pio],3))+")"
-                info+="\n"
-
-    Y=T@Y
-    return I,N,T,O,Y,info
+    return I,N,T,O,Y,pair_info
 
 def PrincipalInteractingOrbital(nao_mwfn,frags):
     basis_indices_by_center=nao_mwfn.getBasisIndexByCenter()
@@ -78,16 +65,36 @@ def PrincipalInteractingOrbital(nao_mwfn,frags):
         basis_indices_by_frag.append(basis_indices_this_fragment)
     pio_mwfn=cp.deepcopy(nao_mwfn)
     pimo_mwfn=cp.deepcopy(nao_mwfn)
-    if nao_mwfn.Wfntype==0:
-        nbasis=nao_mwfn.getNumIndBasis()
-        C=nao_mwfn.getCoefficientMatrix()
-        P=nao_mwfn.Extra_info["NAO_density_matrix"]
-        I,N,T,O,Y,info=generatePrincipalInteractingOrbital(basis_indices_by_frag,P)
-        print(info)
-        pio_mwfn.setOccupation(2*N)
-        pio_mwfn.setEnergy(4*I)
-        pio_mwfn.setCoefficientMatrix(C@T)
-        pimo_mwfn.setOccupation(2*O)
-        pimo_mwfn.setEnergy(4*I)
-        pimo_mwfn.setCoefficientMatrix(C@Y)
-        return pio_mwfn,pimo_mwfn
+    nbasis=nao_mwfn.getNumIndBasis()
+    print("Principal interacting orbitals:")
+    if nao_mwfn.Wfntype==0 or nao_mwfn.Wfntype==1:
+        for spin in ([0] if nao_mwfn.Wfntype==0 else [1,2]):
+            C=nao_mwfn.getCoefficientMatrix(spin)
+            P=None
+            match spin:
+                case 0:
+                    P=nao_mwfn.Extra_info["NAO_density_matrix"]
+                case 1:
+                    P=nao_mwfn.Extra_info["NAO_alpha_density_matrix"]
+                case 2:
+                    P=nao_mwfn.Extra_info["NAO_beta_density_matrix"]
+            I,N,T,O,Y,pair_info=generatePrincipalInteractingOrbital(basis_indices_by_frag,P)
+            I*=1 if nao_mwfn.Wfntype==0 else 2
+            output="Spin "+str(spin)+"\n"
+            if len(basis_indices_by_frag)==2: # Printing PIMO components
+                for ipair in range(len(pair_info)):
+                    pimos=pair_info[ipair]["pimos"]
+                    pios=pair_info[ipair]["pios"]
+                    for pimo in pimos:
+                        output+="PIMO_"+str(pimo+ (nao_mwfn.getNumIndBasis() if spin==2 else 0))+" ("+str(round(O[pimo],3))+", "+str(round(I[pimo]*(2 if spin==2 else 1),3))+") ="
+                        for pio in pios:
+                            output+="  "+str(round(Y[pio,pimo],3))+" * PIO_"+str(pio+ (nao_mwfn.getNumIndBasis() if spin==2 else 0))+" ("+str(round(N[pio],3))+")"
+                        output+="\n"
+            print(output)
+            pio_mwfn.setOccupation(spin,N)
+            pio_mwfn.setEnergy(spin,I)
+            pio_mwfn.setCoefficientMatrix(spin,C@T)
+            pimo_mwfn.setOccupation(spin,O)
+            pimo_mwfn.setEnergy(spin,I)
+            pimo_mwfn.setCoefficientMatrix(spin,C@T@Y)
+    return pio_mwfn,pimo_mwfn

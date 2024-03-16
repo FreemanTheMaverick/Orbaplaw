@@ -35,7 +35,7 @@ def generateNaturalBondOrbital(basis_indices_by_frag,P,C,S,maxnfrags,maxnnbos,th
         Nblock=Nblock[::-1] # Decreasing order.
         Hblock=np.fliplr(Hblock)
         for jpnbo in range(len(bic)):
-            if Nblock[jpnbo]<1.-threshold: # Ignoring all little occupation.
+            if Nblock[jpnbo]<threshold: # Ignoring all little occupation.
                 Nblock[jpnbo]=0
             else:
                 N[pnbo]=Nblock[jpnbo] # Copying the occupation number of this combination into the pNBO occupation array.
@@ -156,22 +156,10 @@ def generateNaturalBondOrbital(basis_indices_by_frag,P,C,S,maxnfrags,maxnnbos,th
         U=loc.generatePipekMezey(C@I@H[:,nbid],S,basis_indices_by_frag,loc.LowdinCharge,0) # C - NAO in AO basis; C@I@H - degenerate pNBO in AO basis
         H[:,nbid]=H[:,nbid]@U # Partially localizing the degenerate NBOs.
 
-
-    # Printing NBO and NHO information
-    info=""
-    for icomb in range(len(combs)):
-        info+="Fragment combination "+str(combs[icomb])+"\n"
-        for jnbo in range(nbo):
-            if nbo_info[jnbo]["comb"]==icomb:
-                info+="NBO_"+str(jnbo)+" ("+str(round(N[jnbo],3))+")  ="
-                for knho in nbo_info[jnbo]["nhos"]:
-                    info+="  "+str(round(H[knho,jnbo],3))+" * NHO_"+str(knho)+" ("+str(round(J[knho],3))+", F_"+str(pnho_info[knho]["frag"])+")"
-                info+="\n"
-    H=I@H # Transforming the coefficient matrix of NBO from NHO basis to NAO basis
-    return J,I,N,H,info
+    return J,I,N,H,combs,nbo_info,pnho_info
 
 
-def NaturalBondOrbital(nao_mwfn,frags=[],maxnfrags=-1,maxnnbos=-1,threshold=0.05): # By default, every atom is a fragment, which is the case of NBO. By combining atoms into fragments one extends NBO to natural fragment bond orbital (NFBO).
+def NaturalBondOrbital(nao_mwfn,frags=[],maxnfrags=-1,maxnnbos=-1,threshold=0.95): # By default, every atom is a fragment, which is the case of NBO. By combining atoms into fragments one extends NBO to natural fragment bond orbital (NFBO).
     maxnfrags=nao_mwfn.getNumCenters() if maxnfrags==-1 else maxnfrags
     frags=[[i] for i in range(nao_mwfn.getNumCenters())] if frags==[] else frags
     basis_indices_by_center=nao_mwfn.getBasisIndexByCenter()
@@ -182,22 +170,43 @@ def NaturalBondOrbital(nao_mwfn,frags=[],maxnfrags=-1,maxnnbos=-1,threshold=0.05
             assert icenter<nao_mwfn.getNumCenters(),"Atom index out of range!"
             basis_indices_this_fragment.extend(basis_indices_by_center[icenter])
         basis_indices_by_frag.append(basis_indices_this_fragment)
+    S=nao_mwfn.Overlap_matrix
+    nbasis=nao_mwfn.getNumIndBasis()
     nho_mwfn=cp.deepcopy(nao_mwfn)
     nbo_mwfn=cp.deepcopy(nao_mwfn)
-    if nao_mwfn.Wfntype==0:
-        nbasis=nao_mwfn.getNumIndBasis()
-        C=nao_mwfn.getCoefficientMatrix()
-        S=nao_mwfn.Overlap_matrix
-        maxnnbos=nao_mwfn.Naelec if maxnnbos==-1 else maxnnbos
-        P=nao_mwfn.Extra_info["NAO_density_matrix"]
-        NHO_n,NHO_nao,NBO_n,NBO_nao,info=generateNaturalBondOrbital(basis_indices_by_frag,P,C,S,maxnfrags,maxnnbos,threshold)
-        print(info)
-        nho_mwfn.setEnergy([0 for i in range(nbasis)])
-        nho_mwfn.setOccupation(2*NHO_n)
-        nho_mwfn.setCoefficientMatrix(nho_mwfn.getCoefficientMatrix()@NHO_nao)
-        nho_mwfn.Comment="Natural hybrid orbital."
-        nbo_mwfn.setEnergy([0 for i in range(nbasis)])
-        nbo_mwfn.setOccupation(2*NBO_n)
-        nbo_mwfn.setCoefficientMatrix(nbo_mwfn.getCoefficientMatrix()@NBO_nao)
-        nbo_mwfn.Comment="Natural bond orbital."
+    print("Natural (fragment) bond orbitals:")
+    if nao_mwfn.Wfntype==0 or nao_mwfn.Wfntype==1:
+        for spin in ([0] if nao_mwfn.Wfntype==0 else [1,2]):
+            C=nao_mwfn.getCoefficientMatrix(spin)
+            if maxnnbos==-1:
+                maxnnbos=nao_mwfn.Naelec if spin==1 else nao_mwfn.Nbelec
+            P=None
+            match spin:
+                case 0:
+                    P=nao_mwfn.Extra_info["NAO_density_matrix"]
+                case 1:
+                    P=nao_mwfn.Extra_info["NAO_alpha_density_matrix"]
+                case 2:
+                    P=nao_mwfn.Extra_info["NAO_beta_density_matrix"]
+            if nao_mwfn.Wfntype==0:
+                threshold=2*threshold
+            J,I,N,H,combs,nbo_info,nho_info=generateNaturalBondOrbital(basis_indices_by_frag,P,C,S,maxnfrags,maxnnbos,threshold)
+            output="Spin "+str(spin)+"\n" # Printing NBO and NHO information
+            for icomb in range(len(combs)):
+                output+="Fragment combination "+str(combs[icomb])+"\n"
+                for jnbo in range(len(nbo_info)):
+                    if nbo_info[jnbo]["comb"]==icomb:
+                        output+="NBO_"+str(jnbo+ (nao_mwfn.getNumIndBasis() if spin==2 else 0))+" ("+str(round(N[jnbo],3))+")  ="
+                        for knho in nbo_info[jnbo]["nhos"]:
+                            output+="  "+str(round(H[knho,jnbo],3))+" * NHO_"+str(knho+ (nao_mwfn.getNumIndBasis() if spin==2 else 0))+" ("+str(round(J[knho],3))+", F_"+str(nho_info[knho]["frag"])+")"
+                        output+="\n"
+            print(output)
+            nho_mwfn.setEnergy(spin,[0 for i in range(nbasis)])
+            nho_mwfn.setOccupation(spin,J)
+            nho_mwfn.setCoefficientMatrix(spin,C@I)
+            nho_mwfn.Comment="Natural hybrid orbital."
+            nbo_mwfn.setEnergy(spin,[0 for i in range(nbasis)])
+            nbo_mwfn.setOccupation(spin,N)
+            nbo_mwfn.setCoefficientMatrix(spin,C@I@H)
+            nbo_mwfn.Comment="Natural bond orbital."
     return nho_mwfn,nbo_mwfn
