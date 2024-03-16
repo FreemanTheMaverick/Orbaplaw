@@ -259,6 +259,8 @@ def MinimalShells(an,nc): # an - Atomic number; nc - Nuclear charge
         case 27:
             return [4,2,1,0,0,0,0] # Co
         case 28:
+            if nc==18:
+                return [2,1,1,0,0,0,0]
             return [4,2,1,0,0,0,0] # Ni
         case 29:
             return [4,2,1,0,0,0,0] # Cu
@@ -405,29 +407,53 @@ def MinimalShells(an,nc): # an - Atomic number; nc - Nuclear charge
         case 89:
             return [7,5,4,1,0,0,0] # Ac
         case 90:
+            if nc==12:
+                return [2,1,1,1,0,0,0]
+            elif nc==30:
+                return [3,2,2,1,0,0,0]
             return [7,5,4,1,0,0,0] # Th
         case 91:
             return [7,5,4,2,0,0,0] # Pa
         case 92:
+            if nc==14:
+                return [2,1,1,2,0,0,0]
+            elif nc==32:
+                return [3,2,2,2,0,0,0]
             return [7,5,4,2,0,0,0] # U
 
 
-def NaturalAtomicOrbital(mwfn_obj):
-    result_mwfn_obj=cp.deepcopy(mwfn_obj)
-    basis_indices_by_center=result_mwfn_obj.getBasisIndexByCenter()
-    shell_indices_by_center=result_mwfn_obj.getShellIndexByCenter()
-    basis_indices_by_shell=result_mwfn_obj.getBasisIndexByShell()
-    D=result_mwfn_obj.Total_density_matrix/2
-    S=result_mwfn_obj.Overlap_matrix
-    angulars=[shell.Type for shell in result_mwfn_obj.Shells]
-    minimal_shells=[MinimalShells(center.Index,int(center.Nuclear_charge)) for center in mwfn_obj.Centers]
-    basis_indices_nmb,basis_indices_nrb,W,N=generateNaturalAtomicOrbital(shell_indices_by_center,basis_indices_by_shell,basis_indices_by_center,angulars,D,S,minimal_shells)
-    result_mwfn_obj.setOccupation(2*W)
-    result_mwfn_obj.setCoefficientMatrix(N)
-    result_mwfn_obj.setEnergy([0 for iorbital in result_mwfn_obj.Orbitals])
-    result_mwfn_obj.Extra_info["NAO_density_matrix"]=N.T@S@D@S@N
-    result_mwfn_obj.Extra_info["NAO_minimal_basis_indices"]=basis_indices_nmb
-    result_mwfn_obj.Extra_info["NAO_Rydberg_basis_indices"]=basis_indices_nrb
-    result_mwfn_obj.Comment="Natural atomic orbitals. The Total_density_matrix is NAO-based P."
-    return result_mwfn_obj
-
+def NaturalAtomicOrbital(mo_mwfn):
+    nao_mwfn=cp.deepcopy(mo_mwfn)
+    basis_indices_by_center=nao_mwfn.getBasisIndexByCenter()
+    shell_indices_by_center=nao_mwfn.getShellIndexByCenter()
+    basis_indices_by_shell=nao_mwfn.getBasisIndexByShell()
+    basis_indices_nmb,basis_indices_nrb=None,None
+    S=nao_mwfn.Overlap_matrix
+    angulars=[shell.Type for shell in nao_mwfn.Shells]
+    minimal_shells=[MinimalShells(center.Index,int(center.Nuclear_charge)) for center in mo_mwfn.Centers]
+    print("Natural atomic orbitals:")
+    if mo_mwfn.Wfntype==0 or mo_mwfn.Wfntype==1:
+        for spin in ([0] if mo_mwfn.Wfntype==0 else [1,2]):
+            D=None
+            match spin:
+                case 0:
+                    D=nao_mwfn.Total_density_matrix
+                case 1:
+                    D=nao_mwfn.Alpha_density_matrix
+                case 2:
+                    D=nao_mwfn.Beta_density_matrix
+            basis_indices_nmb,basis_indices_nrb,W,N=generateNaturalAtomicOrbital(shell_indices_by_center,basis_indices_by_shell,basis_indices_by_center,angulars,D,S,minimal_shells)
+            nao_mwfn.setOccupation(spin,W)
+            nao_mwfn.setCoefficientMatrix(spin,N)
+            nao_mwfn.setEnergy(spin,[0 for i in range(nao_mwfn.getNumIndBasis())])
+            match spin:
+                case 0:
+                    nao_mwfn.Extra_info["NAO_density_matrix"]=N.T@S@D@S@N
+                case 1:
+                    nao_mwfn.Extra_info["NAO_alpha_density_matrix"]=N.T@S@D@S@N
+                case 2:
+                    nao_mwfn.Extra_info["NAO_beta_density_matrix"]=N.T@S@D@S@N
+    nao_mwfn.Extra_info["NAO_minimal_basis_indices"]=basis_indices_nmb
+    nao_mwfn.Extra_info["NAO_Rydberg_basis_indices"]=basis_indices_nrb
+    nao_mwfn.Comment="Natural atomic orbitals."
+    return nao_mwfn
