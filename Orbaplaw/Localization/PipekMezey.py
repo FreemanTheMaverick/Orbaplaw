@@ -1,8 +1,6 @@
 import numpy as np
-import scipy.optimize as so
 import scipy.linalg as sl
-import random as rd
-import itertools as it
+import scipy.optimize as so
 import copy as cp
 
 def LowdinCharge(C,S,basis_indices_by_center):
@@ -62,25 +60,6 @@ def PM_gradient(x,*args):
             gradient=np.append(gradient,element)
     return gradient if reverse else -gradient
 
-def PM_hessian(x,y,*args):
-    X=Lower2Skew(x)
-    Y=Lower2Skew(y)
-    C,S,basis_indices_by_center,charge_type,reverse=args
-    Qs=charge_type(C@sl.expm(-X),S,basis_indices_by_center)
-    hessian=np.array([])
-    Qks=[]
-    kD=Y@Lower2Skew(PM_gradient(x,C,S,basis_indices_by_center,charge_type,reverse))
-    for Q in Qs:
-        Qks.append(Q@Y)
-    for k in range(Qs[0].shape[0]):
-        for l in range(k):
-            element=0
-            for Q,Qk in zip(Qs,Qks):
-                element+=4*(Q[l,l]-Q[k,k])*(Qk[k,l]+Qk[l,k])
-                element-=8*(Qk[k,k]*Q[k,l]-Qk[l,l]*Q[l,k])
-                element+=0.25*(kD[l,k]-kD[k,l])
-            hessian=np.append(hessian,element)
-    return hessian if reverse else -hessian
 
 def generatePipekMezey(C,S,basis_indices_by_center,charge_type,reverse):
     norbitals=C.shape[1]
@@ -118,19 +97,24 @@ def generatePipekMezey(C,S,basis_indices_by_center,charge_type,reverse):
     X=Lower2Skew(PM.x)
     return U@sl.expm(-X)
 
-def PipekMezey(mo_mwfn,occ=True,vir=True,charge_type=LowdinCharge):
+def PipekMezey(mo_mwfn,occ=True,vir=False,charge_type=LowdinCharge):
     S=mo_mwfn.Overlap_matrix
     basis_indices_by_center=mo_mwfn.getBasisIndexByCenter()
     pm_mwfn=cp.deepcopy(mo_mwfn)
-    if mo_mwfn.Wfntype==0:
-        C=mo_mwfn.getCoefficientMatrix()
-        nocc=mo_mwfn.Naelec
-        if occ: # Localizing occupied orbitals
-            Uocc=generatePipekMezey(C[:,:nocc],S,basis_indices_by_center,charge_type,0)
-            C[:,:nocc]=C[:,:nocc]@Uocc
-        if vir: # Localizing virtual orbitals
-            Uvir=generatePipekMezey(C[:,nocc:],S,basis_indices_by_center,charge_type,0)
-            C[:,nocc:]=C[:,nocc:]@Uvir
-        pm_mwfn.setCoefficientMatrix(C)
-        pm_mwfn.setEnergy([0 for i in range(mo_mwfn.getNumIndBasis())])
-        return pm_mwfn
+    print("Pipek-Mezey localization:")
+    if mo_mwfn.Wfntype==0 or mo_mwfn.Wfntype==1:
+        for spin in ([0] if mo_mwfn.Wfntype==0 else [1,2]):
+            print("Spin "+str(spin))
+            C=mo_mwfn.getCoefficientMatrix(spin)
+            nocc=mo_mwfn.Naelec if spin==1 else mo_mwfn.Nbelec
+            if occ:
+                print("Localizing occupied orbitals")
+                Uocc=generatePipekMezey(C[:,:nocc],S,basis_indices_by_center,charge_type,0)
+                C[:,:nocc]=C[:,:nocc]@Uocc
+            if vir:
+                print("Localizing virtual orbitals")
+                Uvir=generatePipekMezey(C[:,nocc:],S,basis_indices_by_center,charge_type,0)
+                C[:,nocc:]=C[:,nocc:]@Uvir
+            pm_mwfn.setCoefficientMatrix(spin,C)
+            pm_mwfn.setEnergy(spin,[0 for i in range(mo_mwfn.getNumIndBasis())])
+    return pm_mwfn
