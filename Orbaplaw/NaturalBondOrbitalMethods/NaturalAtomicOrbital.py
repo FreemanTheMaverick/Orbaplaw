@@ -239,8 +239,9 @@ def MinimalShells(an,nc): # an - Atomic number; nc - Nuclear charge
         case 18:
             return [3,2,0,0,0,0,0] # Ar
         case 19:
-            if nc==9:
-                return [2,1,0,0,0,0,0]
+            match nc:
+                case 9:
+                    return [2,1,0,0,0,0,0]
             return [4,2,0,0,0,0,0] #  K
         case 20:
             return [4,2,0,0,0,0,0] # Ca
@@ -259,8 +260,9 @@ def MinimalShells(an,nc): # an - Atomic number; nc - Nuclear charge
         case 27:
             return [4,2,1,0,0,0,0] # Co
         case 28:
-            if nc==18:
-                return [2,1,1,0,0,0,0]
+            match nc:
+                case 18:
+                    return [2,1,1,0,0,0,0]
             return [4,2,1,0,0,0,0] # Ni
         case 29:
             return [4,2,1,0,0,0,0] # Cu
@@ -271,8 +273,9 @@ def MinimalShells(an,nc): # an - Atomic number; nc - Nuclear charge
         case 32:
             return [4,3,1,0,0,0,0] # Ge
         case 33:
-            if nc==5:
-                return [1,1,0,0,0,0,0]
+            match nc:
+                case 5:
+                    return [1,1,0,0,0,0,0]
             return [4,3,1,0,0,0,0] # As
         case 34:
             return [4,3,1,0,0,0,0] # Se
@@ -281,12 +284,14 @@ def MinimalShells(an,nc): # an - Atomic number; nc - Nuclear charge
         case 36:
             return [4,3,1,0,0,0,0] # Kr
         case 37:
-            if nc==9:
-                return [2,1,0,0,0,0,0]
+            match nc:
+                case 9:
+                    return [2,1,0,0,0,0,0]
             return [5,3,1,0,0,0,0] # Rb
         case 38:
-            if nc==10:
-                return [2,1,0,0,0,0,0]
+            match nc:
+                case 10:
+                    return [2,1,0,0,0,0,0]
             return [5,3,1,0,0,0,0] # Sr
         case 39:
             return [5,3,2,0,0,0,0] #  Y
@@ -299,12 +304,16 @@ def MinimalShells(an,nc): # an - Atomic number; nc - Nuclear charge
         case 43:
             return [5,3,2,0,0,0,0] # Tc
         case 44:
+            match nc:
+                case 16:
+                    return [2,1,1,0,0,0,0]
             return [5,3,2,0,0,0,0] # Ru
         case 45:
             return [5,3,2,0,0,0,0] # Rh
         case 46:
-            if nc==18:
-                return [2,1,1,0,0,0,0]
+            match nc:
+                case 18:
+                    return [2,1,1,0,0,0,0]
             return [5,3,2,0,0,0,0] # Pd
         case 47:
             return [5,3,2,0,0,0,0] # Ag
@@ -313,16 +322,18 @@ def MinimalShells(an,nc): # an - Atomic number; nc - Nuclear charge
         case 49:
             return [5,4,2,0,0,0,0] # In
         case 50:
-            if nc==4:
-                return [1,1,0,0,0,0,0]
-            if nc==22:
-                return [2,2,1,0,0,0,0]
+            match nc:
+                case 4:
+                    return [1,1,0,0,0,0,0]
+                case 22:
+                    return [2,2,1,0,0,0,0]
             return [5,4,2,0,0,0,0] # Sn
         case 51:
-            if nc==5:
-                return [1,1,0,0,0,0,0]
-            if nc==23:
-                return [2,2,1,0,0,0,0]
+            match nc:
+                case 5:
+                    return [1,1,0,0,0,0,0]
+                case 23:
+                    return [2,2,1,0,0,0,0]
             return [5,4,2,0,0,0,0] # Sb
         case 52:
             return [5,4,2,0,0,0,0] # Te
@@ -371,20 +382,23 @@ def MinimalShells(an,nc): # an - Atomic number; nc - Nuclear charge
         case 74:
             return [6,4,3,1,0,0,0] #  W
         case 75:
-            if nc==15:
-                return [2,1,1,0,0,0,0]
+            match nc:
+                case 15:
+                    return [2,1,1,0,0,0,0]
             return [6,4,3,1,0,0,0] # Re
         case 76:
             return [6,4,3,1,0,0,0] # Os
         case 77:
             return [6,4,3,1,0,0,0] # Ir
         case 78:
-            if nc==18:
-                return [2,1,1,0,0,0,0]
+            match nc:
+                case 18:
+                    return [2,1,1,0,0,0,0]
             return [6,4,3,1,0,0,0] # Pt
         case 79:
-            if nc==19:
-                return [2,1,1,0,0,0,0]
+            match nc:
+                case 19:
+                    return [2,1,1,0,0,0,0]
             return [6,4,3,1,0,0,0] # Au
         case 80:
             return [6,4,3,1,0,0,0] # Hg
@@ -393,6 +407,11 @@ def MinimalShells(an,nc): # an - Atomic number; nc - Nuclear charge
         case 82:
             return [6,5,3,1,0,0,0] # Pb
         case 83:
+            match nc:
+                case 5:
+                    return [1,1,0,0,0,0,0]
+                case 23:
+                    return [2,2,1,0,0,0,0]
             return [6,5,3,1,0,0,0] # Bi
         case 84:
             return [6,5,3,1,0,0,0] # Po
@@ -407,18 +426,20 @@ def MinimalShells(an,nc): # an - Atomic number; nc - Nuclear charge
         case 89:
             return [7,5,4,1,0,0,0] # Ac
         case 90:
-            if nc==12:
-                return [2,1,1,1,0,0,0]
-            elif nc==30:
-                return [3,2,2,1,0,0,0]
+            match nc:
+                case 12:
+                    return [2,1,1,1,0,0,0]
+                case 30:
+                    return [3,2,2,1,0,0,0]
             return [7,5,4,1,0,0,0] # Th
         case 91:
             return [7,5,4,2,0,0,0] # Pa
         case 92:
-            if nc==14:
-                return [2,1,1,2,0,0,0]
-            elif nc==32:
-                return [3,2,2,2,0,0,0]
+            match nc:
+                case 14:
+                    return [2,1,1,2,0,0,0]
+                case 32:
+                    return [3,2,2,2,0,0,0]
             return [7,5,4,2,0,0,0] # U
 
 
