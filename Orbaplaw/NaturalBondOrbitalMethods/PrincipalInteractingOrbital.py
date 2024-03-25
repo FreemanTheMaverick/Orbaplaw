@@ -65,7 +65,7 @@ def PrincipalInteractingOrbital(nao_mwfn,frags):
         basis_indices_by_frag.append(basis_indices_this_fragment)
     pio_mwfn=cp.deepcopy(nao_mwfn)
     pimo_mwfn=cp.deepcopy(nao_mwfn)
-    nbasis=nao_mwfn.getNumIndBasis()
+    nbasis=nao_mwfn.getNumBasis()
     print("Principal interacting orbitals:")
     if nao_mwfn.Wfntype==0 or nao_mwfn.Wfntype==1:
         for spin in ([0] if nao_mwfn.Wfntype==0 else [1,2]):
