@@ -96,7 +96,11 @@ class MultiWaveFunction:
             return matrix
 
         with open(filename,'r') as f:
-            iorbital=None
+            naorbitals=0
+            nborbitals=0
+            aorbitals=[]
+            borbitals=[]
+            this_orbital=None
             while True:
                 line=f.readline()
                 if not line:
@@ -229,19 +233,33 @@ class MultiWaveFunction:
 
                 # Field 4
                 elif "Index=" in line:
-                    if iorbital is None:
-                        self.Orbitals=[MwfnOrbital() for i in range(self.getNumIndBasis()*(1 if self.Wfntype==0 else 2))]
-                        for orbital in self.Orbitals:
+                    if len(aorbitals+borbitals)==0:
+                        aorbitals=[MwfnOrbital() for i in range(self.getNumBasis())]
+                        for orbital in aorbitals:
+                            orbital.Type=0 if self.Wfntype==0 else 1
+                            orbital.Energy=0
+                            orbital.Occ=0
                             orbital.Coeff=np.zeros(self.getNumBasis())
-                    iorbital=int(value)-1
+                        if self.Wfntype==1:
+                            borbitals=[MwfnOrbital() for i in range(self.getNumBasis())]
+                            for orbital in borbitals:
+                                orbital.Type=2
+                                orbital.Energy=0
+                                orbital.Occ=0
+                                orbital.Coeff=np.zeros(self.getNumBasis())
                 elif "Type=" in line:
-                    self.Orbitals[iorbital].Type=int(value)
+                    if int(value)!=2:
+                        this_orbital=aorbitals[naorbitals]
+                        naorbitals+=1
+                    else:
+                        this_orbital=borbitals[nborbitals]
+                        nborbitals+=1
                 elif "Energy=" in line:
-                    self.Orbitals[iorbital].Energy=float(value)
+                    this_orbital.Energy=float(value)
                 elif "Occ=" in line:
-                    self.Orbitals[iorbital].Occ=float(value)
+                    this_orbital.Occ=float(value)
                 elif "Sym=" in line:
-                    self.Orbitals[iorbital].Sym=value
+                    this_orbital.Sym=value
                 elif "$Coeff" in line:
                     ibasis=0
                     finished=False
@@ -252,9 +270,9 @@ class MultiWaveFunction:
                         newvalues=newline.split()
                         for newvalue in newvalues:
                             try:
-                                self.Orbitals[iorbital].Coeff[ibasis]=float(newvalue)
+                                this_orbital.Coeff[ibasis]=float(newvalue)
                             except ValueError:
-                                self.Orbitals[iorbital].Coeff[ibasis]=0.
+                                this_orbitalCoeff[ibasis]=0.
                             ibasis+=1
                             if ibasis==self.getNumBasis():
                                 finished=True
@@ -307,6 +325,14 @@ class MultiWaveFunction:
                     lower=int(values[7])
                     self.Potential_energy_matrix=ReadMatrix(f,nrows,ncols,lower)
         Extra_info={}
+        self.Orbitals=[MwfnOrbital() for i in range(self.getNumBasis()*(2 if self.Wfntype==1 else 1))]
+        for iaorbital in range(self.getNumBasis()):
+            self.Orbitals[iaorbital]=aorbitals[iaorbital]
+            self.Orbitals[iaorbital].Index=iaorbital+1
+        if self.Wfntype==1:
+            for iborbital in range(self.getNumBasis()):
+                self.Orbitals[iborbital+self.getNumBasis()]=borbitals[iborbital]
+                self.Orbitals[iborbital+self.getNumBasis()].Index=iborbital+self.getNumBasis()+1
 
     def getCharge(self):
         neutral=0
@@ -325,13 +351,18 @@ class MultiWaveFunction:
         return int(n)
 
     def getNumIndBasis(self):
-        return self.getNumBasis()
+        numindbasis=0
+        for orbital in self.Orbitals:
+            if not np.allclose(orbital.Coeff,np.zeros(self.getNumBasis())):
+                numindbasis+=1
+        numindbasis//=(2 if self.Wfntype==1 else 1)
+        return numindbasis
 
     def getNumPrims(self):
         n=0
         for shell in self.Shells:
-            n+=(abs(shell.Type)+1)*(abs(shell.Type)+2)/2*len(shell.Exponents)
-        return int(n)
+            n+=(abs(shell.Type)+1)*(abs(shell.Type)+2)//2*len(shell.Exponents)
+        return n
 
     def getNumShells(self):
         return len(self.Shells)
@@ -366,7 +397,6 @@ class MultiWaveFunction:
                     indices.append(ishell)
                 ishell+=1
         return indices
-
 
     def getBasisIndexByCenter(self,centers=-1):
         indices=[]
