@@ -338,6 +338,9 @@ def MinimalShells(an,nc): # an - Atomic number; nc - Nuclear charge
         case 52:
             return [5,4,2,0,0,0,0] # Te
         case 53:
+            match nc:
+                case 25:
+                    return [2,2,1,0,0,0,0]
             return [5,4,2,0,0,0,0] #  I
         case 54:
             return [5,4,2,0,0,0,0] # Xe
@@ -466,7 +469,7 @@ def NaturalAtomicOrbital(mo_mwfn):
             basis_indices_nmb,basis_indices_nrb,W,N=generateNaturalAtomicOrbital(shell_indices_by_center,basis_indices_by_shell,basis_indices_by_center,angulars,D,S,minimal_shells)
             nao_mwfn.setOccupation(spin,W)
             nao_mwfn.setCoefficientMatrix(spin,N)
-            nao_mwfn.setEnergy(spin,[0 for i in range(nao_mwfn.getNumIndBasis())])
+            nao_mwfn.setEnergy(spin,[0 for i in range(nao_mwfn.getNumBasis())])
             match spin:
                 case 0:
                     nao_mwfn.Extra_info["NAO_density_matrix"]=N.T@S@D@S@N
