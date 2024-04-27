@@ -238,14 +238,14 @@ class MultiWaveFunction:
                         for orbital in aorbitals:
                             orbital.Type=0 if self.Wfntype==0 else 1
                             orbital.Energy=0
-                            orbital.Occ=0
+                            orbital.Occ=-1
                             orbital.Coeff=np.zeros(self.getNumBasis())
                         if self.Wfntype==1:
                             borbitals=[MwfnOrbital() for i in range(self.getNumBasis())]
                             for orbital in borbitals:
                                 orbital.Type=2
                                 orbital.Energy=0
-                                orbital.Occ=0
+                                orbital.Occ=-1
                                 orbital.Coeff=np.zeros(self.getNumBasis())
                 elif "Type=" in line:
                     if int(value)!=2:
@@ -353,7 +353,7 @@ class MultiWaveFunction:
     def getNumIndBasis(self):
         numindbasis=0
         for orbital in self.Orbitals:
-            if not np.allclose(orbital.Coeff,np.zeros(self.getNumBasis())):
+            if orbital.Occ!=-1:
                 numindbasis+=1
         numindbasis//=(2 if self.Wfntype==1 else 1)
         return numindbasis
