@@ -115,7 +115,7 @@ def generateNaturalBondOrbital(basis_indices_by_frag,P,C,S,maxnfrags,maxnnbos,oc
         eigenvalue=114514
         eigenlist=[] # List of indices of degenerate pNBOs in this degenerate group, [pNBO].
         for pnbo in pnbos_comb:
-            if not np.isclose(eigenvalue,pnbo.Occupancy) and eigenlist!=[]:
+            if not np.isclose(eigenvalue,pnbo.Occupancy,atol=0.01) and eigenlist!=[]:
                 eigenlists.append(eigenlist) # Recording this degenerate group.
                 eigenlist=[] # Clean the degenerate pNBO list.
             eigenvalue=pnbo.Occupancy # Recording the eigenvalue and the index of the current pNBO.
@@ -302,13 +302,13 @@ def NaturalBondOrbital(nao_mwfn,frags=[],maxnfrags=-1,maxnnbos=-1,occ_thres=0.95
                 output+="Fragment combination "+str(comb)+"\n"
                 for nbo in nbos_comb:
                     inbo=nbos.index(nbo)
-                    occ=nbo.Occupancy
+                    occ=nbo.Occupancy.real
                     nbo_mwfn.Orbitals[inbo+ (nbasis if spin==2 else 0)].Occ=occ
                     output+="NBO_"+str(inbo+ (nbasis if spin==2 else 0))+" ("+str(round(occ,3))+")  ="
                     for nho in nbo.NHOs:
                         jnho=nhos.index(nho)
                         frag=nho.Fragment
-                        occ=nho.Occupancy
+                        occ=nho.Occupancy.real
                         nho_mwfn.Orbitals[jnho+ (nbasis if spin==2 else 0)].Occ=occ
                         coef=nbo.Vector[jnho]
                         output+="  "+str(round(coef,3))+" * NHO_"+str(jnho+ (nbasis if spin==2 else 0))+" ("+str(round(occ,3))+", F_"+str(frag)+")"
