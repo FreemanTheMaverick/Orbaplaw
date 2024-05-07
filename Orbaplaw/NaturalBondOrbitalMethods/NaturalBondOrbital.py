@@ -59,7 +59,7 @@ def SortpNBO(pnbos,feature): # Or pnhos.
     return pnbos_features
 
 
-def generateNaturalBondOrbital(basis_indices_by_frag,P,C,S,maxnfrags,maxnnbos,occ_thres,multi_thres):
+def generateNaturalBondOrbital(basis_indices_by_frag,P,C,S,maxnfrags,maxnnbos,occ_thres,multi_thres,pdeg_thres,deg_thres):
     # P - The NAO-based density matrix.
     # C - The NAO coefficient matrix in AO basis set.
     # S - The AO-based overlap matrix.
@@ -115,7 +115,7 @@ def generateNaturalBondOrbital(basis_indices_by_frag,P,C,S,maxnfrags,maxnnbos,oc
         eigenvalue=114514
         eigenlist=[] # List of indices of degenerate pNBOs in this degenerate group, [pNBO].
         for pnbo in pnbos_comb:
-            if not np.isclose(eigenvalue,pnbo.Occupancy,atol=0.01) and eigenlist!=[]:
+            if not np.isclose(eigenvalue,pnbo.Occupancy,atol=pdeg_thres) and eigenlist!=[]:
                 eigenlists.append(eigenlist) # Recording this degenerate group.
                 eigenlist=[] # Clean the degenerate pNBO list.
             eigenvalue=pnbo.Occupancy # Recording the eigenvalue and the index of the current pNBO.
@@ -251,6 +251,23 @@ def generateNaturalBondOrbital(basis_indices_by_frag,P,C,S,maxnfrags,maxnnbos,oc
             Nblock,Hblock=np.linalg.eigh(Pblock) # NBOs.
             Nblock=Nblock[::-1]
             Hblock=np.fliplr(Hblock)
+            eigenlists=[]
+            eigenlist=[]
+            eigenvalue=114514
+            for i in range(len(Nblock)):
+                if not np.isclose(Nblock[i],eigenvalue,atol=deg_thres):
+                    eigenlists.append(eigenlist)
+                    eigenlist=[]
+                eigenvalue=Nblock[i]
+                eigenlist.append(i)
+                if i+1==len(Nblock):
+                    eigenlists.append(eigenlist)
+            for eigenlist in eigenlists:
+                if len(eigenlist)<2:
+                    continue
+                H=Hblock[:,eigenlist]
+                U=loc.generatePipekMezey(C@Iblock@H,S,basis_indices_by_frag,loc.LowdinCharge,0)
+                Hblock[:,eigenlist]=H@U
             for i in range(len(Nblock)):
                 nbo=NBO()
                 nbo.Combination=pnbo.Combination
@@ -264,7 +281,7 @@ def generateNaturalBondOrbital(basis_indices_by_frag,P,C,S,maxnfrags,maxnnbos,oc
     return nhos,nbos
 
 
-def NaturalBondOrbital(nao_mwfn,frags=[],maxnfrags=-1,maxnnbos=-1,occ_thres=0.95,multi_thres=1): # By default, every atom is a fragment, which is the case of NBO. By combining atoms into fragments one extends NBO to natural fragment bond orbital (NFBO).
+def NaturalBondOrbital(nao_mwfn,frags=[],maxnfrags=-1,maxnnbos=-1,occ_thres=0.95,multi_thres=1,pdeg_thres=1e-5,deg_thres=0): # By default, every atom is a fragment, which is the case of NBO. By combining atoms into fragments one extends NBO to natural fragment bond orbital (NFBO).
     maxnfrags=nao_mwfn.getNumCenters() if maxnfrags==-1 else maxnfrags
     frags=[[i] for i in range(nao_mwfn.getNumCenters())] if frags==[] else frags
     basis_indices_by_center=nao_mwfn.getBasisIndexByCenter()
@@ -294,8 +311,9 @@ def NaturalBondOrbital(nao_mwfn,frags=[],maxnfrags=-1,maxnnbos=-1,occ_thres=0.95
                 case 2:
                     P=nao_mwfn.Extra_info["NAO_beta_density_matrix"]
             if nao_mwfn.Wfntype==0:
-                occ_thres=2*occ_thres
-            nhos,nbos=generateNaturalBondOrbital(basis_indices_by_frag,P,C,S,maxnfrags,maxnnbos,occ_thres,multi_thres)
+                occ_thres*=2
+                deg_thres*=2
+            nhos,nbos=generateNaturalBondOrbital(basis_indices_by_frag,P,C,S,maxnfrags,maxnnbos,occ_thres,multi_thres,pdeg_thres,deg_thres)
             output="Spin "+str(spin)+"\n" # Printing NBO and NHO information
             nbos_combs=SortpNBO(nbos,"Combination") # Sorting NBOs by combinations, [combination : NBO].
             for comb,nbos_comb in nbos_combs.items():
