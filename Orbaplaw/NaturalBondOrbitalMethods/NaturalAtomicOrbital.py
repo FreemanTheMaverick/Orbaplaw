@@ -124,7 +124,7 @@ def generateNaturalAtomicOrbital(shell_indices_by_center,basis_indices_by_shell,
     Nryd=np.zeros_like(N)
     Nryd[np.ix_(all_basis_indices_nmb,all_basis_indices_nmb)]=np.eye(len(all_basis_indices_nmb))
     for basis_indices_this_atom in basis_indices_nrb:
-        lmax=int((max(map(len,basis_indices_this_atom))-1)/2)
+        lmax=int((max(map(len,basis_indices_this_atom))-1)/2) if len(basis_indices_this_atom)>0 else -2 # Skipping this part if a minimal basis is used.
         for l in range(lmax+1):
             basis_index_heads=[]
             for basis_index_this_atom_this_shell in basis_indices_this_atom:
