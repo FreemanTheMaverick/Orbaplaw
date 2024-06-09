@@ -5,7 +5,7 @@ Orbital alignment analysis for plane wave basis sets
 `Orbaplaw` can be used to perform
 + Principal interacting orbital (PIO) analysis,
 + Natual fragment bond orbital (NFBO) analysis,
-+ Fragment-aligned molecular orbital (FAMO) analysis (in development).
++ Fragment-aligned molecular orbital (FAMO) analysis (under development).
 
 ## Installation
 ### Prerequisites
