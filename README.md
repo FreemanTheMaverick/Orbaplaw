@@ -43,7 +43,7 @@ Title Card Required
 NFBO analysis requires a basis set of natural atomic orbitals (NAOs).
 In `Orbaplaw`, NAO construction is supported only for pure spherical gaussian basis functions, so the keyword `5d` is necessary in the route section.
 ### Converting wavefunction file
-The resultant wavefunction is store in `job.chk`, an `chk` format file which is not supported by `Orbaplaw`.
+The resultant wavefunction is stored in `job.chk`, an `chk` format file which is not supported by `Orbaplaw`.
 We need to transform `job.chk` to `fchk` with `formchk` and then to `mwfn` format with `Multiwfn`.
 ```
 $ formchk job.chk # Now we have job.fchk
@@ -56,4 +56,28 @@ $ Multiwfn job.fchk
 0 # Return
 q # Exit Multiwfn. Now we have job.mwfn
 ```
+### Making a `.py` script for NFBO analysis
+Here is an example `Python` script for NFBO analysis, named `job.py`.
+```
+from Orbaplaw import WaveFunction as wfn # Orbaplaw.WaveFunction is a subpackage for wavefunction file I/O.
+from Orbaplaw import NaturalBondOrbitalMethods as nbo # Orbaplaw.NaturalBondOrbitalMethods is a subpackage for PIO and N(F)BO analysis.
+
+frag1=[i for i in range(43)] # NFBO analysis needs the user to manually divide the molecule into fragments. In this example, we simply divide the molecule into two fragments.
+frag2=[i for i in range(43,58)] # The first fragment covers Atoms 1-43 and the second 43-58. Note that indices start from 0 in Python.
+mo=wfn.MultiWaveFunction("job.mwfn") # Reading the wavefunction stored in the file "job.mwfn" into a MultiWaveFunction object.
+nao=nbo.NaturalAtomicOrbital(mo) # Transforming the wavefunction into NAO basis set.
+nao.Export("job_nao.mwfn") # Exporting the NAOs to the file "job_nao.mwfn".
+nfho,nfbo=nbo.NaturalBondOrbital(nao,frags=[frag1,frag2]) # Performing NFBO analysis based on the NAO-based wavefunction. Both NFHOs and NFBOs will be returned.
+nfho.Export("job_nfho.mwfn") # Exporting the NFHOs and NFBOs into ".mwfn" file.
+nfbo.Export("job_nfbo.mwfn")
+```
+Run the command `$ python job.py` and you will find the NFBO information printed on the screen, including the orbital indices, the population, the coefficients of NFHOs contributing to NFBOs and the fragments they belong to.
+```
+Fragment combination (0, 1)
+NBO_109 (2.0)  =  0.265 * NHO_109 (0.141, F_0)  0.964 * NHO_110 (1.859, F_1)
+NBO_110 (0.0)  =  -0.964 * NHO_109 (0.141, F_0)  0.265 * NHO_110 (1.859, F_1)
+NBO_111 (2.0)  =  -0.899 * NHO_111 (1.615, F_0)  -0.438 * NHO_112 (0.385, F_1)
+NBO_112 (0.0)  =  0.438 * NHO_111 (1.615, F_0)  -0.899 * NHO_112 (0.385, F_1)
+```
+You can view the orbitals (NAOs, NFHOs and NFBOs) in the ".mwfn" files with Multiwfn.
 ## Gallery
