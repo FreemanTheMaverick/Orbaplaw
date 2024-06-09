@@ -84,10 +84,15 @@ You can view the orbitals (NAOs, NFHOs and NFBOs) in the ".mwfn" files with Mult
 ## Gallery
 ### Transition state of Diels-Alder reaction between dodecahexaene and ethene
 See [^nfbo].
-### The delocalized $\sigma$ bonds in [Zn<sub>3</sub>Cp<sub>3</sub>]<sup>+</sup> and [{Th(C<sub>8</sub>H<sub>8</sub>)Cl<sub>2</sub>}<sub>3</sub>]<sup>2-</sup>
+### The delocalized σ bonds in [Zn<sub>3</sub>Cp<sub>3</sub>]<sup>+</sup> and [{Th(C<sub>8</sub>H<sub>8</sub>)Cl<sub>2</sub>}<sub>3</sub>]<sup>2-</sup>
 See [^zn3cp3] [^th1] [^th2] [^th3] and [^nfbo].
 ### The B<sub>19</sub><sup>-</sup> cluster: A 2-D three-layer model
 See [^wankel1] [^wankel2] and [^nfbo].
+### The back-bonding in a uranium(V)–dinitrogen complex
+[^udn]
+### Weak π interaction accelerating palladium-catalyzed cross-coupling aryldifluoromethylation
+[^pd]
+
 
 [^nfbo]: [This papar](https://doi.org/10.26434/chemrxiv-2024-rt585) elaborates on the concept of NFBO. It is written in a way as pedagogical as possible.
 [^zn3cp3]: Freitag, K.; Gemel, C.; Jerabek, P.; Oppel, I. M.; Seidel, R. W.; Frenking, G.; Banh, H.;Dilchert, K.; Fischer, R. A. The σ-aromatic clusters [Zn<sub>3</sub>]<sup>+</sup> and [Zn<sub>2</sub>Cu]: Embryonic brass. *Angew. Chem. Int. Ed.* **2015**, *54*, 4370–4374. [link](https://onlinelibrary.wiley.com/doi/10.1002/anie.201410737)
@@ -96,3 +101,5 @@ See [^wankel1] [^wankel2] and [^nfbo].
 [^th3]: Boronski, J. T.; Seed, J. A.; Hunger, D.; Woodward, A. W.; van Slageren, J.; Wooles, A. J.; Natrajan, L. S.; Kaltsoyannis, N.; Liddle, S. T. Reply to: [{Th(C<sub>8</sub>H<sub>8</sub>)Cl<sub>2</sub>}<sub>3</sub>]<sup>2-</sup> is stable but not aromatic. *Nature* **2022**, *603*, E21–E22. [link](https://doi.org/10.1038/s41586-021-04320-6)
 [^wankel1]: Huang, W.; Sergeeva, A. P.; Zhai, H.-J.; Averkiev, B. B.; Wang, L.-S.; Boldyrev, A. I. A concentric planar doubly π-aromatic B<sub>19</sub><sup>-</sup> cluster. *Nat. Chem.* **2010**, *2*, 202–206. [link](https://doi.org/10.1038/nchem.534)
 [^wankel2]: Li, R.; You, X.-R.; Guo, J.-C.; Zhai, H.-J. Concentric inner 2π/6σ and outer 10π/14σ aromaticity underlies the dynamic structural fluxionality of planar B<sub>19</sub><sup>-</sup> Wankel motor cluster. *J. Phys. Chem. A* **2021**, *125*, 5022–5030. [link](https://doi.org/10.1021/acs.jpca.1c02764)
+[^udn]: Lu, E.; Atkinson, B. E.; Wooles, A. J.; Boronski, J. T.; Doyle, L. R.; Tuna, F.; Cryer, J. D.; Cobb, P. J.; Vitorica-Yrezabal, I. J.; Whitehead, G. F.; others Back-bonding between an electron-poor, high-oxidation-state metal and poor π-acceptor ligand in a uranium (V)–dinitrogen complex. *Nat. Chem.* **2019**, *11*, 806–811. [link](https://doi.org/10.1038/s41557-019-0306-x)
+[^pd]: Choi, K.; Mormino, M. G.; Kalkman, E. D.; Park, J.; Hartwig, J. F. Palladium-catalyzed aryldifluoromethylation of aryl halides with aryldifluoromethyl trimethylsilanes. *Angew. Chem. Int. Ed.* **2022**, *61*, e202208204.
