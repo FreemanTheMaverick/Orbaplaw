@@ -82,3 +82,11 @@ NBO_112 (0.0)  =  0.438 * NHO_111 (1.615, F_0)  -0.899 * NHO_112 (0.385, F_1)
 You can view the orbitals (NAOs, NFHOs and NFBOs) in the ".mwfn" files with Multiwfn.
 
 ## Gallery
+### Transition state of Diels-Alder reaction between dodecahexaene and ethene
+See [^nfbo].
+### The delocalized $\sigma$ bonds in [Zn<sub>3</sub>Cp<sub>3</sub>]<sup>+</sup> and [{Th(C<sub>8</sub>H<sub>8</sub>)Cl<sub>2</sub>}<sub>3</sub>]<sup>2-</sup>
+See [^nfbo] and [^zn3cp3].
+### The B<sub>19</sub><sup>-</sup> cluster: A 2-D three-layer model
+
+[^nfbo]: [This papar](https://doi.org/10.26434/chemrxiv-2024-rt585) elaborates on the concept of NFBO. It is written in a way as pedagogical as possible.
+[^zn3cp3]: Freitag, K.; Gemel, C.; Jerabek, P.; Oppel, I. M.; Seidel, R. W.; Frenking, G.; Banh, H.;Dilchert, K.; Fischer, R. A. The σ-aromatic clusters [Zn<sub>3</sub>]<sup>+</sup> and [Zn<sub>2</sub>Cu]: Embryonic brass. *Angew. Chem. Int. Ed.* **2015**, *54*, 4370–4374. [link](https://onlinelibrary.wiley.com/doi/10.1002/anie.201410737)
