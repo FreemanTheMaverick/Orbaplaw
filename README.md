@@ -91,7 +91,14 @@ See [^wankel1] [^wankel2] and [^nfbo].
 ### The back-bonding in a uranium(V)–dinitrogen complex
 [^udn]
 ### Weak π interaction accelerating palladium-catalyzed cross-coupling aryldifluoromethylation
-[^pd]
+[^pd] ![](doc/pd.png)
+```
+Fragment combination (0, 1)
+NBO_129 (2.0)  =  -0.984 * NHO_129 (1.937, F_0)  -0.177 * NHO_130 (0.063, F_1)
+NBO_130 (0.0)  =  0.177 * NHO_129 (1.937, F_0)  -0.984 * NHO_130 (0.063, F_1)
+NBO_131 (2.0)  =  0.668 * NHO_131 (0.893, F_0)  0.744 * NHO_132 (1.107, F_1)
+NBO_132 (0.0)  =  -0.744 * NHO_131 (0.893, F_0)  0.668 * NHO_132 (1.107, F_1)
+```
 
 
 [^nfbo]: [This papar](https://doi.org/10.26434/chemrxiv-2024-rt585) elaborates on the concept of NFBO. It is written in a way as pedagogical as possible.
