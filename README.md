@@ -80,4 +80,5 @@ NBO_111 (2.0)  =  -0.899 * NHO_111 (1.615, F_0)  -0.438 * NHO_112 (0.385, F_1)
 NBO_112 (0.0)  =  0.438 * NHO_111 (1.615, F_0)  -0.899 * NHO_112 (0.385, F_1)
 ```
 You can view the orbitals (NAOs, NFHOs and NFBOs) in the ".mwfn" files with Multiwfn.
+
 ## Gallery
