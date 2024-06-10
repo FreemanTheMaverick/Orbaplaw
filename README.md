@@ -1,6 +1,9 @@
 # Orbaplaw
 Orbital alignment analysis for plane wave basis sets
 
+## Contents
+[Functions](#functions)
+
 ## Functions
 `Orbaplaw` can be used to perform
 + Principal interacting orbital (PIO) analysis,
