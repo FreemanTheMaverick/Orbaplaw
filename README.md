@@ -95,12 +95,12 @@ In 2022, Choi *et al.* realized palladium-catalyzed aryldifluoromethylation of a
 It is found that this catalyzed reaction is orders of magnitude faster than similar reactions of analogous trifluoromethyl complexes.
 The authors attributes this high reaction rate to the d(Pd)->π*(phenyl) weak interaction in the transition state of the reductive elimination step, which lowers the barrier.
 Now we use NFBO to verify this statement.
+![Transition state of the reductive elimination step](doc/pd.png)
 
 The *ab initio* computation is done to the transition state at the level of B3LYP/6-31g(d)+MWB28 with `Gaussian 16`.
 We consider the aryldifluoromethyl group as one fragment and everything else as the other fragment.
-The occupation threshold is set to 1.95 per orbital
-![](doc/pd.png)
-![](doc/pd_nfbo.png)
+The occupation threshold is set to 1.95 per orbital.
+![NFBOs and NFHOs of the transition state](doc/pd_nfbo.png)
 ```
 Fragment combination (0, 1)
 NBO_129 (2.0)  =  -0.984 * NHO_129 (1.937, F_0)  -0.177 * NHO_130 (0.063, F_1)
@@ -108,7 +108,9 @@ NBO_130 (0.0)  =  0.177 * NHO_129 (1.937, F_0)  -0.984 * NHO_130 (0.063, F_1)
 NBO_131 (2.0)  =  0.668 * NHO_131 (0.893, F_0)  0.744 * NHO_132 (1.107, F_1)
 NBO_132 (0.0)  =  -0.744 * NHO_131 (0.893, F_0)  0.668 * NHO_132 (1.107, F_1)
 ```
-
+NFBOs and NFHOs 131 and 132 correspond to the main interaction between the aryldifluoromethyl group and the phenyl ring activated by the Pd catalyst, a new C-C bond to be formed.
+This interaction is simply covalent, featuring nearly equal coefficients and electron population of the two NFHOs.
+NFBOs and NFHOs 129 and 130 correspond to the d(Pd)->π*(phenyl) interaction. NFHO 129, consisting of one of Pd's d orbitals, has a higher coefficient and a higher electron population in the bonding NFBO 129 than does NFHO 130, mainly one of the phenyl π* orbitals, which characterizes a weak dative interaction.
 
 [^nfbo]: [This papar](https://doi.org/10.26434/chemrxiv-2024-rt585) elaborates on the concept of NFBO. It is written in a way as pedagogical as possible.
 [^zn3cp3]: Freitag, K.; Gemel, C.; Jerabek, P.; Oppel, I. M.; Seidel, R. W.; Frenking, G.; Banh, H.;Dilchert, K.; Fischer, R. A. The σ-aromatic clusters [Zn<sub>3</sub>]<sup>+</sup> and [Zn<sub>2</sub>Cu]: Embryonic brass. *Angew. Chem. Int. Ed.* **2015**, *54*, 4370–4374. [link](https://onlinelibrary.wiley.com/doi/10.1002/anie.201410737)
