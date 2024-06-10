@@ -3,13 +3,18 @@ Orbital alignment analysis for plane wave basis sets
 
 
 ## Contents
-[Functions](#functions)
++ [Functions](#functions)
 
-[Installation](#installation)
++ [Installation](#installation)
 
-[Usage](#usage)
++ [Usage](#usage)
 
-[Gallery](#gallery)
++ [Gallery](#gallery)
+  + [Transition state of Diels-Alder reaction between dodecahexaene and ethene](#da)
+  + [The delocalized σ bonds in [Zn<sub>3</sub>Cp<sub>3</sub>]<sup>+</sup> and [{Th(C<sub>8</sub>H<sub>8</sub>)Cl<sub>2</sub>}<sub>3</sub>]<sup>2-</sup>](#trimetal)
+  + [The B<sub>19</sub><sup>-</sup> cluster: A 2-D three-layer model](#b19-)
+  + [The uranium-cyclobutadiene-uranium sandwich](#uu)
+  + [d->π* weak interaction accelerating palladium-catalyzed cross-coupling aryldifluoromethylation](#pd)
 
 
 ## Functions
