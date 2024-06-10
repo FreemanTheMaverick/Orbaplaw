@@ -88,18 +88,20 @@ See [^nfbo].
 See [^zn3cp3] [^th1] [^th2] [^th3] and [^nfbo].
 ### The B<sub>19</sub><sup>-</sup> cluster: A 2-D three-layer model
 See [^wankel1] [^wankel2] and [^nfbo].
-### The back-bonding in a uranium(V)–dinitrogen complex
-[^udn]
+### The uranium-cyclobutadiene-uranium sandwich
+[^uu]
 ### d->π* weak interaction accelerating palladium-catalyzed cross-coupling aryldifluoromethylation
 In 2022, Choi *et al.* realized palladium-catalyzed aryldifluoromethylation of aryl halides with aryldifluoromethyl trimethylsilanes.[^pd]
 It is found that this catalyzed reaction is orders of magnitude faster than similar reactions of analogous trifluoromethyl complexes.
 The authors attributes this high reaction rate to the d(Pd)->π*(phenyl) weak interaction in the transition state of the reductive elimination step, which lowers the barrier.
 Now we use NFBO to verify this statement.
+
 ![Transition state of the reductive elimination step](doc/pd.png)
 
 The *ab initio* computation is done to the transition state at the level of B3LYP/6-31g(d)+MWB28 with `Gaussian 16`.
 We consider the aryldifluoromethyl group as one fragment and everything else as the other fragment.
 The occupation threshold is set to 1.95 per orbital.
+
 ![NFBOs and NFHOs of the transition state](doc/pd_nfbo.png)
 ```
 Fragment combination (0, 1)
@@ -119,5 +121,5 @@ NFBOs and NFHOs 129 and 130 correspond to the d(Pd)->π*(phenyl) interaction. NF
 [^th3]: Boronski, J. T.; Seed, J. A.; Hunger, D.; Woodward, A. W.; van Slageren, J.; Wooles, A. J.; Natrajan, L. S.; Kaltsoyannis, N.; Liddle, S. T. Reply to: [{Th(C<sub>8</sub>H<sub>8</sub>)Cl<sub>2</sub>}<sub>3</sub>]<sup>2-</sup> is stable but not aromatic. *Nature* **2022**, *603*, E21–E22. [link](https://doi.org/10.1038/s41586-021-04320-6)
 [^wankel1]: Huang, W.; Sergeeva, A. P.; Zhai, H.-J.; Averkiev, B. B.; Wang, L.-S.; Boldyrev, A. I. A concentric planar doubly π-aromatic B<sub>19</sub><sup>-</sup> cluster. *Nat. Chem.* **2010**, *2*, 202–206. [link](https://doi.org/10.1038/nchem.534)
 [^wankel2]: Li, R.; You, X.-R.; Guo, J.-C.; Zhai, H.-J. Concentric inner 2π/6σ and outer 10π/14σ aromaticity underlies the dynamic structural fluxionality of planar B<sub>19</sub><sup>-</sup> Wankel motor cluster. *J. Phys. Chem. A* **2021**, *125*, 5022–5030. [link](https://doi.org/10.1021/acs.jpca.1c02764)
-[^udn]: Lu, E.; Atkinson, B. E.; Wooles, A. J.; Boronski, J. T.; Doyle, L. R.; Tuna, F.; Cryer, J. D.; Cobb, P. J.; Vitorica-Yrezabal, I. J.; Whitehead, G. F. S.; Kaltsoyannis, N.; Liddle, S. T. Back-bonding between an electron-poor, high-oxidation-state metal and poor π-acceptor ligand in a uranium (V)–dinitrogen complex. *Nat. Chem.* **2019**, *11*, 806–811. [link](https://doi.org/10.1038/s41557-019-0306-x)
+[^uu]: Patel, D.; McMaster, J.; Lewis, W.; Blake, A. J.; Liddle, S. T. Reductive assembly of cyclobutadienyl and diphosphacyclobutadienyl rings at uranium. *Nat. Commun.* **2013**, *4*, 2323. [link](https://doi.org/10.1038/ncomms3323)
 [^pd]: Choi, K.; Mormino, M. G.; Kalkman, E. D.; Park, J.; Hartwig, J. F. Palladium-catalyzed aryldifluoromethylation of aryl halides with aryldifluoromethyl trimethylsilanes. *Angew. Chem. Int. Ed.* **2022**, *61*, e202208204. [link](https://doi.org/10.1002/anie.202208204)
