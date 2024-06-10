@@ -10,7 +10,7 @@ Orbital alignment analysis for plane wave basis sets
 + [Usage](#usage)
 
 + [Gallery](#gallery)
-  + [Transition state of Diels-Alder reaction between dodecahexaene and ethene](#Transition-state-of-Diels-Alder-reaction-between-dodecahexaene-and-ethene)
+  + [Transition state of Diels-Alder reaction between dodecahexaene and ethene](#da)
 
 
 
@@ -97,7 +97,7 @@ You can view the orbitals (NAOs, NFHOs and NFBOs) in the ".mwfn" files with `Mul
 
 
 ## Gallery
-### Transition state of Diels-Alder reaction between dodecahexaene and ethene
+### <a id="da"></a> Transition state of Diels-Alder reaction between dodecahexaene and ethene
 See [^nfbo].
 ### The delocalized σ bonds in [Zn<sub>3</sub>Cp<sub>3</sub>]<sup>+</sup> and [{Th(C<sub>8</sub>H<sub>8</sub>)Cl<sub>2</sub>}<sub>3</sub>]<sup>2-</sup>
 See [^zn3cp3] [^th1] [^th2] [^th3] and [^nfbo].
