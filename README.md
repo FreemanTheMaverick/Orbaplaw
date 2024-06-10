@@ -90,8 +90,17 @@ See [^zn3cp3] [^th1] [^th2] [^th3] and [^nfbo].
 See [^wankel1] [^wankel2] and [^nfbo].
 ### The back-bonding in a uranium(V)–dinitrogen complex
 [^udn]
-### Weak π interaction accelerating palladium-catalyzed cross-coupling aryldifluoromethylation
-[^pd] ![](doc/pd.png)
+### d->π* weak interaction accelerating palladium-catalyzed cross-coupling aryldifluoromethylation
+In 2022, Choi *et al.* realized palladium-catalyzed aryldifluoromethylation of aryl halides with aryldifluoromethyl trimethylsilanes.[^pd]
+It is found that this catalyzed reaction is orders of magnitude faster than similar reactions of analogous trifluoromethyl complexes.
+The authors attributes this high reaction rate to the d(Pd)->π*(phenyl) weak interaction in the transition state of the reductive elimination step, which lowers the barrier.
+Now we use NFBO to verify this statement.
+
+The *ab initio* computation is done to the transition state at the level of B3LYP/6-31g(d)+MWB28 with `Gaussian 16`.
+We consider the aryldifluoromethyl group as one fragment and everything else as the other fragment.
+The occupation threshold is set to 1.95 per orbital
+![](doc/pd.png)
+![](doc/pd_nfbo.png)
 ```
 Fragment combination (0, 1)
 NBO_129 (2.0)  =  -0.984 * NHO_129 (1.937, F_0)  -0.177 * NHO_130 (0.063, F_1)
