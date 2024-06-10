@@ -79,7 +79,7 @@ NBO_110 (0.0)  =  -0.964 * NHO_109 (0.141, F_0)  0.265 * NHO_110 (1.859, F_1)
 NBO_111 (2.0)  =  -0.899 * NHO_111 (1.615, F_0)  -0.438 * NHO_112 (0.385, F_1)
 NBO_112 (0.0)  =  0.438 * NHO_111 (1.615, F_0)  -0.899 * NHO_112 (0.385, F_1)
 ```
-You can view the orbitals (NAOs, NFHOs and NFBOs) in the ".mwfn" files with Multiwfn.
+You can view the orbitals (NAOs, NFHOs and NFBOs) in the ".mwfn" files with `Multiwfn`.
 
 ## Gallery
 ### Transition state of Diels-Alder reaction between dodecahexaene and ethene
@@ -89,7 +89,16 @@ See [^zn3cp3] [^th1] [^th2] [^th3] and [^nfbo].
 ### The B<sub>19</sub><sup>-</sup> cluster: A 2-D three-layer model
 See [^wankel1] [^wankel2] and [^nfbo].
 ### The uranium-cyclobutadiene-uranium sandwich
-[^uu]
+In 2013, Patel *et al* reported the synthesis of several complexes featuring a uranium-cyclobutadienyl/diphosphacyclobutadienyl-uranium sandwich structure.[^uu]
+In this type of complexes, the cyclobutadienyl/diphosphacyclobutadienyl group lies between two uranium motifs.
+Their molecular orbitals, however, are too delocalized and make the bonding schemes between the uranium motifs and the cyclobutadienyl/diphosphacyclobutadienyl group elusive.
+Here we use our NFBO method to decipher the bonding schemes.
+
+![The uranium-cyclobutadiene-uranium sandwich structure](doc/uu.png)
+
+We choose the uranium-cyclobutadiene-uranium complex as an example and replace all the aromatic and methyl substituents with hydrogen atoms to simplify the model for shorter computation time.
+The *ab initio* computation is done at the level of B3LYP/6-31g(d)+MWB60 with `Gaussian 16`.
+The two uranium motifs and the middle cyclobutadiene are considered three fragments.
 ### d->π* weak interaction accelerating palladium-catalyzed cross-coupling aryldifluoromethylation
 In 2022, Choi *et al.* realized palladium-catalyzed aryldifluoromethylation of aryl halides with aryldifluoromethyl trimethylsilanes.[^pd]
 It is found that this catalyzed reaction is orders of magnitude faster than similar reactions of analogous trifluoromethyl complexes.
