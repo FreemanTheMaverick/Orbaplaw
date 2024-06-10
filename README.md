@@ -1,11 +1,16 @@
 # Orbaplaw
 Orbital alignment analysis for plane wave basis sets
 
+
 ## Contents
 [Functions](#functions)
+
 [Installation](#installation)
+
 [Usage](#usage)
+
 [Gallery](#gallery)
+
 
 ## Functions
 `Orbaplaw` can be used to perform
@@ -28,7 +33,8 @@ Therefore, a recent distribution of `Anaconda` is all `Orbaplaw` needs.
   export PYTHONPATH=[Installation directory]/Orbaplaw:$PYTHONPATH
   ```
 + `$ source ~/.bashrc`
-  
+
+
 ## Usage
 Here is a typical procedure to perform NFBO analysis with `Orbaplaw`.
 ### *Ab initio* quantum chemistry computation
@@ -86,6 +92,7 @@ NBO_111 (2.0)  =  -0.899 * NHO_111 (1.615, F_0)  -0.438 * NHO_112 (0.385, F_1)
 NBO_112 (0.0)  =  0.438 * NHO_111 (1.615, F_0)  -0.899 * NHO_112 (0.385, F_1)
 ```
 You can view the orbitals (NAOs, NFHOs and NFBOs) in the ".mwfn" files with `Multiwfn`.
+
 
 ## Gallery
 ### Transition state of Diels-Alder reaction between dodecahexaene and ethene
