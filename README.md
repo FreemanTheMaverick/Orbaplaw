@@ -11,7 +11,10 @@ Orbital alignment analysis for plane wave basis sets
 
 + [Gallery](#gallery)
   + [Transition state of Diels-Alder reaction between dodecahexaene and ethene](#da)
-
+  + [The delocalized σ bonds in [Zn<sub>3</sub>Cp<sub>3</sub>]<sup>+</sup> and [{Th(C<sub>8</sub>H<sub>8</sub>)Cl<sub>2</sub>}<sub>3</sub>]<sup>2-</sup>](#trimetal)
+  + [The B<sub>19</sub><sup>-</sup> cluster: A 2-D three-layer model](#wankel)
+  + [The uranium-cyclobutadiene-uranium sandwich](#uu)
+  + [d->π* weak interaction accelerating palladium-catalyzed cross-coupling aryldifluoromethylation](#pd)
 
 
 ## Functions
@@ -99,11 +102,11 @@ You can view the orbitals (NAOs, NFHOs and NFBOs) in the ".mwfn" files with `Mul
 ## Gallery
 ### <a id="da"></a> Transition state of Diels-Alder reaction between dodecahexaene and ethene
 See [^nfbo].
-### The delocalized σ bonds in [Zn<sub>3</sub>Cp<sub>3</sub>]<sup>+</sup> and [{Th(C<sub>8</sub>H<sub>8</sub>)Cl<sub>2</sub>}<sub>3</sub>]<sup>2-</sup>
+### <a id="trimetal"></a> The delocalized σ bonds in [Zn<sub>3</sub>Cp<sub>3</sub>]<sup>+</sup> and [{Th(C<sub>8</sub>H<sub>8</sub>)Cl<sub>2</sub>}<sub>3</sub>]<sup>2-</sup>
 See [^zn3cp3] [^th1] [^th2] [^th3] and [^nfbo].
-### The B<sub>19</sub><sup>-</sup> cluster: A 2-D three-layer model
+### <a id="wankel"></a> The B<sub>19</sub><sup>-</sup> cluster: A 2-D three-layer model
 See [^wankel1] [^wankel2] and [^nfbo].
-### The uranium-cyclobutadiene-uranium sandwich
+### <a id="uu"></a> The uranium-cyclobutadiene-uranium sandwich
 In 2013, Patel *et al* reported the synthesis of several complexes featuring a uranium-cyclobutadienyl/diphosphacyclobutadienyl-uranium sandwich structure.[^uu]
 In this type of complexes, the cyclobutadienyl/diphosphacyclobutadienyl group lies between two uranium motifs.
 Their molecular orbitals, however, are too delocalized and make the bonding schemes between the uranium motifs and the cyclobutadienyl/diphosphacyclobutadienyl group elusive.
@@ -114,7 +117,7 @@ Here we use our NFBO method to decipher the bonding schemes.
 We choose the uranium-cyclobutadiene-uranium complex as an example and replace all the aromatic and methyl substituents with hydrogen atoms to simplify the model for shorter computation time.
 The *ab initio* computation is done at the level of B3LYP/6-31g(d)+MWB60 with `Gaussian 16`.
 The two uranium motifs and the middle cyclobutadiene are considered three fragments.
-### d->π* weak interaction accelerating palladium-catalyzed cross-coupling aryldifluoromethylation
+### <a id="pd"></a> d->π* weak interaction accelerating palladium-catalyzed cross-coupling aryldifluoromethylation
 In 2022, Choi *et al.* realized palladium-catalyzed aryldifluoromethylation of aryl halides with aryldifluoromethyl trimethylsilanes.[^pd]
 It is found that this catalyzed reaction is orders of magnitude faster than similar reactions of analogous trifluoromethyl complexes.
 The authors attributes this high reaction rate to the d(Pd)->π*(phenyl) weak interaction in the transition state of the reductive elimination step, which lowers the barrier.
