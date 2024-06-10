@@ -3,6 +3,9 @@ Orbital alignment analysis for plane wave basis sets
 
 ## Contents
 [Functions](#functions)
+[Installation](#installation)
+[Usage](#usage)
+[Gallery](#gallery)
 
 ## Functions
 `Orbaplaw` can be used to perform
