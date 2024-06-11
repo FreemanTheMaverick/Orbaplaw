@@ -108,14 +108,27 @@ See [^zn3cp3] [^th1] [^th2] [^th3] and [^nfbo].
 ### <a id="wankel"></a> The B<sub>19</sub><sup>-</sup> cluster: A 2-D three-layer model
 See [^wankel1] [^wankel2] and [^nfbo].
 ### <a id="ti"></a> The tri-nuclear titanium polyhydride complex
-[^ti]
+Shima *et al.* achieved dinitrogen cleavage with a tri-nuclear titanium polyhydride complex.[^ti]
+This complex consists of three [Ti-Cp'] motifs connected by six bridging hydrogen atoms and another hydrogen atom above the tri-nuclear plane.
+When it comes to the electronic structure of this complex, however, the authors had difficulties in assigning the oxidation state of the titanium atoms.
+The total charge of the ligands are ten, not divisible by three, the number of the titanium atoms.
+As a result, one may have to make do with two titanium atoms with formal charge (III) and the other with (IV).
+By NFBO analysis, we will show that there is actually one pair of electrons delocalized among the three titanium atoms and the out-of-plane hydrogen atoms.
+Seperating the two electrons from the two Ti(III) atoms, we have a normal three-Ti(IV) configuration.
 
 ![The tri-nuclear titanium polyhydride complex structure](doc/ti.png)
+
+We simplify the model by replacing all the substituents on the Cp rings to hydrogen atoms.
+The *ab initio* computation is done at the level of B3LYP/6-31g(d) with `Gaussian 16`.
+The three [Ti-Cp'] motifs and the out-of-plane hydrogen atom are taken as four fragments.
+Each pair of the remaining hydrogen atoms makes one fragment.
+In total, there are seven fragments.
+
 
 ![NFBOs and NFHOs of the delocalized bond](doc/ti_nfbo.png)
 
 ### <a id="uu"></a> The uranium-cyclobutadiene-uranium sandwich
-In 2013, Patel *et al* reported the synthesis of several complexes featuring a uranium-cyclobutadienyl/diphosphacyclobutadienyl-uranium sandwich structure.[^uu]
+In 2013, Patel *et al.* reported the synthesis of several complexes featuring a uranium-cyclobutadienyl/diphosphacyclobutadienyl-uranium sandwich structure.[^uu]
 In this type of complexes, the cyclobutadienyl/diphosphacyclobutadienyl group lies between two uranium motifs.
 Their molecular orbitals, however, are too delocalized and make the bonding schemes between the uranium motifs and the cyclobutadienyl/diphosphacyclobutadienyl group elusive.
 Here we use our NFBO method to decipher the bonding schemes.
@@ -128,7 +141,7 @@ The two uranium motifs and the middle cyclobutadiene are considered three fragme
 ### <a id="pd"></a> d->π* weak interaction accelerating palladium-catalyzed cross-coupling aryldifluoromethylation
 In 2022, Choi *et al.* realized palladium-catalyzed aryldifluoromethylation of aryl halides with aryldifluoromethyl trimethylsilanes.[^pd]
 It is found that this catalyzed reaction is orders of magnitude faster than similar reactions of analogous trifluoromethyl complexes.
-The authors attributes this high reaction rate to the d(Pd)->π*(phenyl) weak interaction in the transition state of the reductive elimination step, which lowers the barrier.
+The authors attribute this high reaction rate to the d(Pd)->π*(phenyl) weak interaction in the transition state of the reductive elimination step, which lowers the barrier.
 Now we use NFBO to verify this statement.
 
 ![Transition state of the reductive elimination step](doc/pd.png)
