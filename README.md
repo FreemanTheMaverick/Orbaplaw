@@ -118,7 +118,7 @@ Seperating these two electrons from the two Ti(III) atoms, we have a normal thre
 
 ![The tri-nuclear titanium polyhydride complex structure](doc/ti.png)
 
-We simplify the model by replacing all the substituents on the Cp rings to hydrogen atoms.
+We simplify the model by replacing all the Cp' rings with unsubstituted Cp rings.
 The *ab initio* computation is done at the level of B3LYP/6-31g(d) with `Gaussian 16`.
 The three [Ti-Cp'] motifs and the out-of-plane hydrogen atom are taken as four fragments.
 Each pair of the remaining hydrogen atoms makes one fragment.
