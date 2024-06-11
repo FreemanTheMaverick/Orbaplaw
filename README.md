@@ -13,6 +13,7 @@ Orbital alignment analysis for plane wave basis sets
   + [Transition state of Diels-Alder reaction between dodecahexaene and ethene](#da)
   + [The delocalized σ bonds in [Zn<sub>3</sub>Cp<sub>3</sub>]<sup>+</sup> and [{Th(C<sub>8</sub>H<sub>8</sub>)Cl<sub>2</sub>}<sub>3</sub>]<sup>2-</sup>](#trimetal)
   + [The B<sub>19</sub><sup>-</sup> cluster: A 2-D three-layer model](#wankel)
+  + [The tri-nuclear titanium polyhydride complex](#ti)
   + [The uranium-cyclobutadiene-uranium sandwich](#uu)
   + [d->π* weak interaction accelerating palladium-catalyzed cross-coupling aryldifluoromethylation](#pd)
 
@@ -106,6 +107,13 @@ See [^nfbo].
 See [^zn3cp3] [^th1] [^th2] [^th3] and [^nfbo].
 ### <a id="wankel"></a> The B<sub>19</sub><sup>-</sup> cluster: A 2-D three-layer model
 See [^wankel1] [^wankel2] and [^nfbo].
+### <a id="ti"></a> The tri-nuclear titanium polyhydride complex
+
+
+![The tri-nuclear titanium polyhydride complex structure](doc/ti.png)
+
+![NFBOs and NFHOs of the delocalized bond](doc/ti_nfbo.png)
+
 ### <a id="uu"></a> The uranium-cyclobutadiene-uranium sandwich
 In 2013, Patel *et al* reported the synthesis of several complexes featuring a uranium-cyclobutadienyl/diphosphacyclobutadienyl-uranium sandwich structure.[^uu]
 In this type of complexes, the cyclobutadienyl/diphosphacyclobutadienyl group lies between two uranium motifs.
