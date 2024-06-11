@@ -119,8 +119,8 @@ Seperating these two electrons from the two Ti(III) atoms, we have a normal thre
 ![The tri-nuclear titanium polyhydride complex structure](doc/ti.png)
 
 We simplify the model by replacing all the Cp' rings with unsubstituted Cp rings.
-The *ab initio* computation is done at the level of B3LYP/6-31g(d) with `Gaussian 16`.
-The three [Ti-Cp'] motifs and the out-of-plane hydrogen atom are taken as four fragments.
+The *ab initio* computation is done at the level of B3LYP/6-31G(d) with `Gaussian 16`.
+The three [Ti-Cp] motifs and the out-of-plane hydrogen atom are taken as four fragments.
 Each pair of the remaining hydrogen atoms makes one fragment.
 In total, there are seven fragments.
 NFBO analysis gives a result of six Ti-H<sub>μ2</sub>-Ti three-center bonds (each involving one bridging hydrogen atom and its two neighbouring titanium atoms), one Ti-Ti-Ti-H<sub>μ3</sub> four-center bond and one Ti-Ti-Ti three-center bond.
@@ -138,7 +138,7 @@ Here we use our NFBO method to decipher the bonding schemes.
 ![The uranium-cyclobutadiene-uranium sandwich structure](doc/uu.png)
 
 We choose the uranium-cyclobutadiene-uranium complex as an example and replace all the aromatic and methyl substituents with hydrogen atoms to simplify the model for shorter computation time.
-The *ab initio* computation is done at the level of B3LYP/6-31g(d)+MWB60 with `Gaussian 16`.
+The *ab initio* computation is done at the level of B3LYP/6-31G(d)+MWB60 with `Gaussian 16`.
 The two uranium motifs and the middle cyclobutadiene are considered three fragments.
 ### <a id="pd"></a> d->π* weak interaction accelerating palladium-catalyzed cross-coupling aryldifluoromethylation
 In 2022, Choi *et al.* realized palladium-catalyzed aryldifluoromethylation of aryl halides with aryldifluoromethyl trimethylsilanes.[^pd]
@@ -148,7 +148,7 @@ Now we use NFBO to verify this statement.
 
 ![Transition state of the reductive elimination step](doc/pd.png)
 
-The *ab initio* computation is done to the transition state at the level of B3LYP/6-31g(d)+MWB28 with `Gaussian 16`.
+The *ab initio* computation is done to the transition state at the level of B3LYP/6-31G(d)+MWB28 with `Gaussian 16`.
 We consider the aryldifluoromethyl group as one fragment and everything else as the other fragment.
 The occupation threshold is set to 1.95 per orbital.
 
