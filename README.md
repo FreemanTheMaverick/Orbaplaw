@@ -113,8 +113,8 @@ This complex consists of three [Ti-Cp'] motifs connected by six bridging hydroge
 When it comes to the electronic structure of this complex, however, the authors had difficulties in assigning the oxidation state of the titanium atoms.
 The total charge of the ligands are ten, not divisible by three, the number of the titanium atoms.
 As a result, one may have to make do with two titanium atoms with formal charge (III) and the other with (IV).
-By NFBO analysis, we will show that there is actually one pair of electrons delocalized among the three titanium atoms and the out-of-plane hydrogen atoms.
-Seperating the two electrons from the two Ti(III) atoms, we have a normal three-Ti(IV) configuration.
+By NFBO analysis, we will show that there is actually one pair of electrons delocalized among the three titanium atoms, involving no ligands.
+Seperating these two electrons from the two Ti(III) atoms, we have a normal three-Ti(IV) configuration.
 
 ![The tri-nuclear titanium polyhydride complex structure](doc/ti.png)
 
@@ -123,7 +123,9 @@ The *ab initio* computation is done at the level of B3LYP/6-31g(d) with `Gaussia
 The three [Ti-Cp'] motifs and the out-of-plane hydrogen atom are taken as four fragments.
 Each pair of the remaining hydrogen atoms makes one fragment.
 In total, there are seven fragments.
-
+NFBO analysis gives a result of six Ti-H<sub>μ2</sub>-Ti three-center bonds (each involving one bridging hydrogen atom and its two neighbouring titanium atoms), one Ti-Ti-Ti-H<sub>μ3</sub> four-center bond and one Ti-Ti-Ti three-center bond.
+When assigning charges to the titanium atoms, one should consider the ten electrons by the ligands as well as the two electrons accommodated by the Ti-Ti-Ti three-center bond.
+Therefore, each titanium atom has an oxidation state of (IV).
 
 ![NFBOs and NFHOs of the delocalized bond](doc/ti_nfbo.png)
 
