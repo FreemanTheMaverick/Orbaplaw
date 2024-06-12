@@ -127,7 +127,10 @@ NFBO analysis gives a result of six Ti-H<sub>μ2</sub>-Ti three-center bonds (ea
 When assigning charges to the titanium atoms, one should consider the ten electrons by the ligands as well as the two electrons accommodated by the Ti-Ti-Ti three-center bond.
 Therefore, each titanium atom has an oxidation state of (IV).
 
-![NFBOs and NFHOs of the delocalized bond](doc/ti_nfbo.png)
+![Ti-H-Ti](doc/ti_nfbo1.png)
+![Ti-Ti-Ti-H](doc/ti_nfbo2.png)
+![Ti-Ti-Ti](doc/ti_nfbo3.png)
+
 
 ### <a id="uu"></a> The uranium-cyclobutadiene-uranium sandwich
 In 2013, Patel *et al.* reported the synthesis of several complexes featuring a uranium-cyclobutadienyl/diphosphacyclobutadienyl-uranium sandwich structure.[^uu]
