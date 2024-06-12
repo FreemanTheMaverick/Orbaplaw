@@ -123,6 +123,7 @@ The *ab initio* computation is done at the level of B3LYP/6-31G(d) with `Gaussia
 The three [Ti-Cp] motifs and the out-of-plane hydrogen atom are taken as four fragments.
 Each pair of the remaining hydrogen atoms makes one fragment.
 In total, there are seven fragments.
+The occupation threshold is the default value, 1.9 per orbital.
 NFBO analysis gives a result of six Ti-H<sub>μ2</sub>-Ti three-center bonds (each involving one bridging hydrogen atom and its two neighbouring titanium atoms), one Ti-Ti-Ti-H<sub>μ3</sub> four-center bond and one Ti-Ti-Ti three-center bond.
 When assigning charges to the titanium atoms, one should consider the ten electrons by the ligands as well as the two electrons accommodated by the Ti-Ti-Ti three-center bond.
 Therefore, each titanium atom has an oxidation state of (IV).
