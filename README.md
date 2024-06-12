@@ -116,7 +116,8 @@ As a result, one may have to make do with two titanium atoms with formal charge 
 By NFBO analysis, we will show that there is actually one pair of electrons delocalized among the three titanium atoms, involving no ligands.
 Seperating these two electrons from the two Ti(III) atoms, we have a normal three-Ti(IV) configuration.
 
-![The tri-nuclear titanium polyhydride complex structure](doc/ti.png)
+![ti](doc/ti.png)
+*The structure of the tri-nuclear titanium polyhydride complex. The formal charge (III) of one Ti atom different from (IV) of the other two is not a typo.*
 
 We simplify the model by replacing all the Cp' rings with unsubstituted Cp rings.
 The *ab initio* computation is done at the level of B3LYP/6-31G(d) with `Gaussian 16`.
@@ -128,10 +129,14 @@ NFBO analysis gives a result of six Ti-H<sub>μ2</sub>-Ti three-center bonds (ea
 When assigning charges to the titanium atoms, one should consider the ten electrons by the ligands as well as the two electrons accommodated by the Ti-Ti-Ti three-center bond.
 Therefore, each titanium atom has an oxidation state of (IV).
 
-![Ti-H-Ti](doc/ti_nfbo1.png)
-![Ti-Ti-Ti-H](doc/ti_nfbo2.png)
-![Ti-Ti-Ti](doc/ti_nfbo3.png)
+![ti_nfbo1](doc/ti_nfbo1.png)
+*One of the six Ti-H<sub>μ2</sub>-Ti three-center bonds*
 
+![ti_nfbo2](doc/ti_nfbo2.png)
+*The Ti-Ti-Ti-H<sub>μ3</sub> four-center bond*
+
+![ti_nfbo3](doc/ti_nfbo3.png)
+*The Ti-Ti-Ti three-center bond*
 
 ### <a id="uu"></a> The uranium-cyclobutadiene-uranium sandwich
 In 2013, Patel *et al.* reported the synthesis of several complexes featuring a uranium-cyclobutadienyl/diphosphacyclobutadienyl-uranium sandwich structure.[^uu]
@@ -139,14 +144,17 @@ In this type of complexes, the cyclobutadienyl/diphosphacyclobutadienyl group li
 Their molecular orbitals, however, are too delocalized and make the bonding schemes between the uranium motifs and the cyclobutadienyl/diphosphacyclobutadienyl group elusive.
 Here we use our NFBO method to decipher the bonding schemes.
 
-![The uranium-cyclobutadiene-uranium sandwich structure](doc/uu.png)
+![uu](doc/uu.png)
 
 We choose the uranium-cyclobutadiene-uranium complex as an example and replace all the aromatic and methyl substituents with hydrogen atoms to simplify the model for shorter computation time.
 The *ab initio* computation is done at the level of B3LYP/6-31G(d)+MWB60 with `Gaussian 16`.
 The two uranium motifs and the middle cyclobutadiene are considered three fragments.
 
 ![uu_nfbo1](doc/uu_nfbo1.png)
+*NFBOs and NFHOs of one three-fragment bonds*
+
 ![uu_nfbo2](doc/uu_nfbo2.png)
+*NFBOs and NFHOs of the other three-fragment bonds*
 
 
 ### <a id="pd"></a> d->π* weak interaction accelerating palladium-catalyzed cross-coupling aryldifluoromethylation
@@ -155,13 +163,15 @@ It is found that this catalyzed reaction is orders of magnitude faster than simi
 The authors attribute this high reaction rate to the d(Pd)->π*(phenyl) weak interaction in the transition state of the reductive elimination step, which lowers the barrier.
 Now we use NFBO to verify this statement.
 
-![Transition state of the reductive elimination step](doc/pd.png)
+![pd](doc/pd.png)
+*Transition state of the reductive elimination step*
 
 The *ab initio* computation is done to the transition state at the level of B3LYP/6-31G(d)+MWB28 with `Gaussian 16`.
 We consider the aryldifluoromethyl group as one fragment and everything else as the other fragment.
 The occupation threshold is set to 1.95 per orbital.
 
-![NFBOs and NFHOs of the transition state](doc/pd_nfbo.png)
+![pd_nfbo](doc/pd_nfbo.png)
+*NFBOs and NFHOs of the transition state*
 ```
 Fragment combination (0, 1)
 NBO_129 (2.0)  =  -0.984 * NHO_129 (1.937, F_0)  -0.177 * NHO_130 (0.063, F_1)
