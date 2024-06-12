@@ -144,6 +144,11 @@ Here we use our NFBO method to decipher the bonding schemes.
 We choose the uranium-cyclobutadiene-uranium complex as an example and replace all the aromatic and methyl substituents with hydrogen atoms to simplify the model for shorter computation time.
 The *ab initio* computation is done at the level of B3LYP/6-31G(d)+MWB60 with `Gaussian 16`.
 The two uranium motifs and the middle cyclobutadiene are considered three fragments.
+
+![uu_nfbo1](doc/uu_nfbo1.png)
+![uu_nfbo2](doc/uu_nfbo2.png)
+
+
 ### <a id="pd"></a> d->π* weak interaction accelerating palladium-catalyzed cross-coupling aryldifluoromethylation
 In 2022, Choi *et al.* realized palladium-catalyzed aryldifluoromethylation of aryl halides with aryldifluoromethyl trimethylsilanes.[^pd]
 It is found that this catalyzed reaction is orders of magnitude faster than similar reactions of analogous trifluoromethyl complexes.
