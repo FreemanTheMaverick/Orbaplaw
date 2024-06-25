@@ -25,10 +25,10 @@ def Localizer(mo_mwfn,space="occ",method="PipekMezey",method_optn={}):
             else:
                 if space=="occ" or space=="both":
                     print("Localizing occupied orbitals")
-                    C[:,:nocc]=method_function(C[:,:nocc],S,basis_indices_by_center,charge_type)
+                    C[:,:nocc]=C[:,:nocc]@method_function(C[:,:nocc],S,basis_indices_by_center,charge_type)
                 if space=="vir" or space=="both":
                     print("Localizing virtual orbitals")
-                    C[:,nocc:]=method_function(C[:,nocc:],S,basis_indices_by_center,charge_type)
+                    C[:,nocc:]=C[:,nocc:]@method_function(C[:,nocc:],S,basis_indices_by_center,charge_type)
             loc_mwfn.setCoefficientMatrix(spin,C)
             loc_mwfn.setEnergy(spin,[0 for i in range(mo_mwfn.getNumIndBasis())])
     return loc_mwfn
