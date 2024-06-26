@@ -11,6 +11,8 @@ def Localizer(mo_mwfn,space="occ",method="PipekMezey",method_optn={}):
     method_function=None
     charge_type=None
     if method.upper()=="PM" or "PIPEK" in method.upper() or "MEZEY" in method.upper():
+        if space=="mix":
+            raise RuntimeError("Fractionally occupied orbitals and mixing occupied and virtual orbitals in Pipek-Mezey localization is not supported!")
         method_string="Pipek-Mezey"
         method_function=PipekMezey
         charge_type=method_optn.get("charge_type","Lowdin")
@@ -20,7 +22,7 @@ def Localizer(mo_mwfn,space="occ",method="PipekMezey",method_optn={}):
             print("Spin "+str(spin))
             C=mo_mwfn.getCoefficientMatrix(spin)
             nocc=mo_mwfn.Naelec if spin==1 else mo_mwfn.Nbelec
-            if space=="all":
+            if space=="mix":
                 pass
             else:
                 if space=="occ" or space=="both":
