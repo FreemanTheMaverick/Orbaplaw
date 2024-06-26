@@ -122,7 +122,7 @@ By NFBO analysis, we will show that there is actually one pair of electrons delo
 Seperating these two electrons from the two Ti(III) atoms, we have a normal three-Ti(IV) configuration.
 
 ![ti](doc/ti.png)
-*The structure of the tri-nuclear titanium polyhydride complex. The formal charge (III) of one Ti atom different from (IV) of the other two is not a typo.*
+*The structure of the tri-nuclear titanium polyhydride complex. The formal charge (IV) of one Ti atom different from (III) of the other two is not a typo.*
 
 We simplify the model by replacing all the Cp' rings with unsubstituted Cp rings.
 The *ab initio* computation is done at the level of B3LYP/6-31G(d) with `Gaussian 16`.
