@@ -20,9 +20,14 @@ Orbital alignment analysis for plane wave basis sets
 
 ## Functions
 `Orbaplaw` can be used to perform
-+ Principal interacting orbital (PIO) analysis,
-+ Natual fragment bond orbital (NFBO) analysis,
-+ Fragment-aligned molecular orbital (FAMO) analysis (under development).
++ Population analysis
+  + Lowin Population
++ Orbital localization
+  + Pipek-Mezey localization
++ Inter-fragment bonding analysis
+  + Principal interacting orbital (PIO) analysis,
+  + Natual fragment bond orbital (NFBO) analysis,
+  + Fragment-aligned molecular orbital (FAMO) analysis (under development).
 
 ## Installation
 ### Prerequisites
@@ -51,7 +56,7 @@ Here we use `Gaussian 16` as an example.
 %nprocshared=40
 %mem=60GB
 %chk=job.chk
-# b3lyp 6-31g(d) 5d
+# b3lyp 6-31g(d) 5d 7f
 
 Title Card Required
 
@@ -59,7 +64,7 @@ Title Card Required
 ......
 ```
 NFBO analysis requires a basis set of natural atomic orbitals (NAOs).
-In `Orbaplaw`, NAO construction is supported only for pure spherical gaussian basis functions, so the keyword `5d` is necessary in the route section.
+In `Orbaplaw`, NAO construction is supported only for pure spherical gaussian basis functions, so the keyword `5d 7f` is necessary in the route section.
 ### Converting wavefunction file
 The resultant wavefunction is stored in `job.chk`, an `chk` format file which is not supported by `Orbaplaw`.
 We need to transform `job.chk` to `fchk` with `formchk` and then to `mwfn` format with `Multiwfn`.
