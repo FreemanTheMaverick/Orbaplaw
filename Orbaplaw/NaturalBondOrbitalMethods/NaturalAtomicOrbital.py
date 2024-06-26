@@ -231,6 +231,9 @@ def MinimalShells(an,nc): # an - Atomic number; nc - Nuclear charge
         case 14:
             return [3,2,0,0,0,0,0] # Si
         case 15:
+            match nc:
+                case 5:
+                    return [1,1,0,0,0,0]
             return [3,2,0,0,0,0,0] #  P
         case 16:
             return [3,2,0,0,0,0,0] #  S
