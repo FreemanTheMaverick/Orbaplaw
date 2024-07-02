@@ -4,5 +4,5 @@ ConjugateGradient=DirectionSearch.ConjugateGradient
 from Orbaplaw.Optimization import LineSearch
 MeshCubic=LineSearch.MeshCubic
 
-from Orbaplaw.Optimization import Optimizer
-UnitaryOptimizer=Optimizer.UnitaryOptimizer
+from Orbaplaw.Optimization import UnitaryOptimizer
+Lehtola=UnitaryOptimizer.Lehtola
