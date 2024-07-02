@@ -24,6 +24,9 @@ Orbital alignment analysis for plane wave basis sets
   + Lowin Population
 + Orbital localization
   + Pipek-Mezey localization
+  + Fock space localization
+  + Foster-Boys localization (under development)
+  + Localized orbitalet (under development)
 + Inter-fragment bonding analysis
   + Principal interacting orbital (PIO) analysis,
   + Natual fragment bond orbital (NFBO) analysis,
