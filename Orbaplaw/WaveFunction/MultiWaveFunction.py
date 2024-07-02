@@ -1,4 +1,5 @@
 import numpy as np
+import scipy.linalg as sl
 
 
 class MwfnCenter:
@@ -474,6 +475,20 @@ class MultiWaveFunction:
         for i in range(len(orbital_indices)):
             self.Orbitals[orbital_indices[i]].Energy=energies[i]
 
+    def calcHamiltonian(self):
+        S=self.Overlap_matrix
+        if self.Wfntype==0:
+            E=np.diag(self.getEnergy(0))
+            C=self.getCoefficientMatrix(0)
+            self.Hamiltonian_matrix=S@C@E@C.T@S
+        elif self.Wfntype==1:
+            Ea=np.diag(self.getEnergy(1))
+            Ca=self.getCoefficientMatrix(1)
+            self.Alpha_Hamiltonian_matrix=S@Ca@Ea@Ca.T@S
+            Eb=np.diag(self.getEnergy(2))
+            Cb=self.getCoefficientMatrix(2)
+            self.Beta_Hamiltonian_matrix=S@Cb@Eb@Cb.T@S
+
     def getOccupation(self,type_):
         return [orbital.Occ for orbital in self.Orbitals if orbital.Type==type_]
 
@@ -482,6 +497,20 @@ class MultiWaveFunction:
         assert len(occupations)==len(orbital_indices)
         for i in range(len(orbital_indices)):
             self.Orbitals[orbital_indices[i]].Occ=occupations[i]
+
+    def calcDensity(self):
+        S=self.Overlap_matrix
+        if self.Wfntype==0:
+            N=np.diag(self.getOccupation(0))
+            C=self.getCoefficientMatrix(0)
+            self.Total_density_matrix=C@N@C.T
+        elif self.Wfntype==1:
+            Na=np.diag(self.getOccupation(1))
+            Ca=self.getCoefficientMatrix(1)
+            self.Alpha_density_matrix=Ca@Na@Ca.T
+            Nb=np.diag(self.getEnergy(2))
+            Cb=self.getCoefficientMatrix(2)
+            self.Beta_density_matrix=Cb@Nb@Cb.T
 
     def Export(self,filename):
 

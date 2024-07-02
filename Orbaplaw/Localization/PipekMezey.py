@@ -29,5 +29,11 @@ def PM_jac(U,C0,S,basis_indices_by_center,charge_type):
     Gamma*=2 # Euclidean derivative
     return Gamma@U.T-U@Gamma.T # Riemannian derivative
 
-def PipekMezey(C0,S,basis_indices_by_center,charge_type):
-    return opt.UnitaryOptimizer(PM_func,C0,PM_jac,(C0,S,basis_indices_by_center,charge_type),(C0,S,basis_indices_by_center,charge_type),4)
+def PM_conv(x,f,g,xlast,flast,glast):
+    return np.max(np.abs(g))<1e-3 or abs(f-flast)<5e-6
+
+def PipekMezey(C0,S,basis_indices_by_center,charge_type,conv):
+    func=lambda x:PM_func(x,C0,S,basis_indices_by_center,charge_type)
+    jac=lambda x:PM_jac(x,C0,S,basis_indices_by_center,charge_type)
+    conv_=PM_conv if conv is None else conv
+    return opt.Lehtola(C0,func,jac,4,conv_)

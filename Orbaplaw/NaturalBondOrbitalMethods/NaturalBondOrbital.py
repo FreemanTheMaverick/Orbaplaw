@@ -126,7 +126,7 @@ def generateNaturalBondOrbital(basis_indices_by_frag,P,C,S,maxnfrags,maxnnbos,oc
         if len(eigenlist)==1: # Degenerate groups of only one pNBO, namely non-degenerate-pNBOs, do not need localizing.
             continue
         H=getMatrix(eigenlist)
-        U=loc.PipekMezey(C@H,S,basis_indices_by_frag,"Lowdin") # C - NAO in AO basis; C@H - degenerate pNBO in AO basis
+        U=loc.PipekMezey(C@H,S,basis_indices_by_frag,"Lowdin",None) # C - NAO in AO basis; C@H - degenerate pNBO in AO basis
         H=H@U # Partially localizing the degenerate pNBOs.
         setMatrix(eigenlist,H)
 
@@ -266,7 +266,7 @@ def generateNaturalBondOrbital(basis_indices_by_frag,P,C,S,maxnfrags,maxnnbos,oc
                 if len(eigenlist)<2:
                     continue
                 H=Hblock[:,eigenlist]
-                U=loc.PipekMezey(C@Iblock@H,S,basis_indices_by_frag,"Lowdin")
+                U=loc.PipekMezey(C@Iblock@H,S,basis_indices_by_frag,"Lowdin",None)
                 Hblock[:,eigenlist]=H@U
             for i in range(len(Nblock)):
                 nbo=NBO()
