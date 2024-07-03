@@ -21,4 +21,4 @@ def Fock(C0,S,F,conv):
     func=lambda x:-Fock_func(x,C0,F,F2)
     jac=lambda x:-Fock_jac(x,C0,F,F2)
     conv_=Fock_conv if conv is None else conv
-    return opt.Lehtola(C0,func,jac,4,conv_)
+    return opt.Lehtola(C0,0,func,jac,4,conv_)

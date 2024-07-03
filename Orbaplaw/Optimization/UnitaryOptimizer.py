@@ -4,20 +4,20 @@ from . import DirectionSearch as dc
 from . import LineSearch as ls
 
 
-def Lehtola(C0,func,jac,q,conv,func_para=(),jac_para=(),dir_optn={},line_optn={}):
-    maxiter=500
+def Lehtola(C0,guess,func,jac,q,conv,func_para=(),jac_para=(),dir_optn={},line_optn={}):
+    maxiter=1000
     np.random.seed(0)
     X=np.random.rand(C0.shape[1],C0.shape[1])
     X-=X.T
-    X*=0.001
-    Ulast=X*114514
+    X*=guess
+    Ulast=np.zeros_like(X)+114514
     U=sl.expm(X)
     Llast=-1919810
     L=-1919810
-    Glast=X*114514
-    G=X*114514
-    Hlast=X*1919810
-    H=X*1919810
+    Glast=None
+    G=None
+    Hlast=None
+    H=None
     for iiter in range(maxiter):
         if iiter>0:
             Ulast=U.copy()
@@ -43,4 +43,5 @@ def Lehtola(C0,func,jac,q,conv,func_para=(),jac_para=(),dir_optn={},line_optn={}
         print("Iteration %d:  L = %f; Gmax = %f" % (iiter,L,np.max(np.abs(G))))
         if conv(U,L,G,Ulast,Llast,Glast):
             return U
-    raise RuntimeError("Convergence failed!")
+    print("Convergence not fully achieved!")
+    return U
