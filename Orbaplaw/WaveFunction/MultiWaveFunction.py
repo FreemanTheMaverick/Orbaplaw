@@ -61,6 +61,15 @@ class MultiWaveFunction:
     Overlap_matrix=None
     Kinetic_energy_matrix=None
     Potential_energy_matrix=None
+    X_electric_dipole_moment_matrix=None
+    Y_electric_dipole_moment_matrix=None
+    Z_electric_dipole_moment_matrix=None
+    XX_electric_quadrupole_moment_matrix=None
+    YY_electric_quadrupole_moment_matrix=None
+    ZZ_electric_quadrupole_moment_matrix=None
+    XY_electric_quadrupole_moment_matrix=None
+    YZ_electric_quadrupole_moment_matrix=None
+    XZ_electric_quadrupole_moment_matrix=None
 
     Extra_info={}
 
@@ -325,6 +334,52 @@ class MultiWaveFunction:
                     ncols=int(values[5])
                     lower=int(values[7])
                     self.Potential_energy_matrix=ReadMatrix(f,nrows,ncols,lower)
+                elif "$X electric dipole moment matrix" in line:
+                    nrows=int(values[6])
+                    ncols=int(values[7])
+                    lower=int(values[9])
+                    self.X_electric_dipole_moment_matrix=ReadMatrix(f,nrows,ncols,lower)
+                elif "$Y electric dipole moment matrix" in line:
+                    nrows=int(values[6])
+                    ncols=int(values[7])
+                    lower=int(values[9])
+                    self.Y_electric_dipole_moment_matrix=ReadMatrix(f,nrows,ncols,lower)
+                elif "$Z electric dipole moment matrix" in line:
+                    nrows=int(values[6])
+                    ncols=int(values[7])
+                    lower=int(values[9])
+                    self.Z_electric_dipole_moment_matrix=ReadMatrix(f,nrows,ncols,lower)
+                elif "$XX electric quadrupole moment matrix" in line:
+                    nrows=int(values[6])
+                    ncols=int(values[7])
+                    lower=int(values[9])
+                    self.XX_electric_quadrupole_moment_matrix=ReadMatrix(f,nrows,ncols,lower)
+                elif "$YY electric quadrupole moment matrix" in line:
+                    nrows=int(values[6])
+                    ncols=int(values[7])
+                    lower=int(values[9])
+                    self.YY_electric_quadrupole_moment_matrix=ReadMatrix(f,nrows,ncols,lower)
+                elif "$ZZ electric quadrupole moment matrix" in line:
+                    nrows=int(values[6])
+                    ncols=int(values[7])
+                    lower=int(values[9])
+                    self.ZZ_electric_quadrupole_moment_matrix=ReadMatrix(f,nrows,ncols,lower)
+                elif "$XY electric quadrupole moment matrix" in line:
+                    nrows=int(values[6])
+                    ncols=int(values[7])
+                    lower=int(values[9])
+                    self.XY_electric_quadrupole_moment_matrix=ReadMatrix(f,nrows,ncols,lower)
+                elif "$YZ electric quadrupole moment matrix" in line:
+                    nrows=int(values[6])
+                    ncols=int(values[7])
+                    lower=int(values[9])
+                    self.YZ_electric_quadrupole_moment_matrix=ReadMatrix(f,nrows,ncols,lower)
+                elif "$XZ electric quadrupole moment matrix" in line:
+                    nrows=int(values[6])
+                    ncols=int(values[7])
+                    lower=int(values[9])
+                    self.XZ_electric_quadrupole_moment_matrix=ReadMatrix(f,nrows,ncols,lower)
+
         Extra_info={}
         self.Orbitals=[MwfnOrbital() for i in range(self.getNumBasis()*(2 if self.Wfntype==1 else 1))]
         for iaorbital in range(self.getNumBasis()):

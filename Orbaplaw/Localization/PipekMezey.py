@@ -36,4 +36,4 @@ def PipekMezey(C0,S,basis_indices_by_center,charge_type,conv):
     func=lambda x:PM_func(x,C0,S,basis_indices_by_center,charge_type)
     jac=lambda x:PM_jac(x,C0,S,basis_indices_by_center,charge_type)
     conv_=PM_conv if conv is None else conv
-    return opt.Lehtola(C0,func,jac,4,conv_)
+    return opt.Lehtola(C0,0.001,func,jac,4,conv_)
