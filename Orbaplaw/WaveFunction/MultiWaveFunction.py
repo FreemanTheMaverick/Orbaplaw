@@ -563,10 +563,41 @@ class MultiWaveFunction:
             Na=np.diag(self.getOccupation(1))
             Ca=self.getCoefficientMatrix(1)
             self.Alpha_density_matrix=Ca@Na@Ca.T
-            Nb=np.diag(self.getEnergy(2))
+            Nb=np.diag(self.getOccupation(2))
             Cb=self.getCoefficientMatrix(2)
             self.Beta_density_matrix=Cb@Nb@Cb.T
 
+    def GramSchmidt(self,fix_):
+        def calcGramSchmidt(C,S,fix):
+            Cfix=C[:,:fix]
+            Ccng=C[:,fix:]
+            np.random.seed(0)
+            Ccng=np.random.rand(*Ccng.shape)
+            Cnew=np.hstack([Cfix,Ccng])
+            for i in range(fix,Cnew.shape[1]):
+                vector=Cnew[:,i]*1
+                for j in range(i):
+                    Cnew[:,i]-=(vector@S@Cnew[:,j])*Cnew[:,j]
+                Cnew[:,i]/=np.sqrt(Cnew[:,i]@S@Cnew[:,i])
+            return Cnew
+        fixs=[0,0,0]
+        if self.Wfntype==0:
+            fixs[0]=fix_
+        elif self.Wfntype==1:
+            if type(fix_)==int:
+                fixs[1]=fix_
+                fixs[2]=fix_
+            else:
+                fixs[1]=fix_[0]
+                fixs[2]=fix_[1]
+        S=self.Overlap_matrix
+        if self.Wfntype==0 or self.Wfntype==1:
+            for spin in ([0] if self.Wfntype==0 else [1,2]):
+                C=self.getCoefficientMatrix(spin)
+                fix=fixs[spin]
+                Cnew=calcGramSchmidt(C,S,fix)
+                self.setCoefficientMatrix(spin,Cnew)
+                
     def Export(self,filename):
 
         def PrintMatrix(f,matrix,lower):
