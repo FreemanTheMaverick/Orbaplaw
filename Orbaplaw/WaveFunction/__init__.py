@@ -1,5 +1,8 @@
 from Orbaplaw.WaveFunction import MultiWaveFunction
-from Orbaplaw.WaveFunction import QeWaveFunction
-
 MultiWaveFunction=MultiWaveFunction.MultiWaveFunction
+
+from Orbaplaw.WaveFunction import QeWaveFunction
 QeWaveFunction=QeWaveFunction.QeWaveFunction
+
+from Orbaplaw.WaveFunction import Cube
+Cube=Cube.Cube
