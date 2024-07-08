@@ -296,6 +296,7 @@ def NaturalBondOrbital(nao_mwfn,frags=[],maxnfrags=-1,maxnnbos=-1,occ_thres=0.95
     nbasis=nao_mwfn.getNumBasis()
     nho_mwfn=cp.deepcopy(nao_mwfn)
     nbo_mwfn=cp.deepcopy(nao_mwfn)
+    nnbos=[0,0,0]
     print("Natural (fragment) bond orbitals:")
     if nao_mwfn.Wfntype==0 or nao_mwfn.Wfntype==1:
         for spin in ([0] if nao_mwfn.Wfntype==0 else [1,2]):
@@ -314,6 +315,7 @@ def NaturalBondOrbital(nao_mwfn,frags=[],maxnfrags=-1,maxnnbos=-1,occ_thres=0.95
                 occ_thres*=2
                 deg_thres*=2
             nhos,nbos=generateNaturalBondOrbital(basis_indices_by_frag,P,C,S,maxnfrags,maxnnbos,occ_thres,multi_thres,pdeg_thres,deg_thres)
+            nnbos[spin]=len(nbos)
             output="Spin "+str(spin)+"\n" # Printing NBO and NHO information
             nbos_combs=SortpNBO(nbos,"Combination") # Sorting NBOs by combinations, [combination : NBO].
             for comb,nbos_comb in nbos_combs.items():
@@ -342,4 +344,5 @@ def NaturalBondOrbital(nao_mwfn,frags=[],maxnfrags=-1,maxnnbos=-1,occ_thres=0.95
             nbo_mwfn.setEnergy(spin,[0 for i in range(nbasis)])
             nbo_mwfn.setCoefficientMatrix(spin,C@I@H)
             nbo_mwfn.Comment="Natural bond orbital."
+            nbo_mwfn.GramSchmidt(nnbos[0] if nbo_mwfn.Wfntype==0 else nnbos[1:])
     return nho_mwfn,nbo_mwfn
