@@ -5,6 +5,10 @@ from . import FosterBoys
 from . import Fock
 from . import Orbitalet
 
+calcS='''
+if mo_mwfn.Overlap_matrix is None:
+    mo_mwfn.calcOverlap()
+'''
 
 def Localizer(mo_mwfn,space="occ",method="PipekMezey",method_optn={}):
     loc_mwfn=cp.deepcopy(mo_mwfn)
@@ -15,6 +19,7 @@ def Localizer(mo_mwfn,space="occ",method="PipekMezey",method_optn={}):
             raise RuntimeError("Fractionally occupied orbitals and mixing occupied and virtual orbitals in Pipek-Mezey localization is not supported!")
         method_string="Pipek-Mezey"
         method_function=PipekMezey
+        exec(calcS)
         S=mo_mwfn.Overlap_matrix
         basis_indices_by_center=mo_mwfn.getBasisIndexByCenter()
         charge_type=method_optn.get("charge_type","Lowdin")
@@ -30,6 +35,7 @@ def Localizer(mo_mwfn,space="occ",method="PipekMezey",method_optn={}):
     elif method.upper()=="FOCK":
         method_string="Fock"
         method_function=Fock
+        exec(calcS)
         S=mo_mwfn.Overlap_matrix
         F=[None for i in range(3)]
         for spin in ([0] if mo_mwfn.Wfntype==0 else [1,2]):
@@ -49,6 +55,7 @@ def Localizer(mo_mwfn,space="occ",method="PipekMezey",method_optn={}):
         W2s=[-mo_mwfn.XX_electric_quadrupole_moment_matrix,-mo_mwfn.YY_electric_quadrupole_moment_matrix,-mo_mwfn.ZZ_electric_quadrupole_moment_matrix]
         conv=method_optn.get("conv",None)
         args=[(Ws,W2s,conv) for i in range(3)]
+        exec(calcS)
         S=mo_mwfn.Overlap_matrix
         F=[None for i in range(3)]
         for spin in ([0] if mo_mwfn.Wfntype==0 else [1,2]):
@@ -70,7 +77,7 @@ def Localizer(mo_mwfn,space="occ",method="PipekMezey",method_optn={}):
             print("Spin "+str(spin))
             C=mo_mwfn.getCoefficientMatrix(spin)
             arg=args[spin]
-            nocc=mo_mwfn.Naelec if spin==1 else mo_mwfn.Nbelec
+            nocc=round(mo_mwfn.getNumElec(spin)/(2 if spin==0 else 1))
             if space=="mix":
                 print("Localizing occupied and virtual orbitals together")
                 C=C@method_function(C,*arg)

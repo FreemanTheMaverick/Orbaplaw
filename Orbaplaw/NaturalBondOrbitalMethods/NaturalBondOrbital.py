@@ -292,6 +292,8 @@ def NaturalBondOrbital(nao_mwfn,frags=[],maxnfrags=-1,maxnnbos=-1,occ_thres=0.95
             assert icenter<nao_mwfn.getNumCenters(),"Atom index out of range!"
             basis_indices_this_fragment.extend(basis_indices_by_center[icenter])
         basis_indices_by_frag.append(basis_indices_this_fragment)
+    if nao_mwfn.Overlap_matrix is None:
+        nao_mwfn.calcOverlap()
     S=nao_mwfn.Overlap_matrix
     nbasis=nao_mwfn.getNumBasis()
     nho_mwfn=cp.deepcopy(nao_mwfn)
@@ -301,7 +303,7 @@ def NaturalBondOrbital(nao_mwfn,frags=[],maxnfrags=-1,maxnnbos=-1,occ_thres=0.95
         for spin in ([0] if nao_mwfn.Wfntype==0 else [1,2]):
             C=nao_mwfn.getCoefficientMatrix(spin)
             if maxnnbos==-1:
-                maxnnbos=nao_mwfn.Naelec if spin==1 else nao_mwfn.Nbelec
+                maxnnbos=round(nao_mwfn.getNumElec(1) if spin==1 else nao_mwfn.getNumElec(2))
             P=None
             match spin:
                 case 0:

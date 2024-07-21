@@ -503,6 +503,8 @@ def NaturalAtomicOrbital(mo_mwfn):
     shell_indices_by_center=nao_mwfn.getShellIndexByCenter()
     basis_indices_by_shell=nao_mwfn.getBasisIndexByShell()
     basis_indices_nmb,basis_indices_nrb=None,None
+    if nao_mwfn.Overlap_matrix is None:
+        nao_mwfn.calcOverlap()
     S=nao_mwfn.Overlap_matrix
     angulars=[shell.Type for shell in nao_mwfn.Shells]
     minimal_shells=[MinimalShells(center.Index,int(center.Nuclear_charge)) for center in mo_mwfn.Centers]

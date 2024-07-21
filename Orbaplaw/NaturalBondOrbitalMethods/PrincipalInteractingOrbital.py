@@ -86,7 +86,7 @@ def PrincipalInteractingOrbital(nao_mwfn,frags):
                     pimos=pair_info[ipair]["pimos"]
                     pios=pair_info[ipair]["pios"]
                     for pimo in pimos:
-                        output+="PIMO_"+str(pimo+ (nao_mwfn.getNumIndBasis() if spin==2 else 0))+" ("+str(round(O[pimo],3))+", "+str(round(I[pimo]*(2 if spin==2 else 1),3))+") ="
+                        output+="PIMO_"+str(pimo+ (nao_mwfn.getNumIndBasis() if spin==2 else 0))+" ("+str(round(O[pimo],3))+", "+str(round(I[pimo],3))+") ="
                         for pio in pios:
                             output+="  "+str(round(Y[pio,pimo],3))+" * PIO_"+str(pio+ (nao_mwfn.getNumIndBasis() if spin==2 else 0))+" ("+str(round(N[pio],3))+")"
                         output+="\n"
