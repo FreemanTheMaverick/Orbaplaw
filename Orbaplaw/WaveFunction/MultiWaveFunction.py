@@ -1,6 +1,9 @@
 import numpy as np
 import scipy.linalg as sl
+from Orbaplaw import Integrals as eint
 
+
+__angstrom2bohr__=1.8897259886
 
 class MwfnCenter:
     Symbol=None # String
@@ -18,9 +21,9 @@ class MwfnShell:
     Coefficients=None # List
     def getSize(self):
         if self.Type>=0:
-            return int((self.Type+1)*(self.Type+2)/2)
+            return (self.Type+1)*(self.Type+2)//2
         else:
-            return int(2*abs(self.Type)+1)
+            return 2*abs(self.Type)+1
     def getNumPrims(self):
         return len(self.Exponents)
     
@@ -37,8 +40,6 @@ class MultiWaveFunction:
 
     # Field 1
     Wfntype=None
-    Naelec=None
-    Nbelec=None
     E_tot=None
     VT_ratio=None
 
@@ -73,11 +74,76 @@ class MultiWaveFunction:
 
     Extra_info={}
 
+    def MatrixTransform(self):
+        SPDFGHI=dict()
+        SPDFGHI[0]=np.array([[1]])
+        SPDFGHI[1]=np.eye(3)
+        SPDFGHI[-2]=np.array([
+            [0,0,1,0,0],
+            [0,0,0,1,0],
+            [0,1,0,0,0],
+            [0,0,0,0,1],
+            [1,0,0,0,0]])
+        SPDFGHI[-3]=np.array([
+            [0,0,0,1,0,0,0],
+            [0,0,0,0,1,0,0],
+            [0,0,1,0,0,0,0],
+            [0,0,0,0,0,1,0],
+            [0,1,0,0,0,0,0],
+            [0,0,0,0,0,0,1],
+            [1,0,0,0,0,0,0]])
+        SPDFGHI[-4]=np.array([
+            [0,0,0,0,1,0,0,0,0],
+            [0,0,0,0,0,1,0,0,0],
+            [0,0,0,1,0,0,0,0,0],
+            [0,0,0,0,0,0,1,0,0],
+            [0,0,1,0,0,0,0,0,0],
+            [0,0,0,0,0,0,0,1,0],
+            [0,1,0,0,0,0,0,0,0],
+            [0,0,0,0,0,0,0,0,1],
+            [1,0,0,0,0,0,0,0,0]])
+        SPDFGHI[-5]=np.array([
+            [0,0,0,0,0,1,0,0,0,0,0],
+            [0,0,0,0,0,0,1,0,0,0,0],
+            [0,0,0,0,1,0,0,0,0,0,0],
+            [0,0,0,0,0,0,0,1,0,0,0],
+            [0,0,0,1,0,0,0,0,0,0,0],
+            [0,0,0,0,0,0,0,0,1,0,0],
+            [0,0,1,0,0,0,0,0,0,0,0],
+            [0,0,0,0,0,0,0,0,0,1,0],
+            [0,1,0,0,0,0,0,0,0,0,0],
+            [0,0,0,0,0,0,0,0,0,0,1],
+            [1,0,0,0,0,0,0,0,0,0,0]])
+        SPDFGHI[-6]=np.array([
+            [0,0,0,0,0,0,1,0,0,0,0,0,0],
+            [0,0,0,0,0,0,0,1,0,0,0,0,0],
+            [0,0,0,0,0,1,0,0,0,0,0,0,0],
+            [0,0,0,0,0,0,0,0,1,0,0,0,0],
+            [0,0,0,0,1,0,0,0,0,0,0,0,0],
+            [0,0,0,0,0,0,0,0,0,1,0,0,0],
+            [0,0,0,1,0,0,0,0,0,0,0,0,0],
+            [0,0,0,0,0,0,0,0,0,0,1,0,0],
+            [0,0,1,0,0,0,0,0,0,0,0,0,0],
+            [0,0,0,0,0,0,0,0,0,0,0,1,0],
+            [0,1,0,0,0,0,0,0,0,0,0,0,0],
+            [0,0,0,0,0,0,0,0,0,0,0,0,1],
+            [1,0,0,0,0,0,0,0,0,0,0,0,0]])
+        nbasis=self.getNumBasis()
+        mwfntransform=np.zeros([nbasis,nbasis])
+        jbasis=0
+        for center in self.Centers:
+            for shell in center.Shells:
+                l=shell.Type
+                num=shell.getSize()
+                mwfntransform[jbasis:jbasis+num,jbasis:jbasis+num]=SPDFGHI[l]
+                jbasis+=num
+        return mwfntransform
+
     def __init__(self,filename):
         def ReadMatrix(f,nrows,ncols,lower):
             matrix=np.zeros([nrows,ncols])
             assert nrows==ncols
-            nelements=int((1+nrows)*nrows/2 if lower else nrows*ncols)
+            nelements=((1+nrows)*nrows//2) if lower else nrows*ncols
             elements=["114514" for i in range(nelements)]
             ielement=0
             finished=False
@@ -106,11 +172,10 @@ class MultiWaveFunction:
             return matrix
 
         with open(filename,'r') as f:
-            naorbitals=0
-            nborbitals=0
-            aorbitals=[]
-            borbitals=[]
-            this_orbital=None
+            nbasis=-114
+            nindbasis=-114
+            mwfntransform=None
+            tmp_int=None
             while True:
                 line=f.readline()
                 if not line:
@@ -122,15 +187,11 @@ class MultiWaveFunction:
                     value=values[1]
 
                 if "# Comment: " in line:
-                    self.Comment=line[8:-1]
+                    self.Comment=line[11:]
                 
                 # Field 1
                 elif "Wfntype=" in line:
                     self.Wfntype=int(value)
-                elif "Naelec=" in line: # Charge is inferred from Naelec, Nbelec and nuclear charges of centers.
-                    self.Naelec=int(float(value))
-                elif "Nbelec=" in line:
-                    self.Nbelec=int(float(value))
                 elif "E_tot=" in line:
                     self.E_tot=float(value)
                 elif "VT_ratio=" in line:
@@ -140,21 +201,27 @@ class MultiWaveFunction:
                 elif "Ncenter=" in line:
                     self.Centers=[MwfnCenter() for i in range(int(value))]
                 elif "$Centers" in line:
-                    icenter=0
-                    while True:
+                    for center in self.Centers:
                         newline=f.readline()
-                        if not newline:
-                            break
                         newvalues=newline.split()
-                        self.Centers[icenter].Symbol=newvalues[1]
-                        self.Centers[icenter].Index=int(newvalues[2])
-                        self.Centers[icenter].Nuclear_charge=float(newvalues[3])
-                        self.Centers[icenter].Coordinates=np.array(newvalues[4:7],dtype="float")
-                        icenter+=1
-                        if icenter==len(self.Centers):
-                            break
+                        center.Symbol=newvalues[1]
+                        center.Index=int(newvalues[2])
+                        center.Nuclear_charge=float(newvalues[3])
+                        center.Coordinates=np.array(newvalues[4:7],dtype="float")*__angstrom2bohr__
 
                 # Field 3
+                elif "Nbasis=" in line:
+                    nbasis=int(value)
+                    if nindbasis!=114:
+                        self.Orbitals=[MwfnOrbital() for i in range(nindbasis*(1 if self.Wfntype==0 else 2))]
+                        for orbital in self.Orbitals:
+                            orbital.Coeff=np.zeros(nbasis)
+                elif "Nindbasis=" in line:
+                    nindbasis=int(value)
+                    if nbasis!=114:
+                        self.Orbitals=[MwfnOrbital() for i in range(nindbasis*(1 if self.Wfntype==0 else 2))]
+                        for orbital in self.Orbitals:
+                            orbital.Coeff=np.zeros(nbasis)
                 elif "Nshell=" in line:
                     self.Shells=[MwfnShell() for i in range(int(value))]
                 elif "$Shell types" in line:
@@ -243,33 +310,17 @@ class MultiWaveFunction:
 
                 # Field 4
                 elif "Index=" in line:
-                    if len(aorbitals+borbitals)==0:
-                        aorbitals=[MwfnOrbital() for i in range(self.getNumBasis())]
-                        for orbital in aorbitals:
-                            orbital.Type=0 if self.Wfntype==0 else 1
-                            orbital.Energy=0
-                            orbital.Occ=-1
-                            orbital.Coeff=np.zeros(self.getNumBasis())
-                        if self.Wfntype==1:
-                            borbitals=[MwfnOrbital() for i in range(self.getNumBasis())]
-                            for orbital in borbitals:
-                                orbital.Type=2
-                                orbital.Energy=0
-                                orbital.Occ=-1
-                                orbital.Coeff=np.zeros(self.getNumBasis())
+                    if mwfntransform is None:
+                        mwfntransform=self.MatrixTransform()
+                    tmp_int=int(value)-1
                 elif "Type=" in line:
-                    if int(value)!=2:
-                        this_orbital=aorbitals[naorbitals]
-                        naorbitals+=1
-                    else:
-                        this_orbital=borbitals[nborbitals]
-                        nborbitals+=1
+                    self.Orbitals[tmp_int].Type=int(value)
                 elif "Energy=" in line:
-                    this_orbital.Energy=float(value)
+                    self.Orbitals[tmp_int].Energy=float(value)
                 elif "Occ=" in line:
-                    this_orbital.Occ=float(value)
+                    self.Orbitals[tmp_int].Occ=float(value)
                 elif "Sym=" in line:
-                    this_orbital.Sym=value
+                    self.Orbitals[tmp_int].Sym=value
                 elif "$Coeff" in line:
                     ibasis=0
                     finished=False
@@ -280,9 +331,9 @@ class MultiWaveFunction:
                         newvalues=newline.split()
                         for newvalue in newvalues:
                             try:
-                                this_orbital.Coeff[ibasis]=float(newvalue)
+                                self.Orbitals[tmp_int].Coeff[ibasis]=float(newvalue)
                             except ValueError:
-                                this_orbitalCoeff[ibasis]=0.
+                                self.Orbitals[tmp_int].Coeff[ibasis]=0.
                             ibasis+=1
                             if ibasis==self.getNumBasis():
                                 finished=True
@@ -293,109 +344,122 @@ class MultiWaveFunction:
                     nrows=int(values[4])
                     ncols=int(values[5])
                     lower=int(values[7])
-                    self.Total_density_matrix=ReadMatrix(f,nrows,ncols,lower)
+                    self.Total_density_matrix=mwfntransform.T@ReadMatrix(f,nrows,ncols,lower)@mwfntransform
                 elif "$Alpha density matrix" in line:
                     nrows=int(values[4])
                     ncols=int(values[5])
                     lower=int(values[7])
-                    self.Alpha_density_matrix=ReadMatrix(f,nrows,ncols,lower)
+                    self.Alpha_density_matrix=mwfntransform.T@ReadMatrix(f,nrows,ncols,lower)@mwfntransform
                 elif "$Beta density matrix" in line:
                     nrows=int(values[4])
                     ncols=int(values[5])
                     lower=int(values[7])
-                    self.Beta_density_matrix=ReadMatrix(f,nrows,ncols,lower)
+                    self.Beta_density_matrix=mwfntransform.T@ReadMatrix(f,nrows,ncols,lower)@mwfntransform
                 elif "$1-e Hamiltonian matrix" in line:
                     nrows=int(values[4])
                     ncols=int(values[5])
                     lower=int(values[7])
-                    self.Hamiltonian_matrix=ReadMatrix(f,nrows,ncols,lower)
+                    self.Hamiltonian_matrix=mwfntransform.T@ReadMatrix(f,nrows,ncols,lower)@mwfntransform
                 elif "$Alpha 1-e Hamiltonian matrix" in line:
                     nrows=int(values[4])
                     ncols=int(values[5])
                     lower=int(values[7])
-                    self.Alpha_Hamiltonian_matrix=ReadMatrix(f,nrows,ncols,lower)
+                    self.Alpha_Hamiltonian_matrix=mwfntransform.T@ReadMatrix(f,nrows,ncols,lower)@mwfntransform
                 elif "$Beta 1-e Hamiltonian matrix" in line:
                     nrows=int(values[4])
                     ncols=int(values[5])
                     lower=int(values[7])
-                    self.Beta_Hamiltonian_matrix=ReadMatrix(f,nrows,ncols,lower)
+                    self.Beta_Hamiltonian_matrix=mwfntransform.T@ReadMatrix(f,nrows,ncols,lower)@mwfntransform
                 elif "$Overlap matrix" in line:
                     nrows=int(values[3])
                     ncols=int(values[4])
                     lower=int(values[6])
-                    self.Overlap_matrix=ReadMatrix(f,nrows,ncols,lower)
+                    self.Overlap_matrix=mwfntransform.T@ReadMatrix(f,nrows,ncols,lower)@mwfntransform
                 elif "$Kinetic energy matrix" in line:
                     nrows=int(values[4])
                     ncols=int(values[5])
                     lower=int(values[7])
-                    self.Kinetic_energy_matrix=ReadMatrix(f,nrows,ncols,lower)
+                    self.Kinetic_energy_matrix=mwfntransform.T@ReadMatrix(f,nrows,ncols,lower)@mwfntransform
                 elif "$Potential energy matrix" in line:
                     nrows=int(values[4])
                     ncols=int(values[5])
                     lower=int(values[7])
-                    self.Potential_energy_matrix=ReadMatrix(f,nrows,ncols,lower)
+                    self.Potential_energy_matrix=mwfntransform.T@ReadMatrix(f,nrows,ncols,lower)@mwfntransform
                 elif "$X electric dipole moment matrix" in line:
                     nrows=int(values[6])
                     ncols=int(values[7])
                     lower=int(values[9])
-                    self.X_electric_dipole_moment_matrix=ReadMatrix(f,nrows,ncols,lower)
+                    self.X_electric_dipole_moment_matrix=mwfntransform.T@ReadMatrix(f,nrows,ncols,lower)@mwfntransform
                 elif "$Y electric dipole moment matrix" in line:
                     nrows=int(values[6])
                     ncols=int(values[7])
                     lower=int(values[9])
-                    self.Y_electric_dipole_moment_matrix=ReadMatrix(f,nrows,ncols,lower)
+                    self.Y_electric_dipole_moment_matrix=mwfntransform.T@ReadMatrix(f,nrows,ncols,lower)@mwfntransform
                 elif "$Z electric dipole moment matrix" in line:
                     nrows=int(values[6])
                     ncols=int(values[7])
                     lower=int(values[9])
-                    self.Z_electric_dipole_moment_matrix=ReadMatrix(f,nrows,ncols,lower)
+                    self.Z_electric_dipole_moment_matrix=mwfntransform.T@ReadMatrix(f,nrows,ncols,lower)@mwfntransform
                 elif "$XX electric quadrupole moment matrix" in line:
                     nrows=int(values[6])
                     ncols=int(values[7])
                     lower=int(values[9])
-                    self.XX_electric_quadrupole_moment_matrix=ReadMatrix(f,nrows,ncols,lower)
+                    self.XX_electric_quadrupole_moment_matrix=mwfntransform.T@ReadMatrix(f,nrows,ncols,lower)@mwfntransform
                 elif "$YY electric quadrupole moment matrix" in line:
                     nrows=int(values[6])
                     ncols=int(values[7])
                     lower=int(values[9])
-                    self.YY_electric_quadrupole_moment_matrix=ReadMatrix(f,nrows,ncols,lower)
+                    self.YY_electric_quadrupole_moment_matrix=mwfntransform.T@ReadMatrix(f,nrows,ncols,lower)@mwfntransform
                 elif "$ZZ electric quadrupole moment matrix" in line:
                     nrows=int(values[6])
                     ncols=int(values[7])
                     lower=int(values[9])
-                    self.ZZ_electric_quadrupole_moment_matrix=ReadMatrix(f,nrows,ncols,lower)
+                    self.ZZ_electric_quadrupole_moment_matrix=mwfntransform.T@ReadMatrix(f,nrows,ncols,lower)@mwfntransform
                 elif "$XY electric quadrupole moment matrix" in line:
                     nrows=int(values[6])
                     ncols=int(values[7])
                     lower=int(values[9])
-                    self.XY_electric_quadrupole_moment_matrix=ReadMatrix(f,nrows,ncols,lower)
+                    self.XY_electric_quadrupole_moment_matrix=mwfntransform.T@ReadMatrix(f,nrows,ncols,lower)@mwfntransform
                 elif "$YZ electric quadrupole moment matrix" in line:
                     nrows=int(values[6])
                     ncols=int(values[7])
                     lower=int(values[9])
-                    self.YZ_electric_quadrupole_moment_matrix=ReadMatrix(f,nrows,ncols,lower)
+                    self.YZ_electric_quadrupole_moment_matrix=mwfntransform.T@ReadMatrix(f,nrows,ncols,lower)@mwfntransform
                 elif "$XZ electric quadrupole moment matrix" in line:
                     nrows=int(values[6])
                     ncols=int(values[7])
                     lower=int(values[9])
-                    self.XZ_electric_quadrupole_moment_matrix=ReadMatrix(f,nrows,ncols,lower)
-
+                    self.XZ_electric_quadrupole_moment_matrix=mwfntransform.T@ReadMatrix(f,nrows,ncols,lower)@mwfntransform
+        for spin in ([0] if self.Wfntype==0 else [1,2]):
+            self.setCoefficientMatrix(spin,mwfntransform.T@self.getCoefficientMatrix(spin))
         Extra_info={}
-        self.Orbitals=[MwfnOrbital() for i in range(self.getNumBasis()*(2 if self.Wfntype==1 else 1))]
-        for iaorbital in range(self.getNumBasis()):
-            self.Orbitals[iaorbital]=aorbitals[iaorbital]
-            self.Orbitals[iaorbital].Index=iaorbital+1
-        if self.Wfntype==1:
-            for iborbital in range(self.getNumBasis()):
-                self.Orbitals[iborbital+self.getNumBasis()]=borbitals[iborbital]
-                self.Orbitals[iborbital+self.getNumBasis()].Index=iborbital+self.getNumBasis()+1
+
+    def getNumElec(self,spin):
+        naelec=0.
+        nbelec=0.
+        for orbital in self.Orbitals:
+            if orbital.Type==0:
+                naelec+=orbital.Occ/2
+                nbelec+=orbital.Occ/2
+            elif orbital.Type==1:
+                naelec+=orbital.Occ
+            elif orbital.Type==2:
+                nbelec+=orbital.Occ
+        if spin==0:
+            return naelec+nbelec
+        elif spin==1:
+            return naelec
+        elif spin==2:
+            return nbelec
 
     def getCharge(self):
-        neutral=0
+        n=-self.getNumElec(0)
         for center in self.Centers:
-            neutral+=center.Nuclear_charge
-        actual=self.Naelec+self.Nbelec
-        return actual-neutral
+            n+=center.Nuclear_charge
+        return n
+
+    def getSpin(self):
+        return self.getNumElec(1)-self.getNumElec(2)
 
     def getNumCenters(self):
         return len(self.Centers)
@@ -404,15 +468,10 @@ class MultiWaveFunction:
         n=0
         for shell in self.Shells:
             n+=shell.getSize()
-        return int(n)
+        return n
 
     def getNumIndBasis(self):
-        numindbasis=0
-        for orbital in self.Orbitals:
-            if orbital.Occ!=-1:
-                numindbasis+=1
-        numindbasis//=(2 if self.Wfntype==1 else 1)
-        return numindbasis
+        return len(self.Orbitals)//(2 if self.Wfntype==1 else 1)
 
     def getNumPrims(self):
         n=0
@@ -453,6 +512,12 @@ class MultiWaveFunction:
                     indices.append(ishell)
                 ishell+=1
         return indices
+
+    def getShellCenters(self):
+        center_list=[]
+        for shell in self.Shells:
+            center_list.append(self.Centers.index(shell.Center))
+        return center_list
 
     def getBasisIndexByCenter(self,centers=-1):
         indices=[]
@@ -509,7 +574,7 @@ class MultiWaveFunction:
             return indices
 
     def getCoefficientMatrix(self,type_):
-        matrix=np.zeros([self.getNumBasis(),self.getNumBasis()])
+        matrix=np.zeros([self.getNumBasis(),self.getNumIndBasis()])
         orbital_indices=[i for i in range(len(self.Orbitals)) if self.Orbitals[i].Type==type_]
         for i in range(len(orbital_indices)):
             matrix[:,i]=self.Orbitals[orbital_indices[i]].Coeff
@@ -529,6 +594,9 @@ class MultiWaveFunction:
         assert len(energies)==len(orbital_indices)
         for i in range(len(orbital_indices)):
             self.Orbitals[orbital_indices[i]].Energy=energies[i]
+
+    def calcOverlap(self):
+        self.Overlap_matrix=eint.PyscfOverlap(self,self)
 
     def calcHamiltonian(self):
         S=self.Overlap_matrix
@@ -592,14 +660,14 @@ class MultiWaveFunction:
 
         with open(filename,'w') as f:
             f.write("# Generated by Orbaplaw\n")
-            f.write("\n# Comment: "+self.Comment+"\n")
+            f.write("\n# Comment: "+self.Comment)
 
             # Field 1
             f.write("\n\n# Overview\n")
             f.write("Wfntype= "+str(self.Wfntype)+"\n")
             f.write("Charge= "+str(self.getCharge())+"\n")
-            f.write("Naelec= "+str(self.Naelec)+"\n")
-            f.write("Nbelec= "+str(self.Nbelec)+"\n")
+            f.write("Naelec= "+str(self.getNumElec(1))+"\n")
+            f.write("Nbelec= "+str(self.getNumElec(2))+"\n")
             f.write("E_tot= "+str(self.E_tot)+"\n")
             f.write("VT_ratio= "+str(self.VT_ratio)+"\n")
 
@@ -607,15 +675,14 @@ class MultiWaveFunction:
             f.write("\n\n# Atoms\n")
             f.write("Ncenter= "+str(self.getNumCenters())+"\n")
             f.write("$Centers\n")
-            icenter=0
-            for icenter,center in zip(range(self.getNumCenters()),self.Centers):
+            for icenter,center in enumerate(self.Centers):
                 f.write(str(icenter+1)+" ")
                 f.write(str(center.Symbol)+" ")
                 f.write(str(center.Index)+" ")
                 f.write(str(center.Nuclear_charge)+" ")
-                f.write(str(center.Coordinates[0])+" ")
-                f.write(str(center.Coordinates[1])+" ")
-                f.write(str(center.Coordinates[2])+"\n")
+                f.write(str(center.Coordinates[0]/__angstrom2bohr__)+" ")
+                f.write(str(center.Coordinates[1]/__angstrom2bohr__)+" ")
+                f.write(str(center.Coordinates[2]/__angstrom2bohr__)+"\n")
 
             # Field 3
             f.write("\n\n# Basis set\n")
@@ -656,6 +723,7 @@ class MultiWaveFunction:
                 f.write("\n")
 
             # Field 4
+            mwfntransform=self.MatrixTransform()
             f.write("\n\n# Orbitals")
             for iorbital,orbital in zip(range(len(self.Orbitals)),self.Orbitals):
                 f.write("\nIndex= %9d\n" % (iorbital+1))
@@ -664,7 +732,7 @@ class MultiWaveFunction:
                 f.write("Occ= "+str(orbital.Occ)+"\n")
                 f.write("Sym= "+str(orbital.Sym)+"\n")
                 f.write("$Coeff\n")
-                for element in orbital.Coeff:
+                for element in mwfntransform@orbital.Coeff:
                     f.write(" "+str(element))
                 f.write("\n")
 
@@ -672,28 +740,28 @@ class MultiWaveFunction:
             f.write("\n\n# Matrices\n")
             if self.Total_density_matrix is not None:
                 f.write("$Total density matrix, dim= "+str(self.Total_density_matrix.shape[0])+" "+str(self.Total_density_matrix.shape[1])+" lower= 1\n")
-                PrintMatrix(f,self.Total_density_matrix,True)
+                PrintMatrix(f,mwfntransform@self.Total_density_matrix@mwfntransform.T,True)
             if self.Alpha_density_matrix is not None:
                 f.write("$Alpha density matrix, dim= "+str(self.Alpha_density_matrix.shape[0])+" "+str(self.Alpha_density_matrix.shape[1])+" lower= 1\n")
-                PrintMatrix(f,self.Alpha_density_matrix,True)
+                PrintMatrix(f,mwfntransform@self.Alpha_density_matrix@mwfntransform.T,True)
             if self.Beta_density_matrix is not None:
                 f.write("$Beta density matrix, dim= "+str(self.Beta_density_matrix.shape[0])+" "+str(self.Beta_density_matrix.shape[1])+" lower= 1\n")
-                PrintMatrix(f,self.Beta_density_matrix,True)
+                PrintMatrix(f,mwfntransform@self.Beta_density_matrix@mwfntransform.T,True)
             if self.Hamiltonian_matrix is not None:
                 f.write("$1-e Hamiltonian matrix, dim= "+str(self.Hamiltonian_matrix.shape[0])+" "+str(self.Hamiltonian_matrix.shape[1])+" lower= 1\n")
-                PrintMatrix(f,self.Hamiltonian_matrix,True)
+                PrintMatrix(f,mwfntransform@self.Hamiltonian_matrix@mwfntransform.T,True)
             if self.Alpha_Hamiltonian_matrix is not None:
                 f.write("$Alpha 1-e Hamiltonian matrix, dim= "+str(self.Alpha_Hamiltonian_matrix.shape[0])+" "+str(self.Alpha_Hamiltonian_matrix.shape[1])+" lower= 1\n")
-                PrintMatrix(f,self.Alpha_Hamiltonian_matrix,True)
+                PrintMatrix(f,mwfntransform@self.Alpha_Hamiltonian_matrix@mwfntransform.T,True)
             if self.Beta_Hamiltonian_matrix is not None:
                 f.write("$Beta 1-e Hamiltonian matrix, dim= "+str(self.Beta_Hamiltonian_matrix.shape[0])+" "+str(self.Beta_Hamiltonian_matrix.shape[1])+" lower= 1\n")
-                PrintMatrix(f,self.Beta_Hamiltonian_matrix,True)
+                PrintMatrix(f,mwfntransform@self.Beta_Hamiltonian_matrix@mwfntransform.T,True)
             if self.Overlap_matrix is not None:
                 f.write("$Overlap matrix, dim= "+str(self.Overlap_matrix.shape[0])+" "+str(self.Overlap_matrix.shape[1])+" lower= 1\n")
-                PrintMatrix(f,self.Overlap_matrix,True)
+                PrintMatrix(f,mwfntransform@self.Overlap_matrix@mwfntransform.T,True)
             if self.Kinetic_energy_matrix is not None:
                 f.write("$Kinetic energy matrix, dim= "+str(self.Kinetic_energy_matrix.shape[0])+" "+str(self.Kinetic_energy_matrix.shape[1])+" lower= 1\n")
-                PrintMatrix(f,self.Kinetic_energy_matrix,True)
+                PrintMatrix(f,mwfntransform@self.Kinetic_energy_matrix@mwfntransform.T,True)
             if self.Potential_energy_matrix is not None:
                 f.write("$Potential energy matrix, dim= "+str(self.Potential_energy_matrix.shape[0])+" "+str(self.Potential_energy_matrix.shape[1])+" lower= 1\n")
-                PrintMatrix(f,self.Potential_energy_matrix,True)
+                PrintMatrix(f,mwfntransform@self.Potential_energy_matrix@mwfntransform.T,True)

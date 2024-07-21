@@ -15,7 +15,7 @@ def Analyzer(mo_mwfn,method="Lowdin",method_optn={}):
     if mo_mwfn.Wfntype==0 or mo_mwfn.Wfntype==1:
         for spin in ([0] if mo_mwfn.Wfntype==0 else [1,2]):
             print("Spin "+str(spin))
-            nocc=mo_mwfn.Naelec if spin==1 else mo_mwfn.Nbelec
+            nocc=int(mo_mwfn.getNumElec(spin)/(2 if spin==0 else 1))
             C=mo_mwfn.getCoefficientMatrix(spin)[:,:nocc]
             Qs=Lowdin_func(C,S,basis_indices_by_center)
             for iatom in range(natoms):
