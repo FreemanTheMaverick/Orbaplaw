@@ -83,7 +83,7 @@ As a result, one may have to make do with two titanium atoms with formal charge 
 By NFBO analysis, we will show that there is actually one pair of electrons delocalized among the three titanium atoms, involving no ligands.
 Seperating these two electrons from the two Ti(III) atoms, we have a normal three-Ti(IV) configuration.
 
-![ti](doc/ti.png)
+![ti](ti.png)
 *The structure of the tri-nuclear titanium polyhydride complex. The formal charge (IV) of one Ti atom different from (III) of the other two is not a typo.*
 
 We simplify the model by replacing all the Cp' rings with unsubstituted Cp rings.
@@ -96,13 +96,13 @@ NFBO analysis gives a result of six Ti-H<sub>μ2</sub>-Ti three-center bonds (ea
 When assigning charges to the titanium atoms, one should consider the ten electrons by the ligands as well as the two electrons accommodated by the Ti-Ti-Ti three-center bond.
 Therefore, each titanium atom has an oxidation state of (IV).
 
-![ti_nfbo1](doc/ti_nfbo1.png)
+![ti_nfbo1](ti_nfbo1.png)
 *One of the six Ti-H<sub>μ2</sub>-Ti three-center bonds*
 
-![ti_nfbo2](doc/ti_nfbo2.png)
+![ti_nfbo2](ti_nfbo2.png)
 *The Ti-Ti-Ti-H<sub>μ3</sub> four-center bond*
 
-![ti_nfbo3](doc/ti_nfbo3.png)
+![ti_nfbo3](ti_nfbo3.png)
 *The Ti-Ti-Ti three-center bond*
 
 ### <a id="uu"></a> The uranium-cyclobutadiene-uranium sandwich
@@ -111,16 +111,16 @@ In this type of complexes, the cyclobutadienyl/diphosphacyclobutadienyl group li
 Their molecular orbitals, however, are too delocalized and make the bonding schemes between the uranium motifs and the cyclobutadienyl/diphosphacyclobutadienyl group elusive.
 Here we use our NFBO method to decipher the bonding schemes.
 
-![uu](doc/uu.png)
+![uu](uu.png)
 
 We choose the uranium-cyclobutadiene-uranium complex as an example and replace all the aromatic and methyl substituents with hydrogen atoms to simplify the model for shorter computation time.
 The *ab initio* computation is done at the level of B3LYP/6-31G(d)+MWB60 with `Gaussian 16`.
 The two uranium motifs and the middle cyclobutadiene are considered three fragments.
 
-![uu_nfbo1](doc/uu_nfbo1.png)
+![uu_nfbo1](uu_nfbo1.png)
 *NFBOs and NFHOs of one three-fragment bonds*
 
-![uu_nfbo2](doc/uu_nfbo2.png)
+![uu_nfbo2](uu_nfbo2.png)
 *NFBOs and NFHOs of the other three-fragment bonds*
 
 
@@ -130,14 +130,14 @@ It is found that this catalyzed reaction is orders of magnitude faster than simi
 The authors attribute this high reaction rate to the d(Pd)->π*(phenyl) weak interaction in the transition state of the reductive elimination step, which lowers the barrier.
 Now we use NFBO to verify this statement.
 
-![pd](doc/pd.png)
+![pd](pd.png)
 *Transition state of the reductive elimination step*
 
 The *ab initio* computation is done to the transition state at the level of B3LYP/6-31G(d)+MWB28 with `Gaussian 16`.
 We consider the aryldifluoromethyl group as one fragment and everything else as the other fragment.
 The occupation threshold is set to 1.95 per orbital.
 
-![pd_nfbo](doc/pd_nfbo.png)
+![pd_nfbo](pd_nfbo.png)
 *NFBOs and NFHOs of the transition state*
 ```
 Fragment combination (0, 1)
