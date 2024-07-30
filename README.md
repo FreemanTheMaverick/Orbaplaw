@@ -1,7 +1,9 @@
 # Orbaplaw
 > **Orb**ital **a**lignment analysis for **pla**ne **w**ave basis sets
+>
 > But now we are at the interlude of gaussian basis sets.
 
+## Functions
 `Orbaplaw` can be used to perform
 + Population analysis
   + Lowin Population
@@ -25,6 +27,7 @@
 + [Principal interacting orbital analysis](doc/PIO.md)
 + [Natural fragment bond orbital analysis](doc/NFBO.md)
 + [Fragment-aligned molecular orbital analysis](doc/FAMO.md)
++ [Orbital localization](doc/LMO.md)
 
 
 ## Citation

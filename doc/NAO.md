@@ -10,7 +10,8 @@
 
 ## Usage
 
-+ *Ab initio* computation
++ *Ab initio* computation.
+
 In `Orbaplaw`, NAO construction is supported only for **pure** spherical gaussian basis functions, so the keyword `5d 7f` is necessary in the route section of the `Gaussian` input file.
 
 + Loading necessary packages.
