@@ -19,33 +19,33 @@ Then ideally, only the orbitals semilocalized on the interesting subsystems are 
 By doing so, the wholist CMOs are divided into two spaces, the "matched space" matched with the neighbouring fragment CMOs and the "mismatched space" corresponding to the orbitals on the rest of the molecule, whose electronic structure is to be investigated.
 
 Let's formulate the problem mathematically.
-The **occupied** CMOs of the whole molecule $\left\\{|\psi_i\rangle\right\\}$ and the fragments $\left\\{|\phi_i\rangle\right\\}$ are represented in two basis sets $\left\\{|\chi_\mu\rangle\right\\}$ and $\left\\{|\omega_\nu\rangle\right\\}$.
+The **occupied** CMOs of the whole molecule $\left\{ | \psi_i\rangle \right\}$ and the fragments $\left\{|\phi_i\rangle\right\}$ are represented in two basis sets $\left\{ | \chi_\mu \rangle \right\}$ and $\left\{| \omega_\nu \rangle \right\}$.
 The two basis sets can be the same.
 $
-|\psi_i\rangle=\sum_\mu^m A_{\mu i}|\chi_\mu\rangle\\
-|\phi_j\rangle=\sum_\nu^p B_{\nu j}|\omega_\nu\rangle
+|\psi_i \rangle=\sum_\mu^m A_{\mu i} | \chi_\mu \rangle \\
+|\phi_j \rangle=\sum_\nu^p B_{\nu j} | \omega_\nu \rangle
 $
 
 $\mathbf{A}$ and $\mathbf{B}$ are the two coefficient matrices.
 $m$ and $p$ are the numbers of basis functions used in *ab inito* computation of the whole molecule and the fragments, respectively.
-We want to find a unitary transformation, $\mathbf{X}$, of $\left\\{|\psi_i\rangle\right\\}$
+We want to find a unitary transformation, $\mathbf{X}$, of $\left\{ | \psi_i \rangle \right\}$
 $
 \begin{aligned}
-|\tilde{\psi}_k\rangle
-&=\sum_i^n X_{ik}|\psi_i\rangle\\
-&=\sum_i^n\sum_\mu^m A_{\mu i} X_{ik}|\chi_\mu\rangle
+|\tilde{\psi}_k \rangle
+&=\sum_i^n X_{ik} | \psi_i \rangle \\
+&=\sum_i^n \sum_\mu^m A_{\mu i} X_{ik} | \chi_\mu \rangle
 \end{aligned}
 $
 
-where $n$ is the number of occupied CMOs in the whole molecule, so that the resulted orbitals $\left\\{|\tilde{\psi}_k \rangle\right\\}$ have the best matched and mismatched spaces.
+where $n$ is the number of occupied CMOs in the whole molecule, so that the resulted orbitals $\left\{ | \tilde{\psi}_k \rangle \right\}$ have the best matched and mismatched spaces.
 Finding the best matched and mismatched spaces boils down to the optimization problem, where the wholistic CMOs are transform so that (1) part of the orbitals have as large overlap with the fragment CMOs as possible to construct the matched space and (2) the other part have as small overlap with the fragment CMOs as possible to construct the mismatched space.
 That is to find the minimum of the loss function
 $
 \begin{aligned}
     L
-    &=\sum_j^q\sum_k^n\left(\langle \phi_j |\tilde{\psi}_k\rangle -\delta_{jk}\right)^2\\
-    &=\sum_j^q\sum_k^n\left(\sum_\nu^p B_{\nu j}^* \sum_i^n\sum_\mu^m A_{\mu i} X_{ik} \langle \omega_\nu | \chi_\mu \rangle -\delta_{jk}\right)^2\\
-    &=\sum_j^q\sum_k^n\left[\left(\mathbf{B^\dagger S^\dagger AX-I}\right)_{jk}\right]^2\\
+    &=\sum_j^q \sum_k^n \left( \langle \phi_j | \tilde{\psi}_k \rangle -\delta_{jk} \right) ^2\\
+    &=\sum_j^q \sum_k^n \left( \sum_\nu^p B_{\nu j}^* \sum_i^n \sum_\mu^m A_{\mu i} X_{ik} \langle \omega_\nu | \chi_\mu \rangle -\delta_{jk} \right) ^2\\
+    &=\sum_j^q \sum_k^n \left[ \left( \mathbf{B^\dagger S^\dagger AX-I}\right)_{jk} \right] ^2\\
     &=\left\| \mathbf{\mathbf{B^\dagger S^\dagger AX-I}} \right\|_\text{F}^2
 \end{aligned}
 $
@@ -62,7 +62,7 @@ $
 It is a typical Procrustes problem,
 
 $
-\min_\mathbf{X}\bigl\{\Vert \mathbf{\mathbf{B^\dagger S^\dagger AX-I}} \Vert_\text{F}^2,\ \mathbf{X}^{-1}=\mathbf{X}^\dagger\bigr\}
+\min_\mathbf{X} \bigl\{ \Vert \mathbf{\mathbf{B^\dagger S^\dagger AX-I}} \Vert_\text{F}^2,\ \mathbf{X}^{-1}=\mathbf{X}^\dagger \bigr\}
 $
 
 whose solution is
@@ -78,7 +78,7 @@ $
 $
 
 The resulted orbitals are called fragment aligned molecular orbitals (FAMOs).
-Their corresponding singular values $\left\\{\sigma_f\right\\}$ are the overlap between the matched space and the fragment CMOs, ranging in $\left(0,1\right)$.
+Their corresponding singular values $\left\{ \sigma_f \right\}$ are the overlap between the matched space and the fragment CMOs, ranging in $\left(0,1\right)$.
 A set of singular values close to 1 indicates that the fragments are well-chosen.
 However, the FAMOs in the mismatched space do not have singular values, because they are meant to have zero overlap with the fragment CMOs.
 They mix each other due to degeneracy and have no chemical meaning.
