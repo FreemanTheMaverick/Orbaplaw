@@ -47,7 +47,7 @@ nao.Export("job_nao.mwfn")
 
 NFBO analysis needs the user to manually divide the molecule into fragments.
 In this example, we simply divide the molecule into two fragments.
-The first fragment covers Atoms 1-42 and the second 43-58.
+The first fragment covers Atoms 1-43 and the second 44-58.
 Note that indices start from 0 in Python.
 ```
 frag1=[i for i in range(43)]
