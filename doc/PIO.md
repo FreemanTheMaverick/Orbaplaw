@@ -53,6 +53,8 @@ They correspond to the PIOs of the bigger fragment that have no bonding interact
 
 In this way, we can see the principal interactions between the two fragments free of contamination caused by the substitution groups.
 
+You can find more information about PIO in [^pio1][^pio1][^pio2][^pio3][^pio4][^pio5][^pio6].
+
 ## Usage
 
 + Loading necessary modules.
@@ -106,6 +108,8 @@ PIMO_3 (-0.0, 0.537) =  0.4 * PIO_2 (1.68)  -0.917 * PIO_3 (0.32)
 ```
 
 # Gallery
+
+
 
 [^pio1]: Zhang, J.-X.; Sheong, F. K.; Lin, Z. Unravelling chemical interactions with principal interacting orbital analysis. *Chem. Eur. J.* **2018**, *24*, 9639–9650. [link](https://doi.org/10.1002/chem.201801220)
 [^pio2]: Sheong, F. K.; Zhang, J.-X.; Lin, Z. Principal interacting spin orbital: Understanding the fragment interactions in open-shell systems. *Phys. Chem. Chem. Phys.* **2020**, *22*, 10076–10086. [link](https://doi.org/10.1039/D0CP00127A)
