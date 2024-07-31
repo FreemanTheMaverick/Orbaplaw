@@ -28,16 +28,16 @@ We know that in a density matrix, the diagonal elements indicate the "population
 Similarly, if we put bases into groups by the atoms they come from, the diagonal blocks indicate the "population" of atoms and the off-diagonal blocks indicate the "interaction" between pairs of atoms.
 Again, if we put bases into groups by the fragments they come from, the diagonal blocks indicate the "population" of fragments and the off-diagonal blocks indicate the "interaction" between pairs of fragments.
 Therefore, we will pay special attention to the off-diagonal block of the density matrx.
-In our implementation, the density matrix is based on natural atomic orbitals (NAOs), since they reflect the electronic structures of atoms in the molecular environment and are orthogonal.
+In our implementation, the density matrix is based on [natural atomic orbitals (NAOs)](NAO.md), since they reflect the electronic structures of atoms in the molecular environment and are mutually orthogonal.
 Besides, we assume that the investigated molecule is divided into two fragments, A and B.
 ![pio1](pio1.jpg)
 Now we want to transform the NAO basis set so that each interaction involves only one pair of orbitals, one from A and the other one from B.
 In other words, we want to find a transformation of the NAO basis set that leaves only one non-zero value in each row and each column of the off-diagonal block.
-That can be done by singular value decomposition (SVD) of the diagonal block.
+That can be done by singular value decomposition (SVD) of one of the two off-diagonal blocks, which are conjugate transpose to each other.
 The two transformation matrices obtained are for the NAOs of A and B, respectively.
 The resulted orbitals are called principal interacting orbitals (PIOs), because the forementioned procedure originates from the idea of principal component analysis.
-The singular values indicate the strengths of the interactions, ranging in $$$(0,1)$$$, so they are called PIO-based bond indices (PBIs).
-Theoretically, the number of the interactions equals that of the [NAOs](NAO.md) of the smaller fragment (with fewer NAOs than the bigger fragment).
+The singular values indicate the strengths of the interactions, ranging in $(0,1)$, so they are called PIO-based bond indices (PBIs).
+Theoretically, the number of the interactions equals that of the NAOs of the smaller fragment (with fewer NAOs than the bigger fragment).
 However, most of them have negligible PBIs and thus can be safely ignored; only the few with large PBIs matter.
 ![pio2](pio2.jpg)
 Next, we project the NAO-based density matrix onto the PIO basis set by applying the two forementioned transformation matrix.
@@ -79,7 +79,7 @@ nao.Export("job_nao.mwfn")
 
 PIO analysis needs the user to manually divide the molecule into fragments.
 In this example, we simply divide the molecule into two fragments.
-The first fragment covers Atoms 1-42 and the second 43-58.
+The first fragment covers Atoms 1-43 and the second 44-58.
 Note that indices start from 0 in Python.
 ```
 frag1=[i for i in range(43)]
@@ -88,7 +88,7 @@ frag2=[i for i in range(43,58)]
 
 + Conducting PIO analysis.
 
-Both NFBOs and NFHOs are exported.
+Both PIOs and PIMOs are exported.
 ```
 pio,pimo=nbo.PrincipalInteractingOrbital(nao,[frag1,frag2])
 pio.Export("job_pio.mwfn")
@@ -106,7 +106,6 @@ PIMO_3 (-0.0, 0.537) =  0.4 * PIO_2 (1.68)  -0.917 * PIO_3 (0.32)
 ```
 
 # Gallery
-[^pio1][^pio2][^pio3][^pio4][^pio5][^pio6]
 
 [^pio1]: Zhang, J.-X.; Sheong, F. K.; Lin, Z. Unravelling chemical interactions with principal interacting orbital analysis. *Chem. Eur. J.* **2018**, *24*, 9639–9650. [link](https://doi.org/10.1002/chem.201801220)
 [^pio2]: Sheong, F. K.; Zhang, J.-X.; Lin, Z. Principal interacting spin orbital: Understanding the fragment interactions in open-shell systems. *Phys. Chem. Chem. Phys.* **2020**, *22*, 10076–10086. [link](https://doi.org/10.1039/D0CP00127A)

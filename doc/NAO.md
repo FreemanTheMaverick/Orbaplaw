@@ -7,6 +7,7 @@
 
 
 ## Theory
+[^nao]
 
 ## Usage
 
@@ -30,9 +31,12 @@ job_mwfn=wfn.MultiWaveFunction("job.mwfn")
 job_nao_mwfn=nbo.NaturalAtomicOrbital(job_mwfn)
 ```
 
-+ Exporting the NAO to `job_nao.mwfn`.
++ Exporting the NAOs to `job_nao.mwfn`.
 ```
 job_nao_mwfn.Export("job_nao.mwfn")
 ```
 
 ## Gallery
+
+
+[^nao]: Reed, A. E.; Weinstock, R. B.; Weinhold, F. Natural population analysis. *J. Chem. Phys.* **1985**, *83*, 735–746. [link](https://doi.org/10.1063/1.449486)

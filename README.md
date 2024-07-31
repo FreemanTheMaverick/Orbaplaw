@@ -4,7 +4,9 @@
 > But now we are at the interlude of gaussian basis sets.
 
 ## Functions
+
 `Orbaplaw` can be used to perform
+
 + Population analysis
   + Lowin Population
 + Orbital localization

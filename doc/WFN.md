@@ -15,12 +15,13 @@ Here we use `Gaussian 16` as an example.
 Title Card Required
 
 0 1
-......
+[Geometry]
 ```
 
 ## Converting wavefunction file
 The resultant wavefunction is stored in `job.chk`, an `chk` format file which is not supported by `Orbaplaw`.
-We need to transform `job.chk` to `fchk` with `formchk` and then to `mwfn` format with `Multiwfn`.
+We need to transform `job.chk` to `fchk` with `formchk` and then to `mwfn` format[^mwfn] with `Multiwfn`[^multiwfn].
+
 ```
 $ formchk job.chk # Now we have job.fchk
 $ Multiwfn job.fchk
@@ -92,5 +93,11 @@ mwfn.setCoefficientMatrix(0,C)
 ```
 
 ## Caution
-The ordering for basis functions of $$$l\ge2$$$ in `Orbaplaw` is [d-2, d-1, d0, d+1, d+2] and [f-3, f-2, f-1, f0, f+1, f+2, f+3], etc., different from [d0, d+1, d-1, d+2, d-2] and [f0, f+1, f-1, f+2, f-2, f+3, f-3, f+4, f-4], etc., in the `mwfn` file format.
++ Currently only pure basis functions (5d, 7f, 9g, etc.) are supported.
++ Ordering of basis functions.
+The ordering of basis functions of $l \ge 2$ in `Orbaplaw` is [d-2, d-1, d0, d+1, d+2] and [f-3, f-2, f-1, f0, f+1, f+2, f+3], etc., different from [d0, d+1, d-1, d+2, d-2] and [f0, f+1, f-1, f+2, f-2, f+3, f-3, f+4, f-4], etc., in the `mwfn` file format.
 Upon I/O of `mwfn` file, a matrix transformation is applied to accommodate this difference.
+
+
+[^multiwfn]: Lu, T.; Chen, F. Multiwfn: A multifunctional wavefunction analyzer. *J. Comput. Chem.* **2012** *33*, 580-592. [link](https://doi.org/10.1002/jcc.22885)
+[^mwfn]: Lu, T.; Chen, Q. mwfn: A strict, concise and extensible format for electronic wavefunction storage and exchange. *ChemRxiv.* **2022**. This content is a preprint and has not been peer-reviewed. [link](https://doi.org/10.26434/chemrxiv-2021-lt04f-v6)
