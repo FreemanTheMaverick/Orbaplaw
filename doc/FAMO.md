@@ -162,4 +162,4 @@ famo_mwfn.Export("job_famo.mwfn")
 ## Gallery
 
 
-[^famo]: Sheong, F. K.; Zhang, J.-X.; Lin, Z. Fragment aligned molecular orbital analysis: An innovative tool for analyzing atypical chemical bonding. *J. Chem. Theory Comput.* **2024**, . [link](https://doi.org/10.1021/acs.jctc.4c00456)
+[^famo]: Sheong, F. K.; Zhang, J.-X.; Lin, Z. Fragment aligned molecular orbital analysis: An innovative tool for analyzing atypical chemical bonding. *J. Chem. Theory Comput.* **2024**, *20*, 6569–6577. [link](https://doi.org/10.1021/acs.jctc.4c00456)
