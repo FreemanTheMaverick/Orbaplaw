@@ -35,6 +35,6 @@
 ## Citation
 Zhang, Y. Orbaplaw: Orbital alignment analysis for plane wave basis sets. https://github.com/FreemanTheMaverick/Orbaplaw, 2024.
 
-If `Orbaplaw` benefits your research, please cite this program and all the methods you use in your manuscript.
+If `Orbaplaw` benefits your research, please cite this program and the whole method toolchain you use in your manuscript. For example, if you have used the NFBO method, you had better cite (1) the program `Orbaplaw`, (2) the original paper on NFBO and (3) the original paper on NAO (because NAO is a prerequisite for NFBO and thus part of the toolchain).
 
 ![](doc/please_cite.gif)
