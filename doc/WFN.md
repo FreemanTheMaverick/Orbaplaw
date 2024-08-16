@@ -99,5 +99,5 @@ The ordering of basis functions of $l \ge 2$ in `Orbaplaw` is [d-2, d-1, d0, d+1
 Upon I/O of `mwfn` file, a matrix transformation is applied to accommodate this difference.
 
 
-[^multiwfn]: Lu, T.; Chen, F. Multiwfn: A multifunctional wavefunction analyzer. *J. Comput. Chem.* **2012** *33*, 580-592. [link](https://doi.org/10.1002/jcc.22885)
+[^multiwfn]: Lu, T.; Chen, F. Multiwfn: A multifunctional wavefunction analyzer. *J. Comput. Chem.* **2012**, *33*, 580-592. [link](https://doi.org/10.1002/jcc.22885)
 [^mwfn]: Lu, T.; Chen, Q. mwfn: A strict, concise and extensible format for electronic wavefunction storage and exchange. *ChemRxiv.* **2022**. This content is a preprint and has not been peer-reviewed. [link](https://doi.org/10.26434/chemrxiv-2021-lt04f-v6)
