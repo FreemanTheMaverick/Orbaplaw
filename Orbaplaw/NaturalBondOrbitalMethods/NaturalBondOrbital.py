@@ -1,6 +1,5 @@
 import numpy as np
 import scipy.linalg as sl
-import sympy as sp
 import itertools as it
 import copy as cp
 from Orbaplaw import Localization as loc
