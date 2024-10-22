@@ -68,6 +68,11 @@ from Orbaplaw import NaturalBondOrbitalMethods as nbo
 mo=wfn.MultiWaveFunction("job.mwfn")
 ```
 
++ Calculating the density matrix based on the orbital coefficients and the occupation numbers, which is necessary for generation of NAOs.
+```
+job_mwfn.calcDensity()
+```
+
 + Generating NAOs.
 
 NFBO analysis requires a basis set of natural atomic orbitals (NAOs).
