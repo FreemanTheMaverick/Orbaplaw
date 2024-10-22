@@ -26,6 +26,11 @@ from Orbaplaw import NaturalBondOrbitalMethods as nbo # Orbaplaw.NaturalBondOrbi
 job_mwfn=wfn.MultiWaveFunction("job.mwfn")
 ```
 
++ Calculating the density matrix, which is necessary for generation of NAOs.
+```
+job_mwfn.calcDensity()
+```
+
 + Conducting NAO population analysis.
 ```
 job_nao_mwfn=nbo.NaturalAtomicOrbital(job_mwfn)
