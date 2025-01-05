@@ -497,7 +497,7 @@ def MinimalShells(an,nc): # an - Atomic number; nc - Nuclear charge
             return [7,5,4,2,0,0,0] # U
 
 
-def NaturalAtomicOrbital(mo_mwfn):
+def NaturalAtomicOrbital(mo_mwfn,modify_minimal_shells=[]):
     nao_mwfn=cp.deepcopy(mo_mwfn)
     basis_indices_by_center=nao_mwfn.getBasisIndexByCenter()
     shell_indices_by_center=nao_mwfn.getShellIndexByCenter()
@@ -508,6 +508,8 @@ def NaturalAtomicOrbital(mo_mwfn):
     S=nao_mwfn.Overlap_matrix
     angulars=[shell.Type for shell in nao_mwfn.Shells]
     minimal_shells=[MinimalShells(center.Index,int(center.Nuclear_charge)) for center in mo_mwfn.Centers]
+    for icenter, minimal_shell in modify_minimal_shells:
+        minimal_shells[icenter]=minimal_shell
     print("Natural atomic orbitals:")
     if mo_mwfn.Wfntype==0 or mo_mwfn.Wfntype==1:
         for spin in ([0] if mo_mwfn.Wfntype==0 else [1,2]):
