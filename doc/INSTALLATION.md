@@ -7,8 +7,8 @@
 + `Multiwfn` for visualization of orbitals
 
 ## Download
-+ `$ cd [Installation directory]`
-+ `$ git clone https://github.com/FreemanTheMaverick/Orbaplaw.git`
++ `$ wget https://github.com/FreemanTheMaverick/Orbaplaw/archive/refs/tags/v1.0.zip`
++ `$ unzip -d [Installation directory] v1.0.zip
 
 ## Environment variables
 + `$ vim ~/.bashrc`

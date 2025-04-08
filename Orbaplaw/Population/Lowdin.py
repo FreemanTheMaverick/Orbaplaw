@@ -2,6 +2,14 @@ import numpy as np
 import scipy.linalg as sl
 
 
+def Lowdin(C, S, basis_indices_by_center):
+	SsqrtC = sl.sqrtm(S) @ C
+	Qs = []
+	for basis_indices in basis_indices_by_center:
+		tmp = SsqrtC[basis_indices, :]
+		Qs.append(tmp.T @ tmp)
+	return Qs
+
 def Lowdin_func(C,S,basis_indices_by_center):
     nbasis=C.shape[0]
     norbitals=C.shape[1]
