@@ -3,6 +3,7 @@
 >
 > But now we are at the interlude of gaussian basis sets.
 
+
 ## Functions
 
 `Orbaplaw` can be used to perform
@@ -14,10 +15,12 @@
   + Foster-Boys localization
   + Fock space localization (Inefficiently implemented)
   + Localized orbitalet (Inefficiently implemented)
++ Orbital alignment
+  + Spin natural orbital (SNO)
+  + Fragment-aligned molecular orbital (FAMO)
 + Inter-fragment bonding analysis
-  + Principal interacting orbital (PIO) analysis
-  + Natual fragment bond orbital (NFBO) analysis
-  + Fragment-aligned molecular orbital (FAMO) analysis
+  + Principal interacting orbital (PIO)
+  + Natural fragment bond orbital (NFBO)
 
 
 ## Documents
