@@ -1,5 +1,6 @@
 import numpy as np
 import copy as cp
+from Orbaplaw import Integrals as eint
 from . import PipekMezey
 from . import FosterBoys
 from . import Fock
@@ -42,22 +43,19 @@ def Localizer(mo_mwfn, method = "PipekMezey-Lowdin", space = "occ"):
 			if space.upper() == "MIX":
 				raise RuntimeError("Fractionally occupied orbitals and mixing occupied and virtual orbitals in Pipek-Mezey localization is not supported!")
 			print("Pipek-Mezey localization (%s) on Spin %d Orbitals %d - %d:" % ( charge_type, spin, orbital_range[0], orbital_range[-1] ))
-			exec(calcS)
+			if mo_mwfn.Overlap_matrix is None:
+				mo_mwfn.calcOverlap()
 			S = mo_mwfn.Overlap_matrix
 			basis_indices_by_center = loc_mwfn.getBasisIndexByCenter()
 			Cnew = Cold @ PipekMezey(Cold, S, basis_indices_by_center, charge_type)
 
 		elif "FB" in method.upper() or "FOSTER" in method.upper() or "BOYS" in method.upper():
 			print("Foster-Boys localization on Spin %d Orbitals %d - %d:" % (spin, orbital_range[0], orbital_range[-1]))
-			Waos = [
-					- mo_mwfn.X_electric_dipole_moment_matrix,
-					- mo_mwfn.Y_electric_dipole_moment_matrix,
-					- mo_mwfn.Z_electric_dipole_moment_matrix
-			]
-			W2aoSum = - mo_mwfn.XX_electric_quadrupole_moment_matrix \
-					- mo_mwfn.YY_electric_quadrupole_moment_matrix \
-					- mo_mwfn.ZZ_electric_quadrupole_moment_matrix
-			Cnew = Cold @ FosterBoys(Cold, Wao, W2aoSum)
+			X, Y, Z = eint.PyscfDipole(loc_mwfn, loc_mwfn)
+			XX, _, _, YY, _, ZZ = eint.PyscfQuadrupole(loc_mwfn, loc_mwfn)
+			Waos = [ X, Y, Z ]
+			W2aoSum = - XX - YY - ZZ
+			Cnew = Cold @ FosterBoys(Cold, Waos, W2aoSum)
 
 		C = loc_mwfn.getCoefficientMatrix(spin)
 		C[:, orbital_range] = Cnew
