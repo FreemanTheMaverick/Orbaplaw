@@ -75,6 +75,6 @@ def PipekMezey(Cref, S, basis_indices_by_center, charge_type):
 	tol2 = 10
 	mv.TrustRegion(
 			func, tr_setting, (tol0, tol1, tol2),
-			0.0001, 1, 1000, L, M, 1
+			0.001, 1, 1000, L, M, 1
 	)
 	return M.P

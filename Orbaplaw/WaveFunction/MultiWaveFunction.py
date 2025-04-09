@@ -596,7 +596,7 @@ class MultiWaveFunction:
 			self.Orbitals[orbital_indices[i]].Energy=energies[i]
 
 	def calcOverlap(self):
-		self.Overlap_matrix=eint.PyscfOverlap(self,self)
+		self.Overlap_matrix = eint.PyscfOverlap(self,self)
 
 	def calcHamiltonian(self):
 		S=self.Overlap_matrix

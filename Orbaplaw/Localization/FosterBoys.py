@@ -26,13 +26,13 @@ def oldFosterBoys(C0,Ws,W2s,conv):
 
 import Maniverse as mv
 
-def FosterBoys(C, Wao, W2aoSum):
+def FosterBoys(C, Ws, W2Sum):
 	Wrefs = [ C.T @ W @ C for W in Ws ]
 	W2refSum = C.T @ W2Sum @ C
-	M = mv.Orthogonal(np.eye(Wxref.shape[0]), True)
+	M = mv.Orthogonal(np.eye(Wrefs[0].shape[0]), True)
 	def func(U, order):
 		Ws = [ U.T @ Wref @ U for Wref in Wrefs]
-		DiagWs = [ np.diag(W) for W in Ws ]
+		DiagWs = [ np.diag(np.diag(W)) for W in Ws ]
 		W2Sum = U.T @ W2refSum @ U
 		L = np.trace(W2Sum)
 		for DiagW in DiagWs:
@@ -49,14 +49,17 @@ def FosterBoys(C, Wao, W2aoSum):
 		if order == 2:
 			def He(v):
 				Hv = twoW2refSum @ v
-				for fourWref, DiagW, eightWrefU, UTWref in zip(fourWrefs, DiagWs, eigeWrefUs, UTWrefs):
+				for fourWref, DiagW, eightWrefU, UTWref in zip(fourWrefs, DiagWs, eightWrefUs, UTWrefs):
 					Hv -= fourWref @ v @ DiagW + eightWrefU @ np.diag(np.diag(UTWref @ v))
 				return Hv
 		return L, Ge, He
 	L = 0
 	tr_setting = mv.TrustRegionSetting()
+	tol0 = 1e-8 * M.getDimension()
+	tol1 = 1e-6 * M.getDimension()
+	tol2 = 10
 	mv.TrustRegion(
-			func, tr_setting, (1.e-6, 1.e-4, 1.e-7),
-			1, 100, L, M, True
+			func, tr_setting, (tol0, tol1, tol2),
+			0.001, 1, 1000, L, M, 1
 	)
 	return M.P
