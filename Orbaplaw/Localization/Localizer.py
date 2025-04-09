@@ -1,15 +1,12 @@
 import numpy as np
 import copy as cp
 from Orbaplaw import Integrals as eint
+from Orbaplaw import Population as pop
 from . import PipekMezey
 from . import FosterBoys
 from . import Fock
 from . import Orbitalet
 
-calcS='''
-if mo_mwfn.Overlap_matrix is None:
-	mo_mwfn.calcOverlap()
-'''
 
 def Localizer(mo_mwfn, method = "PipekMezey-Lowdin", space = "occ"):
 
@@ -33,29 +30,59 @@ def Localizer(mo_mwfn, method = "PipekMezey-Lowdin", space = "occ"):
 		Cnew = Cold.copy()
 
 		if "PM" in method.upper() or "PIPEK" in method.upper() or "MEZEY" in method.upper():
-			charge_type = ""
-			if "LOWDIN" in method.upper():
-				charge_type = "Lowdin"
-			elif "MULLIKEN" in method.upper():
-				charge_type = "Mulliken"
-			else:
-				raise RuntimeError("Unrecognized charge type!")
-			if space.upper() == "MIX":
-				raise RuntimeError("Fractionally occupied orbitals and mixing occupied and virtual orbitals in Pipek-Mezey localization is not supported!")
-			print("Pipek-Mezey localization (%s) on Spin %d Orbitals %d - %d:" % ( charge_type, spin, orbital_range[0], orbital_range[-1] ))
 			if mo_mwfn.Overlap_matrix is None:
 				mo_mwfn.calcOverlap()
 			S = mo_mwfn.Overlap_matrix
 			basis_indices_by_center = loc_mwfn.getBasisIndexByCenter()
-			Cnew = Cold @ PipekMezey(Cold, S, basis_indices_by_center, charge_type)
+			charge_type = ""
+			Qrefs = []
+			if "LOWDIN" in method.upper():
+				charge_type = "Lowdin"
+				Qrefs = pop.Lowdin(Cold, S, basis_indices_by_center)
+			elif "MULLIKEN" in method.upper():
+				charge_type = "Mulliken"
+				Qrefs = pop.Mulliken(Cold, S, basis_indices_by_center)
+			else:
+				raise RuntimeError("Unrecognized charge type!")
+			print("Pipek-Mezey localization (%s) on Spin %d Orbitals %d - %d:" % ( charge_type, spin, orbital_range[0], orbital_range[-1] ))
+			if space.upper() == "MIX":
+				raise RuntimeError("Fractionally occupied orbitals and mixing occupied and virtual orbitals in Pipek-Mezey localization is not supported!")
+			Cnew = Cold @ PipekMezey(Qrefs)
 
 		elif "FB" in method.upper() or "FOSTER" in method.upper() or "BOYS" in method.upper():
 			print("Foster-Boys localization on Spin %d Orbitals %d - %d:" % (spin, orbital_range[0], orbital_range[-1]))
 			X, Y, Z = eint.PyscfDipole(loc_mwfn, loc_mwfn)
 			XX, _, _, YY, _, ZZ = eint.PyscfQuadrupole(loc_mwfn, loc_mwfn)
 			Waos = [ X, Y, Z ]
-			W2aoSum = - XX - YY - ZZ
-			Cnew = Cold @ FosterBoys(Cold, Waos, W2aoSum)
+			Wrefs = [ Cold.T @ Wao @ Cold for Wao in Waos ]
+			Wao2Sum = - XX - YY - ZZ
+			W2refSum = Cold.T @ Wao2Sum @ Cold
+			Cnew = Cold @ FosterBoys(Wrefs, W2refSum)
+
+		elif "FOCK" in method.upper(): # Must start from CMOs
+			print("Fock localization on Spin %d Orbitals %d - %d:" % (spin, orbital_range[0], orbital_range[-1]))
+			Eref = np.array(mo_mwfn.getEnergy(spin))[orbital_range]
+			Cnew = Cold @ Fock(Eref)
+
+		elif "OL" in method.upper() or "ORBITALET" in method.upper(): # Must start from CMOs
+			gamma_e = 0.7959
+			for word in method.split():
+				try:
+					gamma_e = float(word)
+					break
+				except ValueError:
+					continue
+			if gamma_e <= 0 or gamma_e >= 1:
+				raise RuntimeError("Gamma_e must be in (0, 1)!")
+			print("Orbitalet localization (Gamma_e = %f) on Spin %d Orbitals %d - %d:" % (gamma_e, spin, orbital_range[0], orbital_range[-1]))
+			X, Y, Z = eint.PyscfDipole(loc_mwfn, loc_mwfn)
+			XX, _, _, YY, _, ZZ = eint.PyscfQuadrupole(loc_mwfn, loc_mwfn)
+			Waos = [ X, Y, Z ]
+			Wrefs = [ Cold.T @ Wao @ Cold for Wao in Waos ]
+			Wao2Sum = - XX - YY - ZZ
+			W2refSum = Cold.T @ Wao2Sum @ Cold
+			Eref = np.array(mo_mwfn.getEnergy(spin))[orbital_range]
+			Cnew = Cold @ Orbitalet(Wrefs, W2refSum, Eref, gamma_e)
 
 		C = loc_mwfn.getCoefficientMatrix(spin)
 		C[:, orbital_range] = Cnew

@@ -1,6 +1,5 @@
 import numpy as np
 import scipy.linalg as sl
-from Orbaplaw import Population as pop
 from Orbaplaw import Optimization as opt
 
 
@@ -40,15 +39,10 @@ def oldPipekMezey(C0,S,basis_indices_by_center,charge_type,conv):
 
 import Maniverse as mv
 
-def PipekMezey(Cref, S, basis_indices_by_center, charge_type):
-	Qrefs = []
-	if "LOWDIN" in charge_type.upper():
-		Qrefs = pop.Lowdin(Cref, S, basis_indices_by_center)
-	elif "MULLIKEN" in charge_type.upper():
-		Qrefs = pop.Mulliken(Cref, S, basis_indices_by_center) # Not implemented yet!
-	M = mv.Orthogonal(np.eye(Cref.shape[1]), True)
+def PipekMezey(Qrefs):
+	M = mv.Orthogonal(np.eye(Qrefs[0].shape[1]), True)
 	def func(U, order):
-		Qdiags = [ np.diag(np.diag( U.T @ Qref @ U)) for Qref in Qrefs ]
+		Qdiags = [ np.diag(np.diag(U.T @ Qref @ U)) for Qref in Qrefs ]
 		L = 0
 		for Qdiag in Qdiags:
 			L -= np.linalg.norm(np.diag(Qdiag)) ** 2
