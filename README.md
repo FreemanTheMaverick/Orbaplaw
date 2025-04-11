@@ -13,8 +13,7 @@
 + Orbital localization
   + Pipek-Mezey localization
   + Foster-Boys localization
-  + Fock space localization (Inefficiently implemented)
-  + Localized orbitalet (Inefficiently implemented)
+  + Localized orbitalet
 + Orbital alignment
   + Spin natural orbital (SNO)
   + Fragment-aligned molecular orbital (FAMO)
