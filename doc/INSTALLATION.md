@@ -25,4 +25,4 @@ $ export PYTHONPATH=[Installation directory]/Orbaplaw:$PYTHONPATH
 $ export PYTHON3=[The path where you can find "Python.h".] # You may check this with the command "locate Python.h".
 ```
 + `pip install Orbaplaw`
-Usually `pip` installs packages to a `lib/` directory that is already in `$PYTHONPATH`, so you do not need to set the environment variable for Orbaplaw.
++ Usually `pip` installs packages to a `lib/` directory that is already in `$PYTHONPATH`, so you do not need to set the environment variable for Orbaplaw.
