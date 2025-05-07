@@ -45,7 +45,10 @@ def Localizer(mo_mwfn, method = "PipekMezey-Lowdin", space = "occ"):
 			else:
 				raise RuntimeError("Unrecognized charge type!")
 			print("Pipek-Mezey localization (%s) on Spin %d Orbitals %d - %d:" % ( charge_type, spin, orbital_range[0], orbital_range[-1] ))
-			if space.upper() == "MIX":
+			occ_all = mo_mwfn.getOccupation(spin)
+			occ = [occ_all[i] for i in orbital_range]
+			mix = len(set(occ)) > 1
+			if mix:
 				raise RuntimeError("Fractionally occupied orbitals and mixing occupied and virtual orbitals in Pipek-Mezey localization is not supported!")
 			Cnew = Cold @ PipekMezey(Qrefs)
 
