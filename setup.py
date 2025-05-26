@@ -9,11 +9,11 @@ setup(
 		description = "Orbital alignment analysis for plane wave basis sets",
 		long_description = open("README.md").read(),
 		long_description_content_type = "text/markdown",
+		url = "https://github.com/FreemanTheMaverick/Orbaplaw.git",
 		packages = find_packages(),
 		entry_points = { "console_scripts": [
 			"orbaplaw = Orbaplaw.main:main"
 		]},
-		url = "https://github.com/FreemanTheMaverick/Orbaplaw.git",
 		install_requires = ["numpy", "scipy", "pyscf", "Maniverse"],
 		classifiers = ["Programming Language :: Python :: 3"]
 )
