@@ -2,15 +2,13 @@ from setuptools import setup, find_packages
 
 __version__ = "1.2.0"
 
-with open("README.md", 'r') as f:
-	long_description = f.read()
-
 setup(
 		name = "Orbaplaw",
 		version = __version__,
 		author = "FreemanTheMaverick",
 		description = "Orbital alignment analysis for plane wave basis sets",
-		long_description = long_description,
+		long_description = open("README.md").read(),
+		long_description_content_type = "text/markdown",
 		packages = find_packages(),
 		entry_points = { "console_scripts": [
 			"orbaplaw = Orbaplaw.main:main"
