@@ -2,6 +2,7 @@ import numpy as np
 import copy as cp
 from Orbaplaw import Integrals as eint
 from Orbaplaw import Population as pop
+from Orbaplaw import Miscellany as mis
 from . import PipekMezey
 from . import FosterBoys
 from . import Fock
@@ -26,6 +27,7 @@ def Localizer(mo_mwfn, method = "PipekMezey-Lowdin", space = "occ"):
 				orbital_range = list(range(norbitals))
 		elif type(space) is list:
 			orbital_range = space
+		format_range = mis.FormatRange(orbital_range)
 		Cold = loc_mwfn.getCoefficientMatrix(spin)[:, orbital_range]
 		Cnew = Cold.copy()
 
@@ -44,7 +46,7 @@ def Localizer(mo_mwfn, method = "PipekMezey-Lowdin", space = "occ"):
 				Qrefs = pop.Mulliken(Cold, S, basis_indices_by_center)
 			else:
 				raise RuntimeError("Unrecognized charge type!")
-			print("Pipek-Mezey localization (%s) on Spin %d Orbitals %d - %d:" % ( charge_type, spin, orbital_range[0], orbital_range[-1] ))
+			print("Pipek-Mezey localization (%s) on Spin %d Orbitals %s:" % ( charge_type, spin, format_range) )
 			occ_all = mo_mwfn.getOccupation(spin)
 			occ = [occ_all[i] for i in orbital_range]
 			mix = len(set(occ)) > 1
@@ -53,7 +55,7 @@ def Localizer(mo_mwfn, method = "PipekMezey-Lowdin", space = "occ"):
 			Cnew = Cold @ PipekMezey(Qrefs)
 
 		elif "FB" in method.upper() or "FOSTER" in method.upper() or "BOYS" in method.upper():
-			print("Foster-Boys localization on Spin %d Orbitals %d - %d:" % (spin, orbital_range[0], orbital_range[-1]))
+			print("Foster-Boys localization on Spin %d Orbitals %s:" % (spin, format_range))
 			X, Y, Z = eint.PyscfDipole(loc_mwfn, loc_mwfn)
 			XX, _, _, YY, _, ZZ = eint.PyscfQuadrupole(loc_mwfn, loc_mwfn)
 			Waos = [ X, Y, Z ]
@@ -63,7 +65,7 @@ def Localizer(mo_mwfn, method = "PipekMezey-Lowdin", space = "occ"):
 			Cnew = Cold @ FosterBoys(Wrefs, W2refSum)
 
 		elif "FOCK" in method.upper(): # Must start from CMOs
-			print("Fock localization on Spin %d Orbitals %d - %d:" % (spin, orbital_range[0], orbital_range[-1]))
+			print("Fock localization on Spin %d Orbitals %s:" % (spin, format_range))
 			Eref = np.array(mo_mwfn.getEnergy(spin))[orbital_range]
 			Cnew = Cold @ Fock(Eref)
 
@@ -77,7 +79,7 @@ def Localizer(mo_mwfn, method = "PipekMezey-Lowdin", space = "occ"):
 					continue
 			if gamma_e <= 0 or gamma_e >= 1:
 				raise RuntimeError("Gamma_e must be in (0, 1)!")
-			print("Orbitalet localization (Gamma_e = %f) on Spin %d Orbitals %d - %d:" % (gamma_e, spin, orbital_range[0], orbital_range[-1]))
+			print("Orbitalet localization (Gamma_e = %f) on Spin %d Orbitals %s:" % (gamma_e, spin, format_range))
 			X, Y, Z = eint.PyscfDipole(loc_mwfn, loc_mwfn)
 			XX, _, _, YY, _, ZZ = eint.PyscfQuadrupole(loc_mwfn, loc_mwfn)
 			Waos = [ X, Y, Z ]
