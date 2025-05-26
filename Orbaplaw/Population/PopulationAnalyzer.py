@@ -1,4 +1,5 @@
 import numpy as np
+from Orbaplaw import Miscellany as mis
 from . import Lowdin
 #from . import Mulliken
 
@@ -18,6 +19,7 @@ def PopulationAnalyzer(mo_mwfn, method = "Lowdin", space = "occ"):
 				orbital_range = list(range(nocc))
 		elif type(space) is list:
 			orbital_range = space
+		format_range = mis.FormatRange(orbital_range)
 		C = mo_mwfn.getCoefficientMatrix(spin)[:, orbital_range]
 
 		charge_type = ""
@@ -31,7 +33,7 @@ def PopulationAnalyzer(mo_mwfn, method = "Lowdin", space = "occ"):
 		else:
 			raise RuntimeError("Unrecognized charge type!")
 
-		print("%s population on Spin %d Orbitals %d - %d:" % ( charge_type, spin, orbital_range[0], orbital_range[-1] ))
+		print("%s population on Spin %d Orbitals %s:" % ( charge_type, spin, format_range ))
 		print("--------------------------------------------")
 		print("| Index | Symbol | Population | Net Charge |")
 		for iatom in range(natoms):

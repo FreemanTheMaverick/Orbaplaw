@@ -1,6 +1,6 @@
 from setuptools import setup, find_packages
 
-__version__ = "1.0.2"
+__version__ = "1.0.3"
 
 with open("README.md", 'r') as f:
 	long_description = f.read()
@@ -12,6 +12,9 @@ setup(
 		description = "Orbital alignment analysis for plane wave basis sets",
 		long_description = long_description,
 		packages = find_packages(),
+		entry_points = { "console_scripts": [
+			"orbaplaw = Orbaplaw.main:main"
+		]},
 		url = "https://github.com/FreemanTheMaverick/Orbaplaw.git",
 		install_requires = ["numpy", "scipy", "pyscf", "Maniverse"],
 		classifiers = ["Programming Language :: Python :: 3"]
