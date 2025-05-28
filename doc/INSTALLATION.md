@@ -20,9 +20,5 @@ $ export PYTHONPATH=[Installation directory]/Orbaplaw:$PYTHONPATH
   + Install `Maniverse` from [here](https://github.com/FreemanTheMaverick/Maniverse.git) and set its environment variable.
 
 ## Download - Easy
-+ If you have not installed `Maniverse` via `pip`, set the following environment variable.
-```
-$ export PYTHON3=[The path where you can find "Python.h".] # You may check this with the command "locate Python.h".
-```
 + `pip install Orbaplaw`
 + Usually `pip` installs packages to a `lib/` directory that is already in `$PYTHONPATH`, so you do not need to set the environment variable for Orbaplaw.
