@@ -1,6 +1,6 @@
 import re
 import argparse
-from Orbaplaw import WaveFunction as wfn
+import libmwfn as lm
 from Orbaplaw import Population as pop
 from Orbaplaw import Localization as loc
 from Orbaplaw import OrbitalAlignment as oa
@@ -88,7 +88,7 @@ def main():
 	parser_loc.add_argument(
 			"--method",
 			default = "PipekMezey-Lowdin",
-			help = "Localization method ('PipekMezey[-Lowdin/-Mulliken]', 'Foster-Boys', 'Orbitalet[ 0.7959/ gamma_e]') (Default: %(default)s)"
+			help = "Localization method ('PipekMezey[-Lowdin/-Mulliken]', 'Foster-Boys', 'Orbitalet[#0.7959/#gamma_e]') (Default: %(default)s)"
 	)
 	parser_loc.add_argument(
 			"--space",
@@ -263,54 +263,54 @@ def main():
 
 	# Running population analysis
 	if args.job_type == "pop":
-		mwfn = wfn.MultiWaveFunction(args.input)
+		mwfn = lm.Mwfn(args.input)
 		pop.PopulationAnalyzer(mwfn, args.charge, args.space)
 
 	# Running localization
 	if args.job_type == "loc":
-		orig_mwfn = wfn.MultiWaveFunction(args.input)
+		orig_mwfn = lm.Mwfn(args.input)
 		loc_mwfn = loc.Localizer(orig_mwfn, args.method, args.space)
 		loc_mwfn.Export(args.output)
 
 	# Running fragment alignment
 	if args.job_type == "famo":
-		whole_mwfn = wfn.MultiWaveFunction(args.input)
+		whole_mwfn = lm.Mwfn(args.input)
 		frag_mwfns = []
 		for frag_mwfn in args.fragments:
-			frag_mwfns.append(mwfn.MultiWaveFunction(frag_mwfn))
+			frag_mwfns.append(mlm.Mwfn(frag_mwfn))
 		famo_mwfn = oa.FragmentAlignment(whole_mwfn, frag_mwfns, args.diagmat, args.diagmis)
 		famo_mwfn.Export(args.output)
 
 	# Running spin alignment
 	if args.job_type == "sno":
-		orig_mwfn = wfn.MultiWaveFunction(args.input)
+		orig_mwfn = lm.Mwfn(args.input)
 		sno_mwfn = oa.SpinAlignment(orig_mwfn, args.diagmat, args.diagmis)
 		sno_mwfn.Export(args.output)
 
 	# Running natural atomic orbitals
 	if args.job_type == "nao":
-		orig_mwfn = wfn.MultiWaveFunction(args.input)
-		nao_mwfn = nbo.NaturalAtomicOrbital(orig_mwfn)
+		orig_mwfn = lm.Mwfn(args.input)
+		nao_mwfn, _ = nbo.NaturalAtomicOrbital(orig_mwfn)
 		nao_mwfn.Export(args.output)
 
 	# Running principal interacting orbitals
 	if args.job_type == "pio":
-		orig_mwfn = wfn.MultiWaveFunction(args.input)
-		nao_mwfn = nbo.NaturalAtomicOrbital(orig_mwfn)
+		orig_mwfn = lm.Mwfn(args.input)
+		nao_mwfn, nao_info = nbo.NaturalAtomicOrbital(orig_mwfn)
 		frags = []
 		for frag in args.fragments:
 			frags.append(parse_range(frag))
-		pio_mwfn, pimo_mwfn = nbo.PrincipalInteractingOrbital(nao_mwfn, frags)
+		pio_mwfn, pimo_mwfn = nbo.PrincipalInteractingOrbital(nao_mwfn, nao_info, frags)
 		pio_mwfn.Export(args.output[0])
 		pimo_mwfn.Export(args.output[1])
 
 	# Running natural bond orbitals
 	if args.job_type == "nbo":
-		orig_mwfn = wfn.MultiWaveFunction(args.input)
-		nao_mwfn = nbo.NaturalAtomicOrbital(orig_mwfn)
+		orig_mwfn = lm.Mwfn(args.input)
+		nao_mwfn, nao_info = nbo.NaturalAtomicOrbital(orig_mwfn)
 		frags = []
 		for frag in args.fragments:
 			frags.append(parse_range(frag))
-		nho_mwfn, nbo_mwfn = nbo.NaturalBondOrbital(nao_mwfn, frags, args.maxnfrags, args.maxnnbos, args.occ_thres, args.multi_thres, args.pdeg_thres, args.deg_thres)
+		nho_mwfn, nbo_mwfn = nbo.NaturalBondOrbital(nao_mwfn, nao_info, frags, args.maxnfrags, args.maxnnbos, args.occ_thres, args.multi_thres, args.pdeg_thres, args.deg_thres)
 		nho_mwfn.Export(args.output[0])
 		nbo_mwfn.Export(args.output[1])

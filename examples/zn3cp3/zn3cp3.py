@@ -1,9 +1,9 @@
-from Orbaplaw import WaveFunction as wfn
+import libmwfn as lm
 from Orbaplaw import NaturalBondOrbitalMethods as nbo
 
-mo = wfn.MultiWaveFunction("zn3cp3.mwfn")
-nao = nbo.NaturalAtomicOrbital(mo)
-nfho, nfbo = nbo.NaturalBondOrbital(nao, frags = [
+mo = lm.Mwfn("zn3cp3.mwfn")
+nao, nao_info = nbo.NaturalAtomicOrbital(mo)
+nfho, nfbo = nbo.NaturalBondOrbital(nao, nao_info, frags = [
 	[i for i in range(11)],
 	[i for i in range(11, 22)],
 	[i for i in range(22, 33)]
