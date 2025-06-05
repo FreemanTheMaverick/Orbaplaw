@@ -1,6 +1,6 @@
 from setuptools import setup, find_packages
 
-__version__ = "1.2.0"
+__version__ = "2.0.0"
 
 setup(
 		name = "Orbaplaw",
@@ -14,6 +14,6 @@ setup(
 		entry_points = { "console_scripts": [
 			"orbaplaw = Orbaplaw.main:main"
 		]},
-		install_requires = ["numpy", "scipy", "pyscf", "Maniverse"],
+		install_requires = ["numpy", "scipy", "pyscf", "Maniverse", "libmwfn"],
 		classifiers = ["Programming Language :: Python :: 3"]
 )

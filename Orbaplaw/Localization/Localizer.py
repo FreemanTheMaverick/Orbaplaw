@@ -11,9 +11,9 @@ from . import Orbitalet
 
 def Localizer(mo_mwfn, method = "PipekMezey-Lowdin", space = "occ"):
 
-	loc_mwfn = cp.deepcopy(mo_mwfn)
+	loc_mwfn = mo_mwfn.Clone()
 	norbitals = loc_mwfn.getNumIndBasis()
-	for spin in ([0] if loc_mwfn.Wfntype == 0 else [1, 2]):
+	for spin in loc_mwfn.getSpins():
 		nocc = round(loc_mwfn.getNumElec(spin))
 		if spin == 0:
 			nocc //= 2
@@ -32,10 +32,10 @@ def Localizer(mo_mwfn, method = "PipekMezey-Lowdin", space = "occ"):
 		Cnew = Cold.copy()
 
 		if "PM" in method.upper() or "PIPEK" in method.upper() or "MEZEY" in method.upper():
-			if mo_mwfn.Overlap_matrix is None:
-				mo_mwfn.calcOverlap()
-			S = mo_mwfn.Overlap_matrix
-			basis_indices_by_center = loc_mwfn.getBasisIndexByCenter()
+			S = loc_mwfn.Overlap
+			if loc_mwfn.Overlap.shape != tuple([loc_mwfn.getNumBasis()] * 2):
+				S = eint.PyscfOverlap(loc_mwfn, loc_mwfn)
+			basis_indices_by_center = loc_mwfn.Atom2BasisList()
 			charge_type = ""
 			Qrefs = []
 			if "LOWDIN" in method.upper():
@@ -49,7 +49,7 @@ def Localizer(mo_mwfn, method = "PipekMezey-Lowdin", space = "occ"):
 			print("Pipek-Mezey localization (%s) on Spin %d Orbitals %s:" % ( charge_type, spin, format_range) )
 			occ_all = mo_mwfn.getOccupation(spin)
 			occ = [occ_all[i] for i in orbital_range]
-			mix = len(set(occ)) > 1
+			mix = len(set(occ)) > 1 # Different occupation values among the orbitals indicate that occupied and unoccupied orbitals are mixed.
 			if mix:
 				raise RuntimeError("Fractionally occupied orbitals and mixing occupied and virtual orbitals in Pipek-Mezey localization is not supported!")
 			Cnew = Cold @ PipekMezey(Qrefs)
@@ -71,7 +71,7 @@ def Localizer(mo_mwfn, method = "PipekMezey-Lowdin", space = "occ"):
 
 		elif "OL" in method.upper() or "ORBITALET" in method.upper(): # Must start from CMOs
 			gamma_e = 0.7959
-			for word in method.split():
+			for word in method.split('#'):
 				try:
 					gamma_e = float(word)
 					break
@@ -86,11 +86,11 @@ def Localizer(mo_mwfn, method = "PipekMezey-Lowdin", space = "occ"):
 			Wrefs = [ Cold.T @ Wao @ Cold for Wao in Waos ]
 			Wao2Sum = - XX - YY - ZZ
 			W2refSum = Cold.T @ Wao2Sum @ Cold
-			Eref = np.array(mo_mwfn.getEnergy(spin))[orbital_range]
+			Eref = loc_mwfn.getEnergy(spin)[orbital_range]
 			Cnew = Cold @ Orbitalet(Wrefs, W2refSum, Eref, gamma_e)
 
 		C = loc_mwfn.getCoefficientMatrix(spin)
 		C[:, orbital_range] = Cnew
-		loc_mwfn.setCoefficientMatrix(spin, C)
+		loc_mwfn.setCoefficientMatrix(C, spin)
 
 	return loc_mwfn

@@ -1,10 +1,10 @@
-from Orbaplaw import WaveFunction as wfn
+import libmwfn as lm
 from Orbaplaw import NaturalBondOrbitalMethods as nbo
 
-mo = wfn.MultiWaveFunction("thorium.mwfn")
-nao = nbo.NaturalAtomicOrbital(mo)
+mo = lm.Mwfn("thorium.mwfn")
+nao, nao_info = nbo.NaturalAtomicOrbital(mo)
 nao.Export("thorium_nao.mwfn")
-nfho, nfbo = nbo.NaturalBondOrbital(nao, frags = [
+nfho, nfbo = nbo.NaturalBondOrbital(nao, nao_info, frags = [
 		[0, 2], [1, 4], [3, 5],
 		[i for i in range(6, 23)],
 		[i for i in range(23, 40)],

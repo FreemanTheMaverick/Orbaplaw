@@ -1,15 +1,16 @@
 import numpy as np
 from Orbaplaw import Miscellany as mis
+from Orbaplaw import Integrals as eint
 from . import Lowdin
 #from . import Mulliken
 
 def PopulationAnalyzer(mo_mwfn, method = "Lowdin", space = "occ"):
 	natoms = mo_mwfn.getNumCenters()
-	if mo_mwfn.Overlap_matrix is None:
-		mo_mwfn.calcOverlap()
-	S = mo_mwfn.Overlap_matrix
-	basis_indices_by_center = mo_mwfn.getBasisIndexByCenter()
-	for spin in ([0] if mo_mwfn.Wfntype == 0 else [1, 2]):
+	S = mo_mwfn.Overlap
+	if mo_mwfn.Overlap.shape != tuple([mo_mwfn.getNumBasis()] * 2):
+		S = eint.PyscfOverlap(mo_mwfn, mo_mwfn)
+	basis_indices_by_center = mo_mwfn.Atom2BasisList()
+	for spin in mo_mwfn.getSpins():
 		nocc = round(mo_mwfn.getNumElec(spin))
 		if spin == 0:
 			nocc //= 2
@@ -28,6 +29,7 @@ def PopulationAnalyzer(mo_mwfn, method = "Lowdin", space = "occ"):
 			charge_type = "Lowdin"
 			Qs = Lowdin(C, S, basis_indices_by_center)
 		elif "MULLIKEN" in method.upper():
+			raise RuntimeError("Not implemented yet!")
 			charge_type = "Mulliken"
 			Qs = Mulliken(C, S, basis_indices_by_center)
 		else:
@@ -37,7 +39,7 @@ def PopulationAnalyzer(mo_mwfn, method = "Lowdin", space = "occ"):
 		print("--------------------------------------------")
 		print("| Index | Symbol | Population | Net Charge |")
 		for iatom in range(natoms):
-			symbol = mo_mwfn.Centers[iatom].Symbol
+			symbol = mo_mwfn.Centers[iatom].getSymbol()
 			population = np.sum(np.diag(Qs[iatom]))
 			if spin == 0:
 				population *= 2
