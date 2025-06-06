@@ -11,11 +11,11 @@
 
 ## Usage
 
-+ *Ab initio* computation.
+### *Ab initio* computation.
 
 In `Orbaplaw`, NAO construction is supported only for **pure** spherical gaussian basis functions, so the keyword `5d 7f` is necessary in the route section of the `Gaussian` input file.
 
-+ Command-line tool
+### Command-line tool
 
 The following commands stores the NAOs generated from `job.mwfn` into a new `job_nao.mwfn`.
 ```shell
@@ -30,8 +30,10 @@ options:
                         Mwfn file for exported NAOs (Required)
 $ nao -i job.mwfn -o job_nao.mwfn
 ```
-You may also write a script to do the same thing if you want to go into details.
 
+### Script
+
+You may also write a script to do the same thing if you want to go into details.
 + Loading necessary packages.
 ```
 from Orbaplaw import WaveFunction as wfn
@@ -39,22 +41,17 @@ from Orbaplaw import NaturalBondOrbitalMethods as nbo # Orbaplaw.NaturalBondOrbi
 ```
 
 + Loading the wavefunction file.
-```
+```python
 job_mwfn = wfn.MultiWaveFunction("job.mwfn")
 ```
 
-+ Calculating the density matrix based on the orbital coefficients and the occupation numbers, which is necessary for generation of NAOs.
-```
-job_mwfn.calcDensity()
-```
-
 + Conducting NAO population analysis.
-```
+```python
 job_nao_mwfn, job_nao_info = nbo.NaturalAtomicOrbital(job_mwfn)
 ```
 
 + Exporting the NAOs to `job_nao.mwfn`.
-```
+```python
 job_nao_mwfn.Export("job_nao.mwfn")
 ```
 

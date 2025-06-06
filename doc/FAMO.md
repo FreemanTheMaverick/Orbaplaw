@@ -93,7 +93,7 @@ The final mismatched FAMOs have the CMO features in accordance with general chem
 The readers may take a look at the original paper[^famo] for more information.
 
 ## Usage
-+ *Ab initio* computation.
+### *Ab initio* computation.
 
 *Ab initio* computation needs to be done on both the molecule and the fragments.
 Some quantum chemistry packages, such as `Gaussian`, rotates the input geometry to a standard orientation by default.
@@ -138,7 +138,7 @@ Note that the fragments should not cover the whole molecule, because the mismatc
 
 When *ab initio* calculations are done, convert the `chk` files into the `mwfn` format with **Multiwfn**.
 
-+ Command-line tool
+### Command-line tool
 
 **Orbaplaw** offers a command-line tool for FAMO analysis.
 The following command aligns the orbitals in `mol.mwfn` with the fragment orbitals in `frag1.mwfn` and `frag2.mwfn` and save the FAMOs in a new file `famo.mwfn`.
@@ -161,6 +161,9 @@ options:
                         True)
 $ orbaplaw famo -i mol.mwfn -f frag1.mwfn frag2.mwfn -o famo.mwfn
 ```
+
+### Script
+
 You may also write a script to do the same thing if you want to go into details.
 
 + Loading necessary packages.
