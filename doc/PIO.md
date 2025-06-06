@@ -58,51 +58,46 @@ You can find more information about PIO in [^pio1][^pio1][^pio2][^pio3][^pio4][^
 ## Usage
 
 + Loading necessary modules.
-```
-from Orbaplaw import WaveFunction as wfn
+```python
+import libmwfn as lm
 from Orbaplaw import NaturalBondOrbitalMethods as nbo
 ```
 
 + Loading the `mwfn` file.
-```
-mo=wfn.MultiWaveFunction("job.mwfn")
-```
-
-+ Calculating the density matrix based on the orbital coefficients and the occupation numbers, which is necessary for generation of NAOs.
-```
-job_mwfn.calcDensity()
+```python
+job_mwfn = lm.Mwfn("job.mwfn")
 ```
 
 + Generating NAOs.
 
 NFBO analysis requires a basis set of natural atomic orbitals (NAOs).
 Read [NAO.md](NAO.md) for more information about this part.
-```
-nao=nbo.NaturalAtomicOrbital(mo)
-nao.Export("job_nao.mwfn")
+```python
+job_nao_mwfn, job_nao_info = nbo.NaturalAtomicOrbital(job_mwfn)
+job_nao_mwfn.Export("job_nao.mwfn")
 ```
 
 + Defining the fragments.
 
 PIO analysis needs the user to manually divide the molecule into fragments.
 In this example, we simply divide the molecule into two fragments.
-The first fragment covers Atoms 1-43 and the second 44-58.
+The first fragment covers Atoms 1-42 and the second 43-57.
 Note that indices start from 0 in Python.
-```
-frag1=[i for i in range(43)]
-frag2=[i for i in range(43,58)]
+```python
+frag1 = list(range(43))
+frag2 = list(range(43, 58))
 ```
 
 + Conducting PIO analysis.
 
 Both PIOs and PIMOs are exported.
-```
-pio,pimo=nbo.PrincipalInteractingOrbital(nao,[frag1,frag2])
-pio.Export("job_pio.mwfn")
-pimo.Export("job_pimo.mwfn")
+```python
+job_pio_mwfn, job_pimo_mwfn = nbo.PrincipalInteractingOrbital(job_nao_mwfn, job_nao_info, [frag1,frag2])
+job_pio_mwfn.Export("job_pio.mwfn")
+job_pimo_mwfn.Export("job_pimo.mwfn")
 ```
 
-+ Reading the results.
+### Reading the results
 
 You will find the PIO/PIMO information printed on the screen, including the orbital indices, the populations, the PBIs and the coefficients of PIOs contributing to PIMOs.
 ```
