@@ -93,7 +93,7 @@ The final mismatched FAMOs have the CMO features in accordance with general chem
 The readers may take a look at the original paper[^famo] for more information.
 
 ## Usage
-### *Ab initio* computation.
+### *Ab initio* computation
 
 *Ab initio* computation needs to be done on both the molecule and the fragments.
 Some quantum chemistry packages, such as `Gaussian`, rotates the input geometry to a standard orientation by default.

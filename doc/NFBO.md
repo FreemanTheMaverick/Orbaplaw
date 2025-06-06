@@ -1,7 +1,5 @@
 # Natural fragment bond orbital
 
-
-
 ## Contents
 + [Theory](#theory)
 
@@ -21,31 +19,69 @@
 Please read [^nfbo].
 
 ## Usage
-Here is a typical procedure to perform NFBO analysis with `Orbaplaw`.
+Here is the typical procedure to perform NFBO analysis with **Orbaplaw**.
 
-+ Loading necessary modules.
+### Command-line tool
+
+The following commands generates `job_nfbo.mwfn` and `job_nfho.mwfn` out of `job.mwfn`.
+Two fragments are defined, one consisting of Atoms 1-42 and the other one Atoms 43-57.
+```shell
+$ orbaplaw nbo -h
+usage: orbaplaw nbo [-h] -i INPUT -o OUTPUT OUTPUT
+                    [--fragments [FRAGMENTS ...]] [--maxnfrags MAXNFRAGS]
+                    [--maxnnbos MAXNNBOS] [--occ_thres OCC_THRES]
+                    [--multi_thres MULTI_THRES] [--pdeg_thres PDEG_THRES]
+                    [--deg_thres DEG_THRES]
+
+options:
+  -h, --help            show this help message and exit
+  -i INPUT, --input INPUT
+                        Original mwfn file (Required)
+  -o OUTPUT OUTPUT, --output OUTPUT OUTPUT
+                        Mwfn file for exported NHOs and NBOs, respectively
+                        (Required)
+  --fragments [FRAGMENTS ...]
+                        Fragmentation scheme (e.g., '0-2,4 6,8-10 ...')
+                        (Default: _EMPTY_ -> each atom is a fragment)
+  --maxnfrags MAXNFRAGS
+                        Maximum number of fragments involved in a bonding
+                        scheme (Default: -1 -> no limit)
+  --maxnnbos MAXNNBOS   Maximum number of bonding schemes to find (Default: -1
+                        -> no limit)
+  --occ_thres OCC_THRES
+                        Occupation threshold for recognizing pNFBOs (ranging
+                        from 0 to 1) (Default: 0.95)
+  --multi_thres MULTI_THRES
+                        Occupation threshold for recognizing multi-electron
+                        bonds (ranging from 0 to 1) (Default: 1.0)
+  --pdeg_thres PDEG_THRES
+                        Occupation difference threshold for recognizing
+                        degenerate pNFBOs (Default: 1e-05)
+  --deg_thres DEG_THRES
+                        Occupation difference threshold for recognizing
+                        degenerate NFBOs (Default: 0.0)
+$ orbaplaw nbo -i job.mwfn --fragments 0-42 43-57 -o job_nfho.mwfn job_nfbo.mwfn
 ```
-from Orbaplaw import WaveFunction as wfn
+
+### Script
++ Loading necessary modules.
+```python
+import libmwfn as lm
 from Orbaplaw import NaturalBondOrbitalMethods as nbo
 ```
 
 + Loading the `mwfn` file.
-```
-mo=wfn.MultiWaveFunction("job.mwfn")
-```
-
-+ Calculating the density matrix based on the orbital coefficients and the occupation numbers, which is necessary for generation of NAOs.
-```
-job_mwfn.calcDensity()
+```python
+job_mwfn = lm.Mwfn("job.mwfn")
 ```
 
 + Generating NAOs.
 
 NFBO analysis requires a basis set of natural atomic orbitals (NAOs).
 Read [NAO.md](NAO.md) for more information about this part.
-```
-nao=nbo.NaturalAtomicOrbital(mo)
-nao.Export("job_nao.mwfn")
+```python
+job_nao_mwfn, job_nao_info = nbo.NaturalAtomicOrbital(job_mwfn)
+job_nao_mwfn.Export("job_nao.mwfn")
 ```
 
 + Defining the fragments.
@@ -54,18 +90,18 @@ NFBO analysis needs the user to manually divide the molecule into fragments.
 In this example, we simply divide the molecule into two fragments.
 The first fragment covers Atoms 1-43 and the second 44-58.
 Note that indices start from 0 in Python.
-```
-frag1=[i for i in range(43)]
-frag2=[i for i in range(43,58)]
+```python
+frag1 = list(range(43))
+frag2 = list(range(43,58))
 ```
 
 + Conducting NFBO analysis.
 
 Both NFBOs and NFHOs are exported.
-```
-nfho,nfbo=nbo.NaturalBondOrbital(nao,frags=[frag1,frag2])
-nfho.Export("job_nfho.mwfn")
-nfbo.Export("job_nfbo.mwfn")
+```python
+job_nfho_mwfn, job_nfbo_mwfn = nbo.NaturalBondOrbital(job_nao_mwfn, job_nao_info, frags = [frag1, frag2])
+job_nfho_mwfn.Export("job_nfho.mwfn")
+job_nfbo_mwfn.Export("job_nfbo.mwfn")
 ```
 
 + Reading the results.
