@@ -27,8 +27,6 @@ jobs:
           python-version: "3"
 
       - name: Build release distributions
-        env:
-          CIBW_BUILD: "cp37-* cp38-* cp39-* cp310-* cp311-* cp312-*"
         run: |
           # NOTE: put your own distribution build steps here.
           python -m pip install build
