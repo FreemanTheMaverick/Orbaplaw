@@ -139,6 +139,7 @@ Note that the fragments should not cover the whole molecule, because the mismatc
 When *ab initio* calculations are done, convert the `chk` files into the `mwfn` format with **Multiwfn**.
 
 + Command-line tool
+
 **Orbaplaw** offers a command-line tool for FAMO analysis.
 The following command aligns the orbitals in `mol.mwfn` with the fragment orbitals in `frag1.mwfn` and `frag2.mwfn` and save the FAMOs in a new file `famo.mwfn`.
 ```shell
