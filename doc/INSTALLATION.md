@@ -1,24 +1,46 @@
 # Installation
 
 ## Prerequisites
-+ `Python 3` (`Anaconda` is recommended)
-+ `Numpy`
-+ `Scipy`
-+ `Pyscf` for electron integrals
-+ `Maniverse` for orbital localization on orthogonal manifolds
-+ `Multiwfn` for visualization of orbitals
++ **Python 3**
++ **pip**
++ A C++ compiler that supports C++20 standard (if any of the dependencies need compiling)
 
-## Download - Hard 
-+ `$ wget https://github.com/FreemanTheMaverick/Orbaplaw/archive/refs/tags/v1.0.zip`
-+ `$ unzip -d [Installation directory] v1.0.zip`
-+ Set the environment variable
-```
-$ export PYTHONPATH=[Installation directory]/Orbaplaw:$PYTHONPATH
-```
-+ Handle dependencies by yourself.
-  + `pip install numpy scipy pyscf`
-  + Install `Maniverse` from [here](https://github.com/FreemanTheMaverick/Maniverse.git) and set its environment variable.
+## Dependencies (Automatically resolved by **pip**)
++ **NumPy** and **SciPy**
++ **libmwfn** for `mwfn` file format handling
++ **Maniverse** for orbital localization on orthogonal manifolds
++ **PySCF** for electron integrals
 
-## Download - Easy
-+ `pip install Orbaplaw`
-+ Usually `pip` installs packages to a `lib/` directory that is already in `$PYTHONPATH`, so you do not need to set the environment variable for Orbaplaw.
+## Related tools
++ `Multiwfn` for wavefunction file format conversion and visualization of orbitals
+
+## Download and build
+```shell
+$ pip install Orbaplaw
+```
+
+## Tryout
++ Command-line tool
+```shell
+$ orbaplaw -h
+usage: orbaplaw [-h] {pop,loc,famo,sno,nao,pio,nbo} ...
+
+Command-line tool for Orbaplaw
+
+options:
+  -h, --help            show this help message and exit
+
+Job types:
+  {pop,loc,famo,sno,nao,pio,nbo}
+    pop                 Population Analysis
+    loc                 Orbital localization
+    famo                Fragment aligned molecular orbital
+    sno                 Spin natural orbital
+    nao                 Natural atomic orbital
+    pio                 Principal interacting orbital
+    nbo                 Natural (fragment) bond orbital
+```
++ Script
+```python
+>>> from Orbaplaw import Population as pop
+```
