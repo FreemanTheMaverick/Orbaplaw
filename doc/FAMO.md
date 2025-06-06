@@ -136,27 +136,53 @@ Title Card Required
 ```
 Note that the fragments should not cover the whole molecule, because the mismatched space is meaningful and had better exist.
 
-+ Loading necessary packages.
+When *ab initio* calculations are done, convert the `chk` files into the `mwfn` format with **Multiwfn**.
+
++ Command-line tool
+**Orbaplaw** offers a command-line tool for FAMO analysis.
+The following command aligns the orbitals in `mol.mwfn` with the fragment orbitals in `frag1.mwfn` and `frag2.mwfn` and save the FAMOs in a new file `famo.mwfn`.
+```shell
+$ orbaplaw famo -h
+usage: orbaplaw famo [-h] -i INPUT -f FRAGMENTS [FRAGMENTS ...] -o OUTPUT
+                     [--diagmat DIAGMAT] [--diagmis DIAGMIS]
+
+options:
+  -h, --help            show this help message and exit
+  -i INPUT, --input INPUT
+                        Original mwfn file of the whole molecule (Required)
+  -f FRAGMENTS [FRAGMENTS ...], --fragments FRAGMENTS [FRAGMENTS ...]
+                        Fragment mwfn file(s)
+  -o OUTPUT, --output OUTPUT
+                        Mwfn file for exported FAMOs (Required)
+  --diagmat DIAGMAT     Whether to diagonalize the matched space (Default:
+                        False)
+  --diagmis DIAGMIS     Whether to diagonalize the mismatched space (Default:
+                        True)
+$ orbaplaw famo -i mol.mwfn -f frag1.mwfn frag2.mwfn -o famo.mwfn
 ```
-from Orbaplaw import WaveFunction as wfn
+You may also write a script to do the same thing if you want to go into details.
+
++ Loading necessary packages.
+```python
+import libmwfn as lm
 from Orbaplaw import OrbitalAlignment as oa
 ```
 
 + Loading the wavefunction file.
-```
-mol_mwfn=wfn.MultiWaveFunction("mol.mwfn")
-frag1_mwfn=wfn.MultiWaveFunction("frag1.mwfn")
-frag2_mwfn=wfn.MultiWaveFunction("frag2.mwfn")
+```python
+mol_mwfn = lm.Mwfn("mol.mwfn")
+frag1_mwfn = lm.Mwfn("frag1.mwfn")
+frag2_mwfn = lm.Mwfn("frag2.mwfn")
 ```
 
 + Conducting FAMO analysis.
-```
-famo_mwfn=oa.FragmentAlignment(phcl_mwfn,[frag1_mwfn,frag2_mwfn])
+```python
+famo_mwfn = oa.FragmentAlignment(mol_mwfn, [frag1_mwfn, frag2_mwfn])
 ```
 
-+ Exporting the FAMOs to `job_famo.mwfn`.
-```
-famo_mwfn.Export("job_famo.mwfn")
++ Exporting the FAMOs to `famo.mwfn`.
+```python
+famo_mwfn.Export("famo.mwfn")
 ```
 
 ## Gallery
