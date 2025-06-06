@@ -36,13 +36,13 @@ $ nao -i job.mwfn -o job_nao.mwfn
 You may also write a script to do the same thing if you want to go into details.
 + Loading necessary packages.
 ```
-from Orbaplaw import WaveFunction as wfn
+import libmwfn as lm
 from Orbaplaw import NaturalBondOrbitalMethods as nbo # Orbaplaw.NaturalBondOrbitalMethods contains the NAO function.
 ```
 
 + Loading the wavefunction file.
 ```python
-job_mwfn = wfn.MultiWaveFunction("job.mwfn")
+job_mwfn = lm.Mwfn("job.mwfn")
 ```
 
 + Conducting NAO population analysis.
