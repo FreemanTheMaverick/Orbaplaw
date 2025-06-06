@@ -104,7 +104,7 @@ job_nfho_mwfn.Export("job_nfho.mwfn")
 job_nfbo_mwfn.Export("job_nfbo.mwfn")
 ```
 
-### Reading the results.
+### Reading the results
 
 You will find the NFBO information printed on the screen, including the orbital indices, the populations, the coefficients of NFHOs contributing to NFBOs and the fragments they belong to.
 ```
