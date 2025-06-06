@@ -24,7 +24,7 @@ Here is the typical procedure to perform NFBO analysis with **Orbaplaw**.
 ### Command-line tool
 
 The following commands generates `job_nfbo.mwfn` and `job_nfho.mwfn` out of `job.mwfn`.
-Two fragments are defined, one consisting of Atoms 1-42 and the other one Atoms 43-57.
+Two fragments are defined, one consisting of Atoms 0-42 and the other one Atoms 43-57.
 ```shell
 $ orbaplaw nbo -h
 usage: orbaplaw nbo [-h] -i INPUT -o OUTPUT OUTPUT
@@ -88,11 +88,11 @@ job_nao_mwfn.Export("job_nao.mwfn")
 
 NFBO analysis needs the user to manually divide the molecule into fragments.
 In this example, we simply divide the molecule into two fragments.
-The first fragment covers Atoms 1-43 and the second 44-58.
+The first fragment covers Atoms 0-42 and the second 43-57.
 Note that indices start from 0 in Python.
 ```python
 frag1 = list(range(43))
-frag2 = list(range(43,58))
+frag2 = list(range(43, 58))
 ```
 
 + Conducting NFBO analysis.
