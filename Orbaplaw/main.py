@@ -277,7 +277,7 @@ def main():
 		whole_mwfn = lm.Mwfn(args.input)
 		frag_mwfns = []
 		for frag_mwfn in args.fragments:
-			frag_mwfns.append(mlm.Mwfn(frag_mwfn))
+			frag_mwfns.append(lm.Mwfn(frag_mwfn))
 		famo_mwfn = oa.FragmentAlignment(whole_mwfn, frag_mwfns, args.diagmat, args.diagmis)
 		famo_mwfn.Export(args.output)
 
