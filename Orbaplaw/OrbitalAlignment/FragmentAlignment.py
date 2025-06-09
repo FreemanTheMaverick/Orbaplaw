@@ -1,11 +1,10 @@
 import numpy as np
-import copy as cp
 from Orbaplaw import Integrals as eint
 from . import OrbitalAlignment
 
 
 def FragmentAlignment(big_mwfn, small_mwfn_list, diagmat = False, diagmis = True):
-	famo_mwfn = cp.deepcopy(big_mwfn)
+	famo_mwfn = big_mwfn.Clone()
 	overlap_matrices = []
 	for small_mwfn in small_mwfn_list:
 		overlap_matrices.append(eint.PyscfOverlap(big_mwfn, small_mwfn))
