@@ -341,16 +341,14 @@ def NaturalBondOrbital(
 				inbo = nbos.index(nbo)
 				occ = nbo.Occupancy.real
 				nbo_mwfn.Orbitals[inbo + (nbasis if spin == 2 else 0)].Occ = occ
-				output += "NBO_" + str(inbo + (nbasis if spin == 2 else 0)) + " (" + str(round(occ, 3)) + ")  ="
+				output += f"NBO_{inbo + (nbasis if spin == 2 else 0)} ({occ:.3f}) ="
 				for nho in nbo.NHOs:
 					jnho = nhos.index(nho)
 					frag = nho.Fragment
 					occ = nho.Occupancy.real
 					nho_mwfn.Orbitals[jnho + (nbasis if spin == 2 else 0)].Occ = occ
 					coef = nbo.Vector[jnho]
-					output += "  " + str(round(coef, 3)) \
-							+ " * NHO_" + str(jnho + (nbasis if spin==2 else 0)) \
-							+ " (" + str(round(occ, 3)) + ", F_" + str(frag)+ ")"
+					output += f"  {coef: .3f} * NHO_{jnho + (nbasis if spin==2 else 0)}({occ:.3f}, F_{frag})"
 				output += "\n"
 		print(output)
 		I = np.zeros([nbasis, nbasis])
@@ -362,4 +360,5 @@ def NaturalBondOrbital(
 		nbo_mwfn.setEnergy([0 for i in range(nbasis)], spin)
 		nbo_mwfn.setCoefficientMatrix(C @ I @ H, spin)
 	nbo_mwfn.Orthogonalize("GramSchmidt")
+	print("Warning: The indeces of orbitals and fragments above start from 0!")
 	return nho_mwfn, nbo_mwfn

@@ -46,3 +46,4 @@ def PopulationAnalyzer(mo_mwfn, method = "Lowdin", space = "occ"):
 			charge = mo_mwfn.Centers[iatom].Nuclear_charge - population
 			print("| %5d | %6s | % 10f | % 10f |" % ( iatom, symbol, population, charge))
 		print("--------------------------------------------")
+	print("Warning: The indeces of orbitals and atoms start from 0!")

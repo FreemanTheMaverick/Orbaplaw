@@ -85,9 +85,9 @@ def PrincipalInteractingOrbital(nao_mwfn, nao_info, frags):
 				pimos = pair_info[ipair]["pimos"]
 				pios = pair_info[ipair]["pios"]
 				for pimo in pimos:
-					output+="PIMO_"+str(pimo+ (nao_mwfn.getNumIndBasis() if spin==2 else 0))+" ("+str(round(O[pimo],3))+", "+str(round(I[pimo],3))+") ="
+					output += f"PIMO_{pimo + (nbasis if spin == 2 else 0)} ({O[pimo]: .3f}, {I[pimo]:.3f}) ="
 					for pio in pios:
-						output+="  "+str(round(Y[pio,pimo],3))+" * PIO_"+str(pio+ (nao_mwfn.getNumIndBasis() if spin==2 else 0))+" ("+str(round(N[pio],3))+")"
+						output += f"  {Y[pio,pimo]: .3f} * PIO_{pio+ (nbasis if spin==2 else 0)} ({N[pio]:.3f})"
 					output+="\n"
 		print(output)
 		pio_mwfn.setOccupation(N, spin)
@@ -96,4 +96,5 @@ def PrincipalInteractingOrbital(nao_mwfn, nao_info, frags):
 		pimo_mwfn.setOccupation(O, spin)
 		pimo_mwfn.setEnergy(I, spin)
 		pimo_mwfn.setCoefficientMatrix(C @ T @ Y, spin)
+	print("Warning: The indeces of orbitals and fragments above start from 0!")
 	return pio_mwfn, pimo_mwfn
