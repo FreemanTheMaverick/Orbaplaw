@@ -41,8 +41,9 @@ def oldPipekMezey(C0,S,basis_indices_by_center,charge_type,conv):
 import Maniverse as mv
 
 def PipekMezey(Qrefs):
-	M = mv.Orthogonal(np.eye(Qrefs[0].shape[1]), True)
-	def func(U, order):
+	M = mv.Iterate([mv.Orthogonal(np.eye(Qrefs[0].shape[1]))], True)
+	def func(Us, order):
+		U = Us[0]
 		Qdiags = [ np.diag(np.diag(U.T @ Qref @ U)) for Qref in Qrefs ]
 		L = 0
 		for Qdiag in Qdiags:
@@ -62,7 +63,7 @@ def PipekMezey(Qrefs):
 					hess1 += Qref @ v @ Qdiag
 					hess2 += QrefU @ np.diag(np.diag(QrefU.T @ v))
 				return - 4 * hess1 - 8 * hess2
-		return L, Ge, He
+		return L, [Ge], [He]
 	L = 0
 	tr_setting = mv.TrustRegionSetting()
 	tol0 = 1e-8 * M.getDimension()
@@ -72,4 +73,4 @@ def PipekMezey(Qrefs):
 			func, tr_setting, (tol0, tol1, tol2),
 			0.001, 1, 1000, L, M, 1
 	)
-	return M.P
+	return M.Point

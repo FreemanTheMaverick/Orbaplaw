@@ -22,10 +22,11 @@ def Fock_func(U, order, Eref):
 	return L, Ge, He
 
 def Fock(Eref):
-	M = mv.Orthogonal(np.eye(len(Eref)), True)
-	def func(U, order):
+	M = mv.Iterate([mv.Orthogonal(np.eye(len(Eref)))], True)
+	def func(Us, order):
+		U = Us[0]
 		L, Ge, He = Fock_func(U, order, Eref)
-		return L, Ge, He
+		return L, [Ge], [He]
 	L = 0
 	tr_setting = mv.TrustRegionSetting()
 	tol0 = 1e-8 * M.getDimension()
@@ -35,4 +36,4 @@ def Fock(Eref):
 			func, tr_setting, (tol0, tol1, tol2),
 			0.001, 1, 1000, L, M, 1
 	)
-	return M.P
+	return M.Point
