@@ -26,10 +26,11 @@ def FB_func(U, order, Wrefs, W2refSum):
 	return L, Ge, He
 
 def FosterBoys(Wrefs, W2refSum):
-	M = mv.Orthogonal(np.eye(Wrefs[0].shape[0]), True)
-	def func(U, order):
+	M = mv.Iterate([mv.Orthogonal(np.eye(Wrefs[0].shape[0]))], True)
+	def func(Us, order):
+		U = Us[0]
 		L, Ge, He = FB_func(U, order, Wrefs, W2refSum)
-		return L, Ge, He
+		return L, [Ge], [He]
 	L = 0
 	tr_setting = mv.TrustRegionSetting()
 	tol0 = 1e-8 * M.getDimension()
@@ -39,4 +40,4 @@ def FosterBoys(Wrefs, W2refSum):
 			func, tr_setting, (tol0, tol1, tol2),
 			0.001, 1, 1000, L, M, 1
 	)
-	return M.P
+	return M.Point
