@@ -40,37 +40,43 @@ def oldPipekMezey(C0,S,basis_indices_by_center,charge_type,conv):
 
 import Maniverse as mv
 
-def PipekMezey(Qrefs):
-	M = mv.Iterate([mv.Orthogonal(np.eye(Qrefs[0].shape[1]))], True)
-	def func(Us, order):
+class PipekMezeyObj(mv.Objective):
+	def __init__(self, Qrefs):
+		super().__init__()
+		self.Qrefs = Qrefs
+		self.Qdiags = None
+		self.QrefUs = None
+
+	def Calculate(self, Us, _):
 		U = Us[0]
-		Qdiags = [ np.diag(np.diag(U.T @ Qref @ U)) for Qref in Qrefs ]
-		L = 0
-		for Qdiag in Qdiags:
-			L -= np.linalg.norm(np.diag(Qdiag)) ** 2
-		Ge = np.zeros_like(U)
-		for Qref, Qdiag in zip(Qrefs, Qdiags):
-			Ge += Qref @ U @ Qdiag
-		Ge *= -4
-		QrefUs = [ Qref @ U for Qref in Qrefs ]
-		def He(v):
-			return np.zeros_like(v)
-		if order == 2:
-			def He(v):
-				hess1 = np.zeros_like(v)
-				hess2 = np.zeros_like(v)
-				for Qref, Qdiag, QrefU in zip(Qrefs, Qdiags, QrefUs):
-					hess1 += Qref @ v @ Qdiag
-					hess2 += QrefU @ np.diag(np.diag(QrefU.T @ v))
-				return - 4 * hess1 - 8 * hess2
-		return L, [Ge], [He]
-	L = 0
-	tr_setting = mv.TrustRegionSetting()
+		self.Qdiags = [ np.diag(np.diag(U.T @ Qref @ U)) for Qref in self.Qrefs ]
+		self.Value = 0
+		for Qdiag in self.Qdiags:
+			self.Value -= np.linalg.norm(np.diag(Qdiag)) ** 2
+		G = np.zeros_like(U)
+		for Qref, Qdiag in zip(self.Qrefs, self.Qdiags):
+			G -= Qref @ U @ Qdiag
+		self.Gradient = [ 4 * G ]
+		self.QrefUs = [ Qref @ U for Qref in self.Qrefs ]
+
+	def Hessian(self, Vs):
+		V = Vs[0]
+		hess1 = np.zeros_like(V)
+		hess2 = np.zeros_like(V)
+		for Qref, Qdiag, QrefU in zip(self.Qrefs, self.Qdiags, self.QrefUs):
+			hess1 += Qref @ V @ Qdiag
+			hess2 += QrefU @ np.diag(np.diag(QrefU.T @ V))
+		return [[ - 4 * hess1 - 8 * hess2 ]]
+
+def PipekMezey(Qrefs):
+	obj = PipekMezeyObj(Qrefs)
+	M = mv.Iterate(obj, [mv.Orthogonal(np.eye(Qrefs[0].shape[1]))], True)
+	tr_setting = mv.TrustRegion()
 	tol0 = 1e-8 * M.getDimension()
 	tol1 = 1e-6 * M.getDimension()
 	tol2 = 10
-	mv.TrustRegion(
-			func, tr_setting, (tol0, tol1, tol2),
-			0.001, 1, 1000, L, M, 1
+	mv.TruncatedNewton(
+			M, tr_setting, (tol0, tol1, tol2),
+			0.001, 1000, 1
 	)
 	return M.Point
