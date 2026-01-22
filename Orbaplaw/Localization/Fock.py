@@ -24,7 +24,7 @@ class FockObj(mv.Objective):
 		self.UTFref = U[0].T @ self.Fref
 
 	def Hessian(self, V):
-		return [[ self.twoF2ref @ V[0] - self.fourFref @ V[0] @ self.DiagF - self.eightFrefU @ np.diag(np.diag(self.UTFref @ V[0])) ]]
+		return [ self.twoF2ref @ V[0] - self.fourFref @ V[0] @ self.DiagF - self.eightFrefU @ np.diag(np.diag(self.UTFref @ V[0])) ]
 
 def Fock(Eref):
 	obj = FockObj(Eref)

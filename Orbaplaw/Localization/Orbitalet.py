@@ -18,7 +18,7 @@ class OrbitaletObj(mv.Objective):
 		self.Gradient = [ self.Wfb * self.FosterBoysObj.Gradient[0] + self.Wf * self.FockObj.Gradient[0] ]
 
 	def Hessian(self, Vs):
-		return [[ self.Wfb * self.FosterBoysObj.Hessian(Vs)[0][0] + self.Wf * self.FockObj.Hessian(Vs)[0][0] ]]
+		return [ self.Wfb * self.FosterBoysObj.Hessian(Vs)[0] + self.Wf * self.FockObj.Hessian(Vs)[0] ]
 
 def Orbitalet(Wrefs, W2refSum, Eref, gamma_e):
 	obj = OrbitaletObj(Wrefs, W2refSum, Eref, gamma_e)
