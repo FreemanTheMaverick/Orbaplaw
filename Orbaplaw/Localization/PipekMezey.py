@@ -66,7 +66,7 @@ class PipekMezeyObj(mv.Objective):
 		for Qref, Qdiag, QrefU in zip(self.Qrefs, self.Qdiags, self.QrefUs):
 			hess1 += Qref @ V @ Qdiag
 			hess2 += QrefU @ np.diag(np.diag(QrefU.T @ V))
-		return [[ - 4 * hess1 - 8 * hess2 ]]
+		return [ - 4 * hess1 - 8 * hess2 ]
 
 def PipekMezey(Qrefs):
 	obj = PipekMezeyObj(Qrefs)

@@ -32,7 +32,7 @@ class FosterBoysObj(mv.Objective):
 		HV = self.twoW2refSum @ V
 		for fourWref, DiagW, eightWrefU, UTWref in zip(self.fourWrefs, self.DiagWs, self.eightWrefUs, self.UTWrefs):
 			HV -= fourWref @ V @ DiagW + eightWrefU @ np.diag(np.diag(UTWref @ V ))
-		return [[ HV ]]
+		return [ HV ]
 
 def FosterBoys(Wrefs, W2refSum):
 	obj = FosterBoysObj(Wrefs, W2refSum)
