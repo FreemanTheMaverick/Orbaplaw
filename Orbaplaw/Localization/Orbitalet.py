@@ -23,12 +23,10 @@ class OrbitaletObj(mv.Objective):
 def Orbitalet(Wrefs, W2refSum, Eref, gamma_e):
 	obj = OrbitaletObj(Wrefs, W2refSum, Eref, gamma_e)
 	M = mv.Iterate(obj, [mv.Orthogonal(np.eye(len(Eref)))], True)
-	tr_setting = mv.TrustRegion()
+	tr = mv.TrustRegion()
+	cg = mv.ConjugateGradient(M, 0, 1, (1e-3, 1e-3), M.getDimension(), 1)
 	tol0 = 1e-8 * M.getDimension()
 	tol1 = 1e-5 * M.getDimension()
 	tol2 = 10
-	mv.TruncatedNewton(
-			M, tr_setting, (tol0, tol1, tol2),
-			0.001, 1000, 1
-	)
+	mv.Newton(M, tr, cg, (tol0, tol1, tol2), 1000, 1)
 	return M.Point
