@@ -352,9 +352,9 @@ def NaturalBondOrbital(
 				output += "\n"
 		print(output)
 		I = np.zeros([nbasis, nbasis])
-		I[:, :len(nhos)] = getMatrix(nhos)
+		I[:P.shape[0], :len(nhos)] = getMatrix(nhos)
 		H = np.zeros([nbasis, nbasis])
-		H[:, :len(nbos)] = getMatrix(nbos)
+		H[:P.shape[0], :len(nbos)] = getMatrix(nbos)
 		nho_mwfn.setEnergy([0 for i in range(nbasis)], spin)
 		nho_mwfn.setCoefficientMatrix(C @ I, spin)
 		nbo_mwfn.setEnergy([0 for i in range(nbasis)], spin)

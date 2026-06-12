@@ -30,7 +30,7 @@ def PM_jac(U,C0,S,basis_indices_by_center,charge_type):
     return Gamma@U.T-U@Gamma.T # Riemannian derivative
 
 def PM_conv(x,f,g,xlast,flast,glast):
-    return np.max(np.abs(g))<1e-3 or abs(f-flast)<5e-6
+    return np.max(np.abs(g))<1e-5 or abs(f-flast)<5e-6
 
 def oldPipekMezey(C0,S,basis_indices_by_center,charge_type,conv):
     func=lambda x:PM_func(x,C0,S,basis_indices_by_center,charge_type)
