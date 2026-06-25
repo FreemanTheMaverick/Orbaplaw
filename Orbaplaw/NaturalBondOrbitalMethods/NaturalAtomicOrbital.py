@@ -327,6 +327,9 @@ def MinimalShells(an,nc): # an - Atomic number; nc - Nuclear charge
 		case 40:
 			return [5,3,2,0,0,0,0] # Zr
 		case 41:
+			match nc:
+				case 13:
+					return [2,1,1,0,0,0,0]
 			return [5,3,2,0,0,0,0] # Nb
 		case 42:
 			return [5,3,2,0,0,0,0] # Mo
@@ -349,6 +352,9 @@ def MinimalShells(an,nc): # an - Atomic number; nc - Nuclear charge
 		case 48:
 			return [5,3,2,0,0,0,0] # Cd
 		case 49:
+			match nc:
+				case 3:
+					return [1,1,0,0,0,0,0]
 			return [5,4,2,0,0,0,0] # In
 		case 50:
 			match nc:
@@ -494,6 +500,11 @@ def MinimalShells(an,nc): # an - Atomic number; nc - Nuclear charge
 				case 32:
 					return [3,2,2,2,0,0,0]
 			return [7,5,4,2,0,0,0] # U
+		case 97:
+			match nc:
+				case 37:
+					return [3,2,2,2,0,0,0]
+			return [7,5,4,2,0,0,0] # Bk
 
 
 def NaturalAtomicOrbital(mo_mwfn, modify_minimal_shells = []):

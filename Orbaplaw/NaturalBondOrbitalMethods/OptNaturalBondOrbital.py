@@ -92,7 +92,7 @@ def group_close_indices(lst, threshold):
 	return groups
 
 
-def generateOptNaturalBondOrbital(basis_indices_by_frag,P_,T,S,maxnfrags,maxnnbos,occ_thres,multi_thres,pdeg_thres,deg_thres):
+def generateOptNaturalBondOrbital(basis_indices_by_frag, adjacency, P_, T, S, maxnfrags, maxnnbos, occ_thres, multi_thres, pdeg_thres, deg_thres):
 	# P - The NAO-based density matrix.
 	# T - The NAO coefficient matrix in AO basis set.
 	# S - The AO-based overlap matrix.
@@ -129,6 +129,17 @@ def generateOptNaturalBondOrbital(basis_indices_by_frag,P_,T,S,maxnfrags,maxnnbo
 		combs = list(it.combinations(range(nfrags_tot), nfrags)) # Combinations of fragments.
 		npnbos = 0
 		for comb in combs:
+			if len(comb)==2:
+				continue
+			bonded = True
+			for ifrag in range(len(comb)):
+				fragi = list(comb)[ifrag]
+				for jfrag in range(ifrag):
+					fragj = list(comb)[jfrag]
+					if not adjacency[fragi][fragj]:
+						bonded = False
+			if not bonded:
+				continue
 			Pblock = np.asarray(P.loc[idx[list(comb), :], idx[list(comb), :]]) # The density matrix block of this combination
 			Nblock, Hblock = np.linalg.eigh(Pblock) # Occupation and orbital vectors
 			to_delete = np.where(Nblock < occ_thres)[0] # Ignoring all small occupancies.
@@ -165,43 +176,56 @@ def generateOptNaturalBondOrbital(basis_indices_by_frag,P_,T,S,maxnfrags,maxnnbo
 		if len(pNBO.columns) == 0:
 			continue
 
-		t = []
-		C = []
-		basis_list = []
-		for comb, subdf in pNBO.groupby(level=0, axis=1):
-			count = 0
-			this_t = []
-			this_C = []
-			basis_list.append([index[1] for index in P.columns if index[0] in comb]) # Basis indices of this combination [(frag, basis)]
-			for i in subdf.columns:
-				count += 1
-				n = min(pNBO.at[("occ", -1, -1), i], 0.99999)
-				this_t.append([ np.arctanh(2 * n - 1) ])
-				this_C.append(pNBO.loc[idx["coeff", list(comb), :], idx[:, i[1]]].T.values[0])
-			this_t = np.array(this_t)
-			this_C = np.array(this_C).T
-			t.append(mv.Euclidean(this_t))
-			C.append(mv.Stiefel(this_C))
-		obj = Obj(P.to_numpy(), basis_list)
-		M = mv.Iterate(obj, t + C)
-		converged = mv.LBFGS(
-				M, (1e-5, 1e-5, 1e-5),
-				100, 1100, 0.1, 0.75, 150, 1
-		)
-		if not converged:
-			raise RuntimeError("Not converged!")
-		kpnbo = 0;
-		nmats = len(t)
-		for imat in range(nmats):
-			for j in range(M.Ms[imat].P.shape[0]):
-				pNBO.loc[idx["occ", -1, -1], idx[:, kpnbo]] = ( np.tanh(M.Ms[imat].P[j, 0]) + 1 ) / 2
-				pNBO.loc[idx["coeff", :, basis_list[imat]], idx[:, kpnbo]] = M.Ms[imat + nmats].P[:, j]
-				kpnbo += 1
-		for combi, ipnbo in pNBO.columns:
-			if pNBO.at[idx["occ", -1, -1], idx[combi, ipnbo]] < occ_thres:
-				pNBO.drop((combi, ipnbo), axis=1)
-		pNBO.columns = pNBO.columns.set_levels(range(npnbos_tot, npnbos_tot + len(pNBO.columns)), level=1)
-		npnbos_tot += len(pNBO.columns)
+		while True:
+			t = []
+			C = []
+			basis_list = []
+			for comb, subdf in pNBO.groupby(level=0, axis=1):
+				count = 0
+				this_t = []
+				this_C = []
+				basis_list.append([index[1] for index in P.columns if index[0] in comb]) # Basis indices of this combination [(frag, basis)]
+				for i in subdf.columns:
+					count += 1
+					n = min(pNBO.at[("occ", -1, -1), i], 0.99999)
+					this_t.append([ np.arctanh(2 * n - 1) ])
+					this_C.append(pNBO.loc[idx["coeff", list(comb), :], idx[:, i[1]]].T.values[0])
+				this_t = np.array(this_t)
+				this_C = np.array(this_C).T
+				t.append(mv.Euclidean(this_t))
+				C.append(mv.Stiefel(this_C))
+			obj = Obj(P.to_numpy(), basis_list)
+			M = mv.Iterate(obj, t + C)
+			converged = mv.LBFGS(
+					M, (1e-5, 1e-4, 1e-3),
+					100, 10000, 0.1, 0.75, 10, 1
+			)
+			if not converged:
+				raise RuntimeError("Not converged!")
+			kpnbo = 0;
+			nmats = len(t)
+			print(pNBO.columns)
+			for imat in range(nmats):
+				for j in range(M.Ms[imat].P.shape[0]):
+					print(kpnbo)
+					pNBO.loc[idx["occ", -1, -1], idx[:, kpnbo]] = ( np.tanh(M.Ms[imat].P[j, 0]) + 1 ) / 2
+					pNBO.loc[idx["coeff", :, basis_list[imat]], idx[:, kpnbo]] = M.Ms[imat + nmats].P[:, j]
+					kpnbo += 1
+			for combi, ipnbo in pNBO.columns:
+				if pNBO.at[idx["occ", -1, -1], idx[combi, ipnbo]] < occ_thres:
+					pNBO.drop((combi, ipnbo), axis=1, inplace=True)
+			if len(pNBO.columns) == 0:
+				break
+			else:
+				level0_old = pNBO.columns.get_level_values(0)
+				level1_new = range(npnbos_tot, npnbos_tot + len(pNBO.columns)) if kpnbo == len(pNBO.columns) else range(len(pNBO.columns))
+				pNBO.columns = pd.MultiIndex.from_arrays([level0_old, level1_new])
+			if kpnbo == len(pNBO.columns):
+				npnbos_tot += len(pNBO.columns)
+				break
+
+		if len(pNBO.columns) == 0:
+			continue
 
 		# Identifying and partially localizing the degenerate orbitals
 		skip_list = []
@@ -215,17 +239,17 @@ def generateOptNaturalBondOrbital(basis_indices_by_frag,P_,T,S,maxnfrags,maxnnbo
 				if abs(
 						pNBO.at[idx["occ", -1, -1], idx[comb, ipnbo]]
 						- pNBO.at[idx["occ", -1, -1], idx[comb, jpnbo]]
-				) < deg_thres:
+				) < pdeg_thres:
 					deg_list.append(jpnbo)
 			if len(deg_list) == 1:
 				continue
 			skip_list += deg_list
-			pNBO.loc[idx["coeff", :, deg_list]].fillna(0)
+			pNBO.fillna(0, inplace=True)
 			if len(comb) == 1:
 				continue
-			H = pNBO.loc[idx["coeff", :, deg_list]].to_numpy()
+			H = pNBO.loc[idx["coeff", :, :], idx[:, deg_list]].to_numpy()
 			U = loc.oldPipekMezey(T @ H, S, basis_indices_by_frag, "Lowdin", None) # T - NAO in AO basis; T@H - degenerate pNBO in AO basis
-			pNBO.loc[idx["coeff", :, deg_list]] = H @ U
+			pNBO.loc[idx["coeff", :, :], idx[:, deg_list]] = H @ U
 
 		# Subtracting the density of the pNBOs
 		for comb, ipnbo in pNBO.columns:
@@ -244,26 +268,27 @@ def generateOptNaturalBondOrbital(basis_indices_by_frag,P_,T,S,maxnfrags,maxnnbo
 		this_pNHO = pd.DataFrame(pNHO_dict, index = pNHO.index)
 		this_pNHO.columns = pd.MultiIndex.from_tuples(this_pNHO.columns)
 		replicate = []
-		for combi, ipnbo, fragi in pNHO.columns:
-			veci = pNHO.loc[idx["coeff", fragi, :], idx[:, ipnbo, fragi]].to_numpy()[:, 0]
+		for combi, ipnbo, fragi in this_pNHO.columns:
+			veci = this_pNHO.loc[idx["coeff", fragi, :], idx[:, ipnbo, fragi]].to_numpy()[:, 0]
 			if np.linalg.norm(veci) < 1e-12:
 				continue
 			for combj, jpnbo, fragj in this_pNHO.columns:
-				if combi == combj or ipnbo >= jpnbo or fragi != fragj:
+				if combi != combj or ipnbo >= jpnbo or fragi != fragj:
 					continue
 				if jpnbo in replicate:
 					continue
 				vecj = this_pNHO.loc[idx["coeff", fragj, :], idx[:, jpnbo, fragj]].to_numpy()[:, 0]
 				if np.linalg.norm(vecj) < 1e-12:
 					continue
-				if abs(np.dot(veci, vecj)) > multi_thres * np.linalg.norm(veci) * np.linalg.norm(vecj):
-					pNHO.loc[idx["coeff", fragi, :], idx[:, ipnbo, fragi]] += vecj
+				overlap = np.dot(veci, vecj)
+				if abs(overlap) > multi_thres * np.linalg.norm(veci) * np.linalg.norm(vecj):
+					this_pNHO.loc[idx["coeff", fragi, :], idx[:, ipnbo, fragi]] += vecj.reshape([-1, 1]) * np.sign(overlap)
 					replicate.append((combj, jpnbo, fragj))
 		for combi, ipnbo, fragi in this_pNHO.columns:
 			if (combi, ipnbo, fragi) in replicate:
-				this_pNHO.drop((frozenset(combi), ipnbo, fragi), axis=1)
+				this_pNHO.drop((combi, ipnbo, fragi), axis=1, inplace=True)
 			else:
-				this_pNHO.loc[idx["coeff", fragi, :], idx[combi, ipnbo, fragi]] /= np.linalg.norm(this_pNHO.loc[idx["coeff", fragi, :], idx[combi, ipnbo, fragi]])
+				this_pNHO.loc[idx["coeff", fragi, :], idx[:, ipnbo, fragi]] /= np.linalg.norm(this_pNHO.loc[idx["coeff", fragi, :], idx[:, ipnbo, fragi]])
 
 		# Merging into the pNHO list
 		pNHO = pNHO.join(this_pNHO)
@@ -282,7 +307,7 @@ def generateOptNaturalBondOrbital(basis_indices_by_frag,P_,T,S,maxnfrags,maxnnbo
 		Pblock = Ptot.loc[idx[frag, :], idx[frag, :]].to_numpy()
 		J = I.T @ Pblock @ I
 		pNHO.loc[idx["occ", -1, -1], idx[:, :, frag]] = np.diag(J)
-	pNHO = pNHO.fillna(0)
+	pNHO.fillna(0, inplace=True)
 
 	# NHO-based density matrix and occupation numbers of NHOs
 	NHOmat = pNHO.loc[idx["coeff", :, :]].to_numpy()
@@ -306,7 +331,7 @@ def generateOptNaturalBondOrbital(basis_indices_by_frag,P_,T,S,maxnfrags,maxnnbo
 		for deg_list in deg_lists:
 			if len(deg_list) == 1:
 				continue
-			I = pNHO.loc[idx["coeff", :, :], idx[combi, ipnbo, :]].to_numpy()
+			I = pNHO.loc[idx["coeff", :, :], idx[:, ipnbo, :]].to_numpy()
 			H = vecs[:, deg_list]
 			U = loc.oldPipekMezey(T @ I @ H, S, basis_indices_by_frag, "Lowdin", None) # T - NAO in AO basis
 			vecs[:, deg_list] = H @ U
@@ -318,7 +343,7 @@ def generateOptNaturalBondOrbital(basis_indices_by_frag,P_,T,S,maxnfrags,maxnnbo
 				columns=[(combi, ipnbo, jnbo)]
 			))
 			jnbo += 1
-	NBO = NBO.fillna(0)
+	NBO.fillna(0, inplace=True)
 	NBO.index = pd.MultiIndex.from_tuples(NBO.index)
 	NBO.columns = pd.MultiIndex.from_tuples(NBO.columns)
 
@@ -328,6 +353,7 @@ def OptNaturalBondOrbital(
 		nao_mwfn,
 		nao_info,
 		frags = [],
+		adjacency = None,
 		maxnfrags = -1,
 		maxnnbos = -1,
 		occ_thres = 0.95,
@@ -341,6 +367,8 @@ def OptNaturalBondOrbital(
 		else:
 			maxnfrags = len(frags)
 	frags=[[i] for i in range(nao_mwfn.getNumCenters())] if frags == [] else frags
+	if adjacency is None: # All connected
+		adjacency = np.zeros([len(frags), len(frags)]) + 1
 	basis_indices_by_center = nao_mwfn.Atom2BasisList()
 	basis_indices_by_frag = []
 	for frag in frags:
@@ -376,6 +404,7 @@ def OptNaturalBondOrbital(
 			deg_thres *= 2
 		nhos, nbos = generateOptNaturalBondOrbital(
 				basis_indices_by_frag,
+				adjacency,
 				P, C, S,
 				maxnfrags, maxnnbos,
 				occ_thres, multi_thres,
